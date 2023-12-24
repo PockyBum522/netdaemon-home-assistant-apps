@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "netdaemon.hassmodel.codegen": {
+      "version": "23.46.1",
+      "commands": [
+        "nd-codegen"
+      ]
+    }
+  }
+}
