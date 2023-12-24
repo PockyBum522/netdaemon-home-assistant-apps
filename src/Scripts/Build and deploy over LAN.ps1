@@ -32,3 +32,14 @@ ssh pockybum522-ha-ssh@192.168.1.25 -i D:\keys\DAVID-LAPTOP-2023-12-24_TO_HOME_A
 
 # End of the script
 Write-Host "ND addon restarted - Script execution completed."
+
+
+Write-Host "Open logs folder? Press Y to open, any other key to not: " -NoNewLine
+
+$key = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown');
+
+if ($key.Character -eq 'y')
+{	
+	explorer "\\192.168.1.25\config\netdaemon4\logs"
+}
+
