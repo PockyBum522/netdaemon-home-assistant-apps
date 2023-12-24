@@ -43,7 +43,7 @@ I do all of my automations in Home Assistant with NetDaemon. It's extremely nice
 Developer Tools: Useful tools such as an event logger similar to what's in HA dev tools
 
 
-Utilities
+Utilities:
   * Notification helpers
   * Extension methods
     * Mapping a number from one range to another, like Arduino's map()
