@@ -24,7 +24,7 @@ public class KitchenLightsController
         
         _logger.Information("Initialized {NamespaceLastPart} v0.01", namespaceLastPart);
         
-        _logger.Information("Deploy Test 01");
+        _logger.Information("Deploy Test 09");
         
         ha.Events.Where(e => e.EventType == "zwave_js_value_notification").Subscribe(async (e) => await HandleKitchenSwitchButtons(e));
 
