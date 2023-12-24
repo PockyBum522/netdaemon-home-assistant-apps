@@ -1,10 +1,5 @@
 Set-Location "D:\source\repos\PockyBum522 Github\netdaemon-home-assistant-apps\src\AllenStreetNetDaemonApps"
 
-# Update the codegen
-dotnet tool update -g NetDaemon.HassModel.CodeGen
-
-dotnet tool run nd-codegen
-
 # Update all nugets to latest versions
 $regex = 'PackageReference Include="([^"]*)" Version="([^"]*)"'
 

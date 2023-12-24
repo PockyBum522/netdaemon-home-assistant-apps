@@ -4,7 +4,7 @@
 $solutionPath = "D:\source\repos\PockyBum522 Github\netdaemon-home-assistant-apps\src\AllenStreetNetDaemonApps"
 $solutionFilename = "AllenStreetNetDaemonApps.csproj"
 
-$buildPath = "\\192.168.1.25\config\netdaemon3\"
+$buildPath = "\\192.168.1.25\config\netdaemon4\"
 
 # Step 1: Run dotnet build
 Set-Location $solutionPath
