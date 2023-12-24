@@ -1,5 +1,5 @@
 # Update the codegen
-dotnet tool update joysoftware.netdaemon.hassmodel.codegen
+dotnet tool update -g NetDaemon.HassModel.CodeGen
 
 # Update all nugets to latest versions
 $regex = 'PackageReference Include="([^"]*)" Version="([^"]*)"'
@@ -14,6 +14,7 @@ ForEach ($file in Get-ChildItem . -Recurse | Where-Object { $_.Extension -like "
     ForEach ($package in $packages) {
         Write-Host "Update $file package :$package"  -ForegroundColor Magenta
         $fullName = $file.FullName
-        Invoke-Expression "dotnet add $fullName package $package"
+        
+        & dotnet add $fullName package $package
     }
 }
