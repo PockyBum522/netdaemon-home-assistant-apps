@@ -1,6 +1,8 @@
 # Update the codegen
 dotnet tool update -g NetDaemon.HassModel.CodeGen
 
+dotnet tool run nd-codegen
+
 # Update all nugets to latest versions
 $regex = 'PackageReference Include="([^"]*)" Version="([^"]*)"'
 
