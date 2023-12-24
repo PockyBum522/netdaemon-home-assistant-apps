@@ -457,3 +457,5 @@ $RECYCLE.BIN/
 appsettings.json
 HomeAssistantGenerated.cs
 SECRETS.cs
+src/AllenStreetNetDaemonApps/NetDaemonCodegen/EntityMetaData.json
+src/AllenStreetNetDaemonApps/NetDaemonCodegen/ServicesMetaData.json
