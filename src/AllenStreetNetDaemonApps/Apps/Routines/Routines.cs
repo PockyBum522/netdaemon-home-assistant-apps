@@ -1,15 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using HomeAssistantGenerated;
-using NetDaemon.AppModel;
-using NetDaemon.Extensions.Scheduler;
-using NetDaemon.HassModel;
-using NetDaemon.HassModel.Entities;
-using NetDaemonApps.Utilities;
-using Serilog;
-
-namespace NetDaemonApps.apps.Routines;
+﻿namespace AllenStreetNetDaemonApps.Apps.Routines;
 
 [NetDaemonApp]
 public class Routines

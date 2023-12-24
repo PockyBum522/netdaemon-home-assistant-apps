@@ -1,4 +1,4 @@
-﻿namespace NetDaemonApps.Utilities;
+﻿namespace AllenStreetNetDaemonApps.Utilities;
 
 public static class Extensions
 {

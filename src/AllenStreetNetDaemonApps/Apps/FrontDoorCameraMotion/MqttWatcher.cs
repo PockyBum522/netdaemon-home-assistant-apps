@@ -1,17 +1,7 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using HomeAssistantGenerated;
-using MQTTnet;
+﻿using MQTTnet;
 using MQTTnet.Client;
-using NetDaemon.AppModel;
-using NetDaemon.Extensions.Scheduler;
-using NetDaemon.HassModel;
-using NetDaemonApps.Utilities.NotificationUtilities;
-using Serilog;
 
-namespace NetDaemonApps.apps.FrontDoorCameraMotion;
+namespace AllenStreetNetDaemonApps.Apps.FrontDoorCameraMotion;
 
 [NetDaemonApp]
 public class MqttWatcher 

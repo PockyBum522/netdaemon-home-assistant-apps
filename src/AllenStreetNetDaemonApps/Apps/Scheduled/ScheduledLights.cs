@@ -1,13 +1,6 @@
-﻿using System;
-using System.Linq;
-using CoordinateSharp;
-using HomeAssistantGenerated;
-using NetDaemon.AppModel;
-using NetDaemon.Extensions.Scheduler;
-using NetDaemon.HassModel;
-using Serilog;
+﻿using CoordinateSharp;
 
-namespace NetDaemonApps.apps.Scheduled;
+namespace AllenStreetNetDaemonApps.Apps.Scheduled;
 
 [NetDaemonApp]
 public class ScheduledLights

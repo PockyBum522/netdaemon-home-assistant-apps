@@ -1,12 +1,4 @@
-using System.Linq;
-using HomeAssistantGenerated;
-using NetDaemon.AppModel;
-using NetDaemon.Extensions.Scheduler;
-using NetDaemon.HassModel;
-using Serilog;
-using ILogger = Serilog.ILogger;
-
-namespace NetDaemonApps.DeveloperTools;
+namespace AllenStreetNetDaemonApps.DeveloperTools;
 
 [NetDaemonApp]
 public class AllEventsListener

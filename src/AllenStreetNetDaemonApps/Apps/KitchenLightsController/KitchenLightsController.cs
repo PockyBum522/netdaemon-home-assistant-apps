@@ -1,17 +1,4 @@
-using System;
-using System.Linq;
-using System.Reactive.Linq;
-using System.Threading.Tasks;
-using HomeAssistantGenerated;
-using NetDaemon.AppModel;
-using NetDaemon.Extensions.Scheduler;
-using NetDaemon.HassModel;
-using NetDaemon.HassModel.Entities;
-using NetDaemonApps.Models;
-using NetDaemonApps.Utilities;
-using Serilog;
-
-namespace NetDaemonApps.apps.KitchenLightsController;
+namespace AllenStreetNetDaemonApps.Apps.KitchenLightsController;
 
 [NetDaemonApp]
 public class KitchenLightsController
@@ -36,6 +23,8 @@ public class KitchenLightsController
             .CreateLogger();
         
         _logger.Information("Initialized {NamespaceLastPart} v0.01", namespaceLastPart);
+        
+        _logger.Information("Deploy Test 01");
         
         ha.Events.Where(e => e.EventType == "zwave_js_value_notification").Subscribe(async (e) => await HandleKitchenSwitchButtons(e));
 

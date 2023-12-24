@@ -1,10 +1,4 @@
-﻿using System;
-using System.IO;
-using HomeAssistantGenerated;
-using NetDaemon.HassModel;
-using Serilog;
-
-namespace NetDaemonApps.apps.FrontDoorCameraMotion;
+﻿namespace AllenStreetNetDaemonApps.Apps.FrontDoorCameraMotion;
 
 public class CameraImageTaker
 {

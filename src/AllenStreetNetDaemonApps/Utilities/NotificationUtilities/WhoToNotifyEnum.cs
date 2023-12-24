@@ -1,4 +1,4 @@
-﻿namespace NetDaemonApps.Utilities.NotificationUtilities;
+﻿namespace AllenStreetNetDaemonApps.Utilities.NotificationUtilities;
 
 public enum WhoToNotify
 {

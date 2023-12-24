@@ -1,18 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Sockets;
-using System.Threading.Tasks;
-using HomeAssistantGenerated;
-using NetDaemon.AppModel;
-using NetDaemon.Extensions.Scheduler;
-using NetDaemon.HassModel;
-using NetDaemonApps.apps.FrontDoorNfcReader.Models;
-using NetDaemonApps.Utilities.NotificationUtilities;
-using Serilog;
-using ILogger = Serilog.ILogger;
 
-namespace NetDaemonApps.apps.FrontDoorNfcReader;
+namespace AllenStreetNetDaemonApps.Apps.FrontDoorNfcReader;
 
 [NetDaemonApp]
 public class MainController

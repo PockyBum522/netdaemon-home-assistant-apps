@@ -1,7 +1,4 @@
-﻿using System;
-using HomeAssistantGenerated;
-
-namespace NetDaemonApps.apps.DoorsLockAfterTimePeriod.Models;
+﻿namespace AllenStreetNetDaemonApps.Apps.DoorsLockAfterTimePeriod.Models;
 
 public class AutomaticallyLockableLock
 {

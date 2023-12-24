@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace NetDaemonApps.Models;
+namespace AllenStreetNetDaemonApps.Models;
 
 public class ZWaveDataElementValue
 {

@@ -1,16 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using HomeAssistantGenerated;
-using NetDaemon.AppModel;
-using NetDaemon.Extensions.Scheduler;
-using NetDaemon.HassModel;
-using NetDaemonApps.apps.DoorsLockAfterTimePeriod.Models;
-using NetDaemonApps.Utilities.NotificationUtilities;
-using Serilog;
+﻿using AllenStreetNetDaemonApps.Apps.DoorsLockAfterTimePeriod.Models;
 
-namespace NetDaemonApps.apps.DoorsLockAfterTimePeriod;
+namespace AllenStreetNetDaemonApps.Apps.DoorsLockAfterTimePeriod;
 
 [NetDaemonApp]
 public class LockController

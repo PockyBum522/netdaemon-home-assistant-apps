@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using NetDaemon.HassModel;
-using ILogger = Serilog.ILogger;
-
-namespace NetDaemonApps.Utilities.NotificationUtilities;
+﻿namespace AllenStreetNetDaemonApps.Utilities.NotificationUtilities;
 
 public class TextNotifier
 {

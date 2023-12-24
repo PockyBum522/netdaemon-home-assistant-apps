@@ -1,4 +1,4 @@
-﻿namespace NetDaemonApps.apps.FrontDoorNfcReader.Models;
+﻿namespace AllenStreetNetDaemonApps.Apps.FrontDoorNfcReader.Models;
 
 public class NfcTag
 {

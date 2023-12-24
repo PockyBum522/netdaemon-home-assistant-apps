@@ -1,9 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using HomeAssistantGenerated;
-using Serilog;
-
-namespace NetDaemonApps.Utilities;
+﻿namespace AllenStreetNetDaemonApps.Utilities;
 
 public class WeatherUtilities
 {

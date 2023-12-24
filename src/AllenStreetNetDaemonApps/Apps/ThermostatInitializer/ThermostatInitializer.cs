@@ -1,15 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using HomeAssistantGenerated;
-using NetDaemon.AppModel;
-using NetDaemon.Extensions.Scheduler;
-using NetDaemon.HassModel;
-using NetDaemonApps.Utilities;
-using Serilog;
-
-namespace NetDaemonApps.apps.ThermostatInitializer;
+﻿namespace AllenStreetNetDaemonApps.Apps.ThermostatInitializer;
 
 [NetDaemonApp]
 public class ThermostatInitializer : IAsyncInitializable

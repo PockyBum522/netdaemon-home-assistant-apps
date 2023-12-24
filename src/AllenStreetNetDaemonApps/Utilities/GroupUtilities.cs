@@ -1,10 +1,4 @@
-﻿using System.Collections.Generic;
-using HomeAssistantGenerated;
-using NetDaemon.HassModel;
-using NetDaemon.HassModel.Entities;
-using Serilog;
-
-namespace NetDaemonApps.Utilities;
+﻿namespace AllenStreetNetDaemonApps.Utilities;
 
 public static class GroupUtilities
 {

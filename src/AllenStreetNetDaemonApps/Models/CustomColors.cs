@@ -1,4 +1,4 @@
-﻿namespace NetDaemonApps.Models;
+﻿namespace AllenStreetNetDaemonApps.Models;
 
 public static class CustomColors
 {
