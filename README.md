@@ -1,5 +1,5 @@
 # PockyBum522's NetDaemon Apps
-These are the current, used way more than daily home automations for my home. 
+These are the current, used (way more frequently than) daily home automations for my home. 
 
 I do all of my automations in Home Assistant with NetDaemon. It's extremely nice to do complex automations with as I was already familiar with C#. Being able to work in something I'm used to for home automation has been quite enjoyable.
 
