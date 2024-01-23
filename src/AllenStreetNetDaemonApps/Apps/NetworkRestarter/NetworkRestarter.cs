@@ -76,7 +76,7 @@ public class NetworkRestarter
             
             await TurnOffMasterBathroomCabinetNetworkEquipment();
 
-            await TurnOffMikrotikMainRouterViaSsh();
+            TurnOffMikrotikMainRouterViaSsh();
             
             // After we've finished, reset dashboard controls and lazy thread safety bool:
             _networkRestartToggle.TurnOff();
@@ -87,7 +87,7 @@ public class NetworkRestarter
         
     }
 
-    private async Task TurnOffMikrotikMainRouterViaSsh()
+    private void TurnOffMikrotikMainRouterViaSsh()
     {
         throw new NotImplementedException();
     }
