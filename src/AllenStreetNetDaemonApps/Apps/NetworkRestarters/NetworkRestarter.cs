@@ -312,13 +312,11 @@ public class NetworkRestarter
         options.DontFragment = true;
 
         // Create a buffer of 32 bytes of data to be transmitted.
-        var data = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+        const string data = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+        const int timeout = 999;
         var buffer = Encoding.ASCII.GetBytes (data);
-        var timeout = 999;
         var reply = pingSender.Send ("1.1.1.1", timeout, buffer, options);
         
-        if (reply is { Status: IPStatus.Success, RoundtripTime: < 200 }) return true;
-
-        return false;
+        return reply is { Status: IPStatus.Success, RoundtripTime: < 200 };
     }
 }
