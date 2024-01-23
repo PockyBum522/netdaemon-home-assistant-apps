@@ -20,13 +20,13 @@ public class CameraImageTaker
 
     public string CaptureFontDoorImage()
     {
-        _logger.Debug("Last motion at: {LastMotionAt}, current time: {Now}", _lastMotionSeenAt, DateTimeOffset.Now);
+        _logger.Debug("CaptureFontDoorImage last motion at: {LastMotionAt}, current time: {Now}", _lastMotionSeenAt, DateTimeOffset.Now);
 
         Directory.CreateDirectory(CameraSnapshotsDirectory);
 
         var fileSafeTimestamp = DateTimeOffset.Now.ToString("yyyy-MM-dd_HH-mm-ss.ff");
 
-        var newImageFilename = fileSafeTimestamp + ".jpg";
+        var newImageFilename = "frontDoorCamClose_" + fileSafeTimestamp + ".jpg";
 
         var fullPathToMedia = Path.Join(MediaSnapshotsDirectory, newImageFilename);
         var fullPathToLocal = Path.Join(CameraSnapshotsDirectory, newImageFilename);
@@ -58,6 +58,29 @@ public class CameraImageTaker
             _logger.Information("Deleting old snapshot: {Path}", filePath);
             File.Delete(filePath);
         }
+    }
+
+    public string CaptureFontDoorImageFromFarCam()
+    {
+        _logger.Debug("CaptureFontDoorImageFromFarCam last motion at: {LastMotionAt}, current time: {Now}", _lastMotionSeenAt, DateTimeOffset.Now);
+
+        Directory.CreateDirectory(CameraSnapshotsDirectory);
+
+        var fileSafeTimestamp = DateTimeOffset.Now.ToString("yyyy-MM-dd_HH-mm-ss.ff");
+
+        var newImageFilename = "frontDoorCamFar_" + fileSafeTimestamp + ".jpg";
+
+        var fullPathToMedia = Path.Join(MediaSnapshotsDirectory, newImageFilename);
+        var fullPathToLocal = Path.Join(CameraSnapshotsDirectory, newImageFilename);
+        
+        _entities.Camera.FrontYardFromSwCorner.Snapshot(fullPathToMedia);
+        _entities.Camera.FrontYardFromSwCorner.Snapshot(fullPathToLocal);
+        
+        _logger.Debug("Saving images to: {MediaPath} and {LocalPath}", fullPathToMedia, fullPathToLocal);
+        
+        DeleteImagesOlderThan(TimeSpan.FromDays(90));
+        
+        return newImageFilename;
     }
 }
 

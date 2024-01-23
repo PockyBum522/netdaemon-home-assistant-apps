@@ -28,14 +28,14 @@ public class MainController
         
         _logger = new LoggerConfiguration()
             .Enrich.WithProperty("netDaemonLogging", $"Serilog{GetType().Name}Context")
-            .MinimumLevel.Warning()
+            .MinimumLevel.Debug()
             .WriteTo.Console()
             .WriteTo.File($"logs/{namespaceLastPart}/{GetType().Name}_.log", rollingInterval: RollingInterval.Day)
             .CreateLogger();
         
         _loopLogger = new LoggerConfiguration()
             .Enrich.WithProperty("netDaemonLogging", $"Serilog{GetType().Name}Context")
-            .MinimumLevel.Warning()
+            .MinimumLevel.Debug()
             .WriteTo.Console()
             .WriteTo.File($"logs/{namespaceLastPart}/{GetType().Name}_SCHEDULED_CHECK.log", rollingInterval: RollingInterval.Day)
             .CreateLogger();
@@ -43,12 +43,15 @@ public class MainController
         _lastTagScannedTime = DateTimeOffset.Now;
         
         _logger.Information("Initialized {NamespaceLastPart} v0.02", namespaceLastPart);
-
+        
         _textNotifier = new TextNotifier(_logger, ha);
         
         // Two seconds works fine. 0.25 seconds does not ever see UDP message
-        scheduler.RunEvery(TimeSpan.FromSeconds(1), async () => await CheckForUdpMessage());
-        scheduler.RunEvery(TimeSpan.FromSeconds(1800), () => LogDebugStatus());
+        
+        // Disabled in preparation for moving reader to MQTT
+        
+        // scheduler.RunEvery(TimeSpan.FromSeconds(1), async () => await CheckForUdpMessage());
+        // scheduler.RunEvery(TimeSpan.FromSeconds(10), () => LogDebugStatus());
     }
 
     private void LogDebugStatus()
