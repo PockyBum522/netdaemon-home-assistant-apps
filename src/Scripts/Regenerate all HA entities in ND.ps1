@@ -4,3 +4,5 @@ Set-Location "D:\source\repos\PockyBum522 Github\netdaemon-home-assistant-apps\s
 dotnet tool update -g NetDaemon.HassModel.CodeGen
 
 dotnet tool run nd-codegen
+
+Set-Location "D:\source\repos\PockyBum522 Github\netdaemon-home-assistant-apps\src\Scripts"

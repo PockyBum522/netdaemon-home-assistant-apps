@@ -17,3 +17,5 @@ ForEach ($file in Get-ChildItem . -Recurse | Where-Object { $_.Extension -like "
         & dotnet add $fullName package $package
     }
 }
+
+Set-Location "D:\source\repos\PockyBum522 Github\netdaemon-home-assistant-apps\src\Scripts"

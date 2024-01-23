@@ -49,3 +49,4 @@ if ($key.Character -eq 'y')
 	explorer "\\192.168.1.25\config\netdaemon4\logs"
 }
 
+Set-Location "D:\source\repos\PockyBum522 Github\netdaemon-home-assistant-apps\src\Scripts"
