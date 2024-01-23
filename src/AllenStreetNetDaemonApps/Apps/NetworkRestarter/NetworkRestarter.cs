@@ -1,4 +1,7 @@
-﻿namespace AllenStreetNetDaemonApps.Apps.NetworkRestarter;
+﻿using Renci.SshNet;
+using Renci.SshNet.Common;
+
+namespace AllenStreetNetDaemonApps.Apps.NetworkRestarter;
 
 [NetDaemonApp]
 public class NetworkRestarter
@@ -11,7 +14,7 @@ public class NetworkRestarter
     private readonly TextNotifier _textNotifier;
 
     private bool _networkIsRestarting;
-
+    
     public NetworkRestarter(IHaContext ha, INetDaemonScheduler scheduler)
     {
         _ha = ha;
@@ -59,9 +62,10 @@ public class NetworkRestarter
                 "Network Restart in 20s",
                 $"Network restarting in 20 seconds.{nl}Please turn off restart network switch if this is not desired.",
                 new List<WhoToNotify>(){WhoToNotify.Alyssa});
-
-            await Task.Delay(TimeSpan.FromSeconds(25));
-        
+            
+            // TODO: Make this 25s when finished
+            await Task.Delay(TimeSpan.FromSeconds(5));
+            
             // Second check after 25s to make sure they really meant to
             if (_networkRestartToggle.State != "on") return;
         
@@ -70,13 +74,14 @@ public class NetworkRestarter
                 $"Network restarting imminently.{nl}Please follow progress in ND logs for NetworkRestarter.",
                 new List<WhoToNotify>(){WhoToNotify.Alyssa});
         
+            // Leave this for lazy threading block
             await Task.Delay(TimeSpan.FromSeconds(5));
             
             await TurnOffLaundryRoomNetworkEquipment();
             
-            await TurnOffMasterBathroomCabinetNetworkEquipment();
-
-            ShutdownMikrotikMainRouterViaSsh();
+            // await TurnOffMasterBathroomCabinetNetworkEquipment();
+            //
+            // await ShutdownMikrotikMainRouterViaSsh();
             
             // After we've finished, reset dashboard controls and lazy thread safety bool:
             _networkRestartToggle.TurnOff();
@@ -87,9 +92,47 @@ public class NetworkRestarter
         
     }
 
-    private void ShutdownMikrotikMainRouterViaSsh()
+    private async Task ShutdownMikrotikMainRouterViaSsh()
     {
-        throw new NotImplementedException();
+        var privateKeyFilename = "tik-routr-priv";
+
+        try
+        {
+            await Task.Delay(TimeSpan.FromSeconds(1));
+        
+            File.WriteAllText(privateKeyFilename, SECRETS.RouterSshPrivateKey);
+        
+            // Setup Credentials and Server Information
+            var connectionInfo = new ConnectionInfo("192.168.1.1", 22, SECRETS.RouterSshUsername,
+                [
+                    new PrivateKeyAuthenticationMethod(SECRETS.RouterSshUsername,
+                    [
+                        new PrivateKeyFile(privateKeyFilename,"")
+                    ])
+                ]
+            );
+
+            // Execute a (SHELL) Command - prepare upload directory
+            using var sshclient = new SshClient(connectionInfo);
+        
+            sshclient.Connect();
+
+            using var cmd = sshclient.CreateCommand("/system shutdown");
+            cmd.Execute();
+                
+            _logger.Information("SSH Command > {Text}", cmd.CommandText);
+            _logger.Information("Exit status value = {Value}", cmd.ExitStatus);
+
+            sshclient.Disconnect();
+
+            await Task.Delay(TimeSpan.FromSeconds(1));
+        
+            File.Delete(privateKeyFilename);
+        }
+        catch (SshConnectionException)
+        {
+            _logger.Information("SSH Connection exception raised! Router just likely shut down properly");
+        }
     }
 
     private async Task TurnOffMasterBathroomCabinetNetworkEquipment()

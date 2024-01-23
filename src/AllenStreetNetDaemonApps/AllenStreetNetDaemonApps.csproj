@@ -39,5 +39,6 @@
 		<PackageReference Include="CoordinateSharp" Version="2.21.1.1" />
         <PackageReference Include="MQTTnet" Version="4.3.3.952" />
         <PackageReference Include="OpenWeatherMap.Standard" Version="2.0.0" />
+        <PackageReference Include="SSH.NET" Version="2023.0.1" />
     </ItemGroup>
 </Project>

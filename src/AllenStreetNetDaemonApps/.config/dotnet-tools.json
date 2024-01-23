@@ -3,7 +3,7 @@
   "isRoot": true,
   "tools": {
     "netdaemon.hassmodel.codegen": {
-      "version": "1000",
+      "version": "23.46.1",
       "commands": [
         "nd-codegen"
       ]
