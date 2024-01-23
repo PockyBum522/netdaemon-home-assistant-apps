@@ -108,7 +108,9 @@ public class ScheduledLights
     private void TurnLightsOnAtSunset()
     {
         _entities.Light.Bulbfrontporch1.TurnOn();
-        //_entities.Switch.BackPorchChristmasWarm.TurnOn();
+        _entities.Switch.BackPorchChristmasLights.TurnOn();
+        
+        _entities.Light.DenLamp.TurnOn();
 
         _logger.Debug("Lights turned on at sunset");
     }
@@ -119,7 +121,10 @@ public class ScheduledLights
         _entities.Light.Bulbbackporchfar.TurnOff();
         
         _entities.Light.Bulbfrontporch1.TurnOff();
-        //_entities.Switch.BackPorchChristmasWarm.TurnOff();
+        
+        _entities.Switch.BackPorchChristmasLights.TurnOff();
+        
+        _entities.Switch.LaundryRoomLights2.TurnOff();
         
         _logger.Debug("Lights turned off at morning");
     }
