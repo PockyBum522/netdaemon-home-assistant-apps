@@ -193,9 +193,6 @@ public class LockController
             // Update this so our code knows this change wasn't due to a user
             _frontLockLastDisableText = newText;
             
-            // Make sure lock isn't disabled manually, which means we don't care that it can't lock.
-            if (lockToWork.DisabledUntil > DateTimeOffset.Now) continue;
-                
             _entities.InputText.FrontDoorLockDisableHours.SetValue(newText);
             
             _logger.Debug("Decremented front door lock textbox to: {NewValue}", newText);

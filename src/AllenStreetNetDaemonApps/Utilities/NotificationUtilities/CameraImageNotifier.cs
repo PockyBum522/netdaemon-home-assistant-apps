@@ -35,8 +35,9 @@ public class CameraImageNotifier
 
         var mediaFullPathWithUrl = SECRETS.NabuUrl + mediaFullPath; 
         
-        _logger.Information("Notifying [DAVID]: {Title} | {Body} | LOCAL: {LocalPath} | MEDIA: {MediaPath}",
-            notifyTitle, notifyBody, localFullPath, mediaFullPathWithUrl);
+        _logger.Information("Notifying [DAVID]: {Title} | BODY: {Body}", notifyTitle, notifyBody);
+        _logger.Information("Notifying [DAVID] LOCAL: {LocalPath}", localFullPath);
+        _logger.Information("Notifying [DAVID] MEDIA: {MediaPath}", mediaFullPathWithUrl);
         
         _haContext.CallService("notify", "david_desktop", data: new
         {
@@ -49,12 +50,6 @@ public class CameraImageNotifier
             }
         });
         
-        // _haContext.CallService("notify", "david_laptop", data: new
-        // {
-        //     title = notifyTitle,
-        //     message = notifyBody
-        // });
-        
         _haContext.CallService("notify", "mobile_app_pixel_fold", data: new
         {
             title = notifyTitle,
@@ -64,27 +59,22 @@ public class CameraImageNotifier
                 image = mediaFullPathWithUrl
             }
         });
-        
-        // _haContext.CallService("notify", "guest_bedroom", data: new
-        // {
-        //     title = notifyTitle,
-        //     message = notifyBody,
-        //     notification_id = notificationId
-        // });
-        
     }
     
     public void NotifyAlyssa(string notifyTitle, string notifyBody, string imageFileName)
     {
+        var localFullPath = Path.Join(LocalPath, imageFileName);
         var mediaFullPath = Path.Join(MediaPath, imageFileName);
 
         mediaFullPath = mediaFullPath.Replace("/media/", "/");
 
-        var mediaFullPathWithUrl = SECRETS.NabuUrl + mediaFullPath; 
+        var mediaFullPathWithUrl = SECRETS.NabuUrl + mediaFullPath;
         
-        _logger.Information("Notifying [ALYSSA]: {Title} | {Body}", notifyTitle, notifyBody);
+        _logger.Information("Notifying [ALYSSA]: {Title} | BODY: {Body}", notifyTitle, notifyBody);
+        _logger.Information("Notifying [ALYSSA] LOCAL: {LocalPath}", localFullPath);
+        _logger.Information("Notifying [ALYSSA] MEDIA: {MediaPath}", mediaFullPathWithUrl);
         
-        _haContext.CallService("notify", "mobile_app_alyssaphone23", data: new
+        _haContext.CallService("notify", SECRETS.AlyssaiPhoneMobileAppId, data: new
         {
             title = notifyTitle,
             message = notifyBody,
@@ -103,7 +93,7 @@ public class CameraImageNotifier
                 //     }
                 // }
             }
-        });    
+        });
     }
     
     // public void NotifyAll(string notifyTitle, string notifyBody)

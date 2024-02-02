@@ -28,7 +28,7 @@ public class MqttWatcher
         
         _logger = new LoggerConfiguration()
             .Enrich.WithProperty("netDaemonLogging", $"Serilog{GetType().Name}Context")
-            .MinimumLevel.Information()
+            .MinimumLevel.Verbose()
             .WriteTo.Console()
             .WriteTo.File($"logs/{namespaceLastPart}/{GetType().Name}_.log", rollingInterval: RollingInterval.Day)
             .CreateLogger();
@@ -139,7 +139,7 @@ public class MqttWatcher
         _logger.Information("Stacked image path is: {Path}", newImageFilename);
         
         // Needs to be a while for the image to be ready to serve over nabu casa url and media folder
-        await Task.Delay(new Random().Next(30000, 31000));
+        await Task.Delay(new Random().Next(40000, 51000));
         
         _cameraImageNotifier.NotifyDavid("Front Door Motion", "", stackedPath); 
         _cameraImageNotifier.NotifyAlyssa("Front Door Motion", "", stackedPath);
