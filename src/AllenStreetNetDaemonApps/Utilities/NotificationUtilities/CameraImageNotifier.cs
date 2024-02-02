@@ -30,9 +30,13 @@ public class CameraImageNotifier
     {
         var localFullPath = Path.Join(LocalPath, imageFileName);
         var mediaFullPath = Path.Join(MediaPath, imageFileName);
+
+        mediaFullPath = mediaFullPath.Replace("/media/", "/");
+
+        var mediaFullPathWithUrl = SECRETS.NabuUrl + mediaFullPath; 
         
         _logger.Information("Notifying [DAVID]: {Title} | {Body} | LOCAL: {LocalPath} | MEDIA: {MediaPath}",
-            notifyTitle, notifyBody, localFullPath, mediaFullPath);
+            notifyTitle, notifyBody, localFullPath, mediaFullPathWithUrl);
         
         _haContext.CallService("notify", "david_desktop", data: new
         {
@@ -57,7 +61,7 @@ public class CameraImageNotifier
             message = notifyBody,
             data = new
             {
-                image = mediaFullPath
+                image = mediaFullPathWithUrl
             }
         });
         
@@ -72,6 +76,12 @@ public class CameraImageNotifier
     
     public void NotifyAlyssa(string notifyTitle, string notifyBody, string imageFileName)
     {
+        var mediaFullPath = Path.Join(MediaPath, imageFileName);
+
+        mediaFullPath = mediaFullPath.Replace("/media/", "/");
+
+        var mediaFullPathWithUrl = SECRETS.NabuUrl + mediaFullPath; 
+        
         _logger.Information("Notifying [ALYSSA]: {Title} | {Body}", notifyTitle, notifyBody);
         
         _haContext.CallService("notify", "mobile_app_alyssaphone23", data: new
@@ -80,7 +90,7 @@ public class CameraImageNotifier
             message = notifyBody,
             data = new
             {
-                image = Path.Join(MediaPath, imageFileName)
+                image = Path.Join(mediaFullPathWithUrl, imageFileName)
                 
                 // This works, you have to hold down on the notification to get to options
                 // actions = new[]

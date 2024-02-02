@@ -1,6 +1,8 @@
 ﻿using MQTTnet;
 using MQTTnet.Client;
+using SixLabors.Fonts;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
@@ -41,7 +43,7 @@ public class MqttWatcher
         _logger.Information("Initialized {NamespaceLastPart} v0.01", namespaceLastPart);
         
         // For Testing:
-        //scheduler.RunIn(TimeSpan.FromSeconds(1), async () => await NotifyUsersWithCameraImage());
+        scheduler.RunIn(TimeSpan.FromSeconds(15), async () => await NotifyUsersWithCameraImage());
         
         scheduler.RunIn(TimeSpan.FromSeconds(10), async () => await StartMqttListener());
     }
@@ -131,12 +133,13 @@ public class MqttWatcher
 
         // Increase this if notifications ever come through without images
         // Offset if this runs twice rapidly to hopefully stop a race condition where _lastRunAtTime isn't updated as fast as it needs to be
-        await Task.Delay(new Random().Next(1000, 2000));
+        await Task.Delay(new Random().Next(2000, 2200));
 
         var stackedPath = StackPicturesVertically(newImageFilename, newFarImageFilename);
         _logger.Information("Stacked image path is: {Path}", newImageFilename);
         
-        await Task.Delay(new Random().Next(1000, 2000));
+        // Needs to be a while for the image to be ready to serve over nabu casa url and media folder
+        await Task.Delay(new Random().Next(30000, 31000));
         
         _cameraImageNotifier.NotifyDavid("Front Door Motion", "", stackedPath); 
         _cameraImageNotifier.NotifyAlyssa("Front Door Motion", "", stackedPath);
@@ -150,7 +153,7 @@ public class MqttWatcher
         using var closeImage = Image.Load<Rgba32>(Path.Join(SECRETS.CameraSnapshotDirectory, newImageFilename));
         using var farImage = Image.Load<Rgba32>(Path.Join(SECRETS.CameraSnapshotDirectory, newFarImageFilename));
         
-        var newHeight = closeImage.Height + farImage.Height;
+        var newHeight = (closeImage.Height + farImage.Height) / 2;
         
         var newWidth = closeImage.Width;
 
@@ -159,11 +162,29 @@ public class MqttWatcher
 
         using var outputImage = new Image<Rgba32>(newWidth, newHeight);
         
+        var closeImageHalfHeight = closeImage.Height / 2;
+
+        // closeImage.Mutate(
+        //     i => i.Crop(
+        //         new Rectangle(0, 0, closeImage.Width, closeImageHalfHeight + 50)));
+        
         // take the 2 source images and draw them onto the image
         outputImage.Mutate(o => o
                 .DrawImage(closeImage, new Point(0, 0), 1f) // draw the first one top left
-                .DrawImage(farImage, new Point(0, closeImage.Height), 1f) // draw the second next to it
+                .DrawImage(farImage, new Point(0, closeImageHalfHeight + 50), 1f) // draw the second next to it
         );
+
+        // foreach (var font in SystemFonts.)
+        // {
+        //     _logger.Warning("{FontName}", font.Name);
+        // }
+        
+        // outputImage.Mutate(o => o.DrawText(
+        //     DateTimeOffset.Now.ToString("F"),
+        //     SystemFonts.CreateFont("Arial", 25),
+        //     new Color(Rgba32.ParseHex("#FFFFFFFFFFF")),
+        //     new PointF(10, outputImage.Height - 200)
+        //     ));
         
         var fileSafeTimestamp = DateTimeOffset.Now.ToString("yyyy-MM-dd_HH-mm-ss.ff");
 
