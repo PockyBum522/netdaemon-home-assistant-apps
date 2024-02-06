@@ -126,11 +126,17 @@ public class LockController
             // Update this since we know a user changed the text
             _frontLockLastDisableText = newText;
 
+            FrontDoorLock.AddAutoLockTime();
+            
+            await Task.Delay(1000);
+            
             FrontDoorLock.DisableAutoLock();
             
             await Task.Delay(1000);
             
             await FrontDoorLock.Unlock();
+            
+            await Task.Delay(1000);
         }
         
         if (_backLockLastDisableText != backLockDisableText)
@@ -145,12 +151,18 @@ public class LockController
             
             // Update this since we know a user changed the text
             _backLockLastDisableText = newText;
-
+            
+            BackDoorLock.AddAutoLockTime();
+            
+            await Task.Delay(1000);
+            
             BackDoorLock.DisableAutoLock();
-
+            
             await Task.Delay(1000);
             
             await BackDoorLock.Unlock();
+            
+            await Task.Delay(1000);
         }
     }
     
