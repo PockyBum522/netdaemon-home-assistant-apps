@@ -43,7 +43,7 @@ public class MqttWatcher
         _logger.Information("Initialized {NamespaceLastPart} v0.01", namespaceLastPart);
         
         // For Testing:
-        scheduler.RunIn(TimeSpan.FromSeconds(15), async () => await NotifyUsersWithCameraImage());
+        //scheduler.RunIn(TimeSpan.FromSeconds(15), async () => await NotifyUsersWithCameraImage());
         
         scheduler.RunIn(TimeSpan.FromSeconds(10), async () => await StartMqttListener());
     }
@@ -138,8 +138,8 @@ public class MqttWatcher
         var stackedPath = StackPicturesVertically(newImageFilename, newFarImageFilename);
         _logger.Information("Stacked image path is: {Path}", newImageFilename);
         
-        // Needs to be a while for the image to be ready to serve over nabu casa url and media folder
-        await Task.Delay(new Random().Next(40000, 51000));
+        // Needs to be 20? 30s? (a while) for the image to be ready to serve over nabu casa url and media folder
+        await Task.Delay(new Random().Next(20000, 21000));
         
         _cameraImageNotifier.NotifyDavid("Front Door Motion", "", stackedPath); 
         _cameraImageNotifier.NotifyAlyssa("Front Door Motion", "", stackedPath);

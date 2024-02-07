@@ -61,7 +61,7 @@ public class TextNotifier
     {
         _logger.Information("Notifying [ALYSSA]: {Title} | {Body}", notifyTitle, notifyBody);
 
-        _haContext.CallService("notify", SECRETS.AlyssaiPhoneMobileAppId, data: new
+        _haContext.CallService("notify", "mobile_app_" + SECRETS.AlyssaiPhoneMobileAppId, data: new
         {
             title = notifyTitle,
             message = notifyBody

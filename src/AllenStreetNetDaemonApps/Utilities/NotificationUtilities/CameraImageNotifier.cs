@@ -74,13 +74,13 @@ public class CameraImageNotifier
         _logger.Information("Notifying [ALYSSA] LOCAL: {LocalPath}", localFullPath);
         _logger.Information("Notifying [ALYSSA] MEDIA: {MediaPath}", mediaFullPathWithUrl);
         
-        _haContext.CallService("notify", SECRETS.AlyssaiPhoneMobileAppId, data: new
+        _haContext.CallService("notify", "mobile_app_" + SECRETS.AlyssaiPhoneMobileAppId, data: new
         {
             title = notifyTitle,
             message = notifyBody,
             data = new
             {
-                image = Path.Join(mediaFullPathWithUrl, imageFileName)
+                image = mediaFullPathWithUrl
                 
                 // This works, you have to hold down on the notification to get to options
                 // actions = new[]
