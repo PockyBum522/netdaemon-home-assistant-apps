@@ -9,7 +9,7 @@ namespace AllenStreetNetDaemonApps.Apps.NetworkRestarters;
 public class NetworkRestarter
 {
     private readonly IHaContext _ha;
-    private readonly Serilog.ILogger _logger;
+    private readonly ILogger _logger;
     private readonly Entities _entities;
     
     private readonly InputBooleanEntity _networkRestartToggle;
@@ -112,6 +112,8 @@ public class NetworkRestarter
 
     private async Task RestartAllNetworkEquipment()
     {
+        await TurnOffShopNetworkEquipment();
+        
         await TurnOffNetworkClosetCamsPoeSwitch();
         
         await TurnOffLaundryRoomNetworkEquipment();
@@ -138,6 +140,71 @@ public class NetworkRestarter
         await TurnOnLaundryRoomNetworkEquipment();
 
         await TurnOnNetworkClosetCamsPoeSwitch();
+        
+        // Wait for laundry switch to come back up, this can be removed when garage router is directly connected to main router
+        await Task.Delay(TimeSpan.FromSeconds(20));
+        
+        await TurnOnShopNetworkEquipment();
+    }
+
+    private async Task TurnOffShopNetworkEquipment()
+    {
+        var entityToWork = _entities.Switch.NetworkPowerShop;
+            
+        _logger.Information("_entities.Switch.NetworkPowerShop State: {State}", entityToWork.State);
+
+        _logger.Information("Turning off: _entities.Switch.NetworkPowerShop");
+            
+        entityToWork.TurnOff();   
+            
+        await Task.Delay(TimeSpan.FromSeconds(10));
+            
+        _logger.Information("_entities.Switch.NetworkPowerShop State: {State}", entityToWork.State);
+    }
+    
+    private async Task TurnOnShopNetworkEquipment()
+    {
+        var entityToWork = _entities.Switch.NetworkPowerShop;
+            
+        _logger.Information("_entities.Switch.NetworkPowerShop State: {State}", entityToWork.State);
+
+        _logger.Information("Turning on: _entities.Switch.NetworkPowerShop");
+            
+        entityToWork.TurnOn();   
+            
+        await Task.Delay(TimeSpan.FromSeconds(10));
+            
+        _logger.Information("_entities.Switch.NetworkPowerShop State: {State}", entityToWork.State);
+    }
+    
+    private async Task TurnOffMasterBathroomCabinetNetworkEquipment()
+    {
+        var entityToWork = _entities.Light.NetworkPowerMasterBathCabinetEquipment;
+            
+        _logger.Information("_entities.Light.NetworkPowerMasterBathCabinetEquipment State: {State}", entityToWork.State);
+
+        _logger.Information("Turning off: _entities.Light.NetworkPowerMasterBathCabinetEquipment");
+            
+        entityToWork.TurnOff();      // Accidentally got dimmers so it's a light not a switch, still works.
+            
+        await Task.Delay(TimeSpan.FromSeconds(10));
+            
+        _logger.Information("_entities.Light.NetworkPowerMasterBathCabinetEquipment State: {State}", entityToWork.State);
+    }    
+    
+    private async Task TurnOnMasterBathroomCabinetNetworkEquipment()
+    {
+        var entityToWork = _entities.Light.NetworkPowerMasterBathCabinetEquipment;
+            
+        _logger.Information("_entities.Light.NetworkPowerMasterBathCabinetEquipment State: {State}", entityToWork.State);
+
+        _logger.Information("Turning on: _entities.Light.NetworkPowerMasterBathCabinetEquipment");
+            
+        entityToWork.TurnOn();      // Accidentally got dimmers so it's a light not a switch, still works.
+            
+        await Task.Delay(TimeSpan.FromSeconds(10));
+            
+        _logger.Information("_entities.Light.NetworkPowerMasterBathCabinetEquipment State: {State}", entityToWork.State);
     }
 
     private async Task ShutdownMikrotikMainRouterViaSsh()
@@ -183,21 +250,6 @@ public class NetworkRestarter
         }
     }
 
-    private async Task TurnOffMasterBathroomCabinetNetworkEquipment()
-    {
-        var entityToWork = _entities.Light.NetworkPowerMasterBathCabinetEquipment;
-            
-        _logger.Information("_entities.Light.NetworkPowerMasterBathCabinetEquipment State: {State}", entityToWork.State);
-
-        _logger.Information("Turning off: _entities.Light.NetworkPowerMasterBathCabinetEquipment");
-            
-        entityToWork.TurnOff();      // Accidentally got dimmers so it's a light not a switch, still works.
-            
-        await Task.Delay(TimeSpan.FromSeconds(10));
-            
-        _logger.Information("_entities.Light.NetworkPowerMasterBathCabinetEquipment State: {State}", entityToWork.State);
-    }
-
     private async Task TurnOffLaundryRoomNetworkEquipment()
     {
         var entityToWork = _entities.Light.NetworkPowerLaundryRoomEquipment;
@@ -241,21 +293,6 @@ public class NetworkRestarter
         await Task.Delay(TimeSpan.FromSeconds(10));
             
         _logger.Information("_entities.Switch.NetworkPowerAllNetworkClosetEquipment State: {State}", entityToWork.State);
-    }
-    
-    private async Task TurnOnMasterBathroomCabinetNetworkEquipment()
-    {
-        var entityToWork = _entities.Light.NetworkPowerMasterBathCabinetEquipment;
-            
-        _logger.Information("_entities.Light.NetworkPowerMasterBathCabinetEquipment State: {State}", entityToWork.State);
-
-        _logger.Information("Turning on: _entities.Light.NetworkPowerMasterBathCabinetEquipment");
-            
-        entityToWork.TurnOn();      // Accidentally got dimmers so it's a light not a switch, still works.
-            
-        await Task.Delay(TimeSpan.FromSeconds(10));
-            
-        _logger.Information("_entities.Light.NetworkPowerMasterBathCabinetEquipment State: {State}", entityToWork.State);
     }
 
     private async Task TurnOnLaundryRoomNetworkEquipment()
