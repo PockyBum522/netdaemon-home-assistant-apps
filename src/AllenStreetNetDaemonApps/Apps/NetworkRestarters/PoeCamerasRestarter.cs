@@ -61,11 +61,13 @@ public class PoeCamerasRestarter
             // Leave this for lazy threading block
             await Task.Delay(TimeSpan.FromSeconds(5));
 
+            await TurnOffShopNetworkEquipment();
             await TurnOffLaundryRoomNetworkEquipment();
             await TurnOffNetworkClosetCamsPoeSwitch();
             
             await Task.Delay(TimeSpan.FromSeconds(20));
             
+            await TurnOnShopNetworkEquipment();
             await TurnOnLaundryRoomNetworkEquipment();
             await TurnOnNetworkClosetCamsPoeSwitch();
             
@@ -76,7 +78,37 @@ public class PoeCamerasRestarter
             await Task.Delay(TimeSpan.FromSeconds(5));
         }
     }
+    
+    private async Task TurnOffShopNetworkEquipment()
+    {
+        var entityToWork = _entities.Switch.NetworkPowerShop;
+            
+        _logger.Information("_entities.Switch.NetworkPowerShop State: {State}", entityToWork.State);
 
+        _logger.Information("Turning off: _entities.Switch.NetworkPowerShop");
+            
+        entityToWork.TurnOff();   
+            
+        await Task.Delay(TimeSpan.FromSeconds(5));
+            
+        _logger.Information("_entities.Switch.NetworkPowerShop State: {State}", entityToWork.State);
+    }
+    
+    private async Task TurnOnShopNetworkEquipment()
+    {
+        var entityToWork = _entities.Switch.NetworkPowerShop;
+            
+        _logger.Information("_entities.Switch.NetworkPowerShop State: {State}", entityToWork.State);
+
+        _logger.Information("Turning on: _entities.Switch.NetworkPowerShop");
+            
+        entityToWork.TurnOn();   
+            
+        await Task.Delay(TimeSpan.FromSeconds(5));
+            
+        _logger.Information("_entities.Switch.NetworkPowerShop State: {State}", entityToWork.State);
+    }
+    
     private async Task TurnOffLaundryRoomNetworkEquipment()
     {
         var entityToWork = _entities.Light.NetworkPowerLaundryRoomEquipment;
@@ -87,7 +119,7 @@ public class PoeCamerasRestarter
             
         entityToWork.TurnOff();      // Accidentally got dimmers so it's a light not a switch, still works.
         
-        await Task.Delay(TimeSpan.FromSeconds(2));
+        await Task.Delay(TimeSpan.FromSeconds(5));
         
         _logger.Information("_entities.Light.NetworkPowerLaundryRoomEquipment State: {State}", entityToWork.State);
     }
@@ -102,7 +134,7 @@ public class PoeCamerasRestarter
             
         entityToWork.TurnOff();
 
-        await Task.Delay(TimeSpan.FromSeconds(2));
+        await Task.Delay(TimeSpan.FromSeconds(5));
 
         _logger.Information("_entities.Switch.NetworkPowerNetworkClosetPoeCameras4PortSwitch2 State: {State}", entityToWork.State);
     }
@@ -117,7 +149,7 @@ public class PoeCamerasRestarter
             
         entityToWork.TurnOn();      // Accidentally got dimmers so it's a light not a switch, still works.
 
-        await Task.Delay(TimeSpan.FromSeconds(2));
+        await Task.Delay(TimeSpan.FromSeconds(5));
 
         _logger.Information("_entities.Light.NetworkPowerLaundryRoomEquipment State: {State}", entityToWork.State);
     }
@@ -132,7 +164,7 @@ public class PoeCamerasRestarter
             
         entityToWork.TurnOn();
 
-        await Task.Delay(TimeSpan.FromSeconds(2));
+        await Task.Delay(TimeSpan.FromSeconds(5));
 
         _logger.Information("_entities.Switch.NetworkPowerNetworkClosetPoeCameras4PortSwitch2 State: {State}", entityToWork.State);
     }
