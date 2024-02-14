@@ -6,7 +6,7 @@ namespace AllenStreetNetDaemonApps.Apps.Scheduled;
 public class ScheduledLights
 {
     private readonly IHaContext _ha;
-    private readonly Serilog.ILogger _logger;
+    private readonly ILogger _logger;
     private readonly Entities _entities;
 
     private bool _sunriseStuffActivated;
@@ -107,20 +107,21 @@ public class ScheduledLights
 
     private void TurnLightsOnAtSunset()
     {
-        _entities.Light.Bulbfrontporch1.TurnOn();
+        _entities.Light.FrontPorchLights.TurnOn();
         _entities.Switch.BackPorchChristmasLights.TurnOn();
         
         _entities.Light.DenLamp.TurnOn();
+
+        _entities.Light.KitchenUndercabinetLights.TurnOn();
 
         _logger.Debug("Lights turned on at sunset");
     }
     
     private void TurnLightsOffAtMorning()
     {
-        _entities.Light.Backporchbydoor.TurnOff();
-        _entities.Light.Bulbbackporchfar.TurnOff();
+        _entities.Light.BackPorchLights.TurnOff();
         
-        _entities.Light.Bulbfrontporch1.TurnOff();
+        _entities.Light.FrontPorchLights.TurnOn();
         
         _entities.Switch.BackPorchChristmasLights.TurnOff();
         

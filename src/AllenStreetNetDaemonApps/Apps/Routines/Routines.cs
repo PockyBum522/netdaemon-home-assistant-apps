@@ -104,10 +104,10 @@ public class Routines
     private void HouseAwayRoutine()
     {
         if (_entities.Climate.HouseHvac.State == "cool")
-            _entities.Climate.HouseHvac.SetTemperature(74.0);
+            _entities.Climate.HouseHvac.SetTemperature(73.0);
         
         if (_entities.Climate.HouseHvac.State == "heat")
-            _entities.Climate.HouseHvac.SetTemperature(66.0);
+            _entities.Climate.HouseHvac.SetTemperature(65.0);
 
         TurnOffEverything();
 
@@ -120,7 +120,7 @@ public class Routines
             _entities.Climate.HouseHvac.SetTemperature(70.0);
         
         if (_entities.Climate.HouseHvac.State == "heat")
-            _entities.Climate.HouseHvac.SetTemperature(69.0);
+            _entities.Climate.HouseHvac.SetTemperature(66.0);
 
         //_entities.Switch.DenLamp.TurnOn();
         
@@ -130,10 +130,10 @@ public class Routines
     private void GoingToBedRoutine()
     {
         if (_entities.Climate.HouseHvac.State == "cool")
-            _entities.Climate.HouseHvac.SetTemperature(69.0);
+            _entities.Climate.HouseHvac.SetTemperature(70.0);
         
         if (_entities.Climate.HouseHvac.State == "heat")
-            _entities.Climate.HouseHvac.SetTemperature(68.0);
+            _entities.Climate.HouseHvac.SetTemperature(66.0);
 
         TurnOffEverything();
 
@@ -146,7 +146,7 @@ public class Routines
             _entities.Climate.HouseHvac.SetTemperature(70.0);
         
         if (_entities.Climate.HouseHvac.State == "heat")
-            _entities.Climate.HouseHvac.SetTemperature(68.0);
+            _entities.Climate.HouseHvac.SetTemperature(66.0);
 
         _logger.Debug("House set to morning mode");
     }
@@ -154,30 +154,14 @@ public class Routines
     private void TurnOffEverything()
     {
         // Lights
-        _entities.Light.Backporchbydoor.TurnOff();
-        _entities.Light.Bulbbackhall1.TurnOff();
-        _entities.Light.Bulbbackporchfar.TurnOff();
-        _entities.Light.Bulbden1.TurnOff();
-        _entities.Light.Bulbden2.TurnOff();
-        _entities.Light.Bulbden3.TurnOff();
-        _entities.Light.Bulbden4.TurnOff();
-        _entities.Light.Bulbfoyer1.TurnOff();
-        _entities.Light.Bulbfrontroom1.TurnOff();
-        _entities.Light.Bulbfrontroom2.TurnOff();
-        _entities.Light.Bulbfrontroom3.TurnOff();
-        _entities.Light.Bulbfrontroom4.TurnOff();
-        _entities.Light.Bulbguestbathsink1.TurnOff();
-        _entities.Light.Bulbguestbathsink2.TurnOff();
-        _entities.Light.Bulbguestbathsink3.TurnOff();
-        _entities.Light.Bulbmasterbath1.TurnOff();
-        _entities.Light.Bulbmasterbath2.TurnOff();
-        _entities.Light.Bulbmasterbathshower1.TurnOff();
-        _entities.Light.Bulbmasterbathvanity.TurnOff();
-        _entities.Light.Bulbmasterbedroom1.TurnOff();
-        _entities.Light.Bulbmasterbedroom2.TurnOff();
-        _entities.Light.Bulbmasterbedroom3.TurnOff();
-        _entities.Light.Bulbmasterbedroom4.TurnOff();
-        _entities.Light.Bulbmasterbedroombybath.TurnOff();
+        _entities.Light.BackPorchLights.TurnOff();
+        _entities.Light.BackHallLights.TurnOff();
+        _entities.Light.DenLights.TurnOff();
+        _entities.Light.FoyerLights.TurnOff();
+        _entities.Light.FrontRoomLights.TurnOff();
+        _entities.Light.GuestBathLights.TurnOff();
+        _entities.Light.MasterBathLights.TurnOff();
+        _entities.Light.MasterBedroomLights.TurnOff();
         
         // TVs
         _entities.Switch.DenTv.TurnOff();

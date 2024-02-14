@@ -26,7 +26,7 @@ public class KitchenLightsController
         
         ha.Events.Where(e => e.EventType == "zwave_js_value_notification").Subscribe(async (e) => await HandleKitchenSwitchButtons(e));
 
-        _kitchenCeilingLightsEntities = GroupUtilities.GetEntitiesFromGroup(ha, _entities.Group.GroupKitchenCeilingLights);
+        _kitchenCeilingLightsEntities = GroupUtilities.GetEntitiesFromGroup(ha, _entities.Light.KitchenCeilingLights);
 
         //scheduler.RunIn(TimeSpan.FromSeconds(0.5), async () => await SetKitchenLightsDimmer());
     }

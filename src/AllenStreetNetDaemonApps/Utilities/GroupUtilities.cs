@@ -2,7 +2,7 @@
 
 public static class GroupUtilities
 {
-    public static Entity[] GetEntitiesFromGroup(IHaContext ha, GroupEntity group, ILogger? logger = null)
+    public static Entity[] GetEntitiesFromGroup(IHaContext ha, LightEntity group, ILogger? logger = null)
     {
         var groupEntities = group.EntityState?.Attributes?.EntityId;
 
