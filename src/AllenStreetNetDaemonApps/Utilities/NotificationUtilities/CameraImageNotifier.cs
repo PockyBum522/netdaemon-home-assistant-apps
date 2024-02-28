@@ -9,9 +9,17 @@ public class CameraImageNotifier
     string MediaPath => SECRETS.CameraImageNotificationCachePath;
     string LocalPath => SECRETS.CameraImageNotificationLocalUrl;
     
-    public CameraImageNotifier(ILogger logger, IHaContext haContext)
+    public CameraImageNotifier(IHaContext haContext)
     {
-        _logger = logger;
+        var namespaceLastPart = GetType().Namespace?.Split('.').Last();
+        
+        _logger = new LoggerConfiguration()
+            .Enrich.WithProperty("netDaemonLogging", $"Serilog{GetType().Name}Context")
+            .MinimumLevel.Verbose()
+            .WriteTo.Console()
+            .WriteTo.File($"logs/{namespaceLastPart}/{GetType().Name}_.log", rollingInterval: RollingInterval.Day)
+            .CreateLogger();
+        
         _haContext = haContext;
     }
     

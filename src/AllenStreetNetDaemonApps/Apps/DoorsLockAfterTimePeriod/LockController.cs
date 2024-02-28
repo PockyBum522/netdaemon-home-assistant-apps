@@ -2,11 +2,13 @@
 
 namespace AllenStreetNetDaemonApps.Apps.DoorsLockAfterTimePeriod;
 
-[NetDaemonApp]
+/// <summary>
+/// This gets set up in MqttWatcher.cs
+/// </summary>
 public class LockController
 {
-    private AutomaticallyLockableLock FrontDoorLock { get; }
-    private AutomaticallyLockableLock BackDoorLock { get; }
+    internal AutomaticallyLockableLock FrontDoorLock { get; }
+    internal AutomaticallyLockableLock BackDoorLock { get; }
     
     private string _frontLockLastDisableText = "";
     private string _backLockLastDisableText = "";
@@ -14,7 +16,7 @@ public class LockController
     private readonly ILogger _logger;
     private readonly Entities _entities;
 
-    public LockController(IHaContext ha, INetDaemonScheduler scheduler, ILogger logger)
+    public LockController(IHaContext ha, INetDaemonScheduler scheduler)
     {
         _entities = new Entities(ha);
 

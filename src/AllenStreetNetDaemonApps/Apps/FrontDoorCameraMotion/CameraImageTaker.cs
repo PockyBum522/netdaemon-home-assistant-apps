@@ -10,9 +10,17 @@ public class CameraImageTaker
     private string CameraSnapshotsDirectory => SECRETS.CameraSnapshotDirectory;
     private string MediaSnapshotsDirectory => SECRETS.MediaSnapshotDirectory;
     
-    public CameraImageTaker(ILogger logger, IHaContext ha)
+    public CameraImageTaker(IHaContext ha)
     {
-        _logger = logger;
+        var namespaceLastPart = GetType().Namespace?.Split('.').Last();
+        
+        _logger = new LoggerConfiguration()
+            .Enrich.WithProperty("netDaemonLogging", $"Serilog{GetType().Name}Context")
+            .MinimumLevel.Verbose()
+            .WriteTo.Console()
+            .WriteTo.File($"logs/{namespaceLastPart}/{GetType().Name}_.log", rollingInterval: RollingInterval.Day)
+            .CreateLogger();
+        
         _entities = new Entities(ha);
         
         _lastMotionSeenAt = DateTimeOffset.Now;
