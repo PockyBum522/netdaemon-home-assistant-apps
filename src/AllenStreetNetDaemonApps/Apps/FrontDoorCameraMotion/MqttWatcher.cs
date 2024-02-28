@@ -11,17 +11,24 @@ namespace AllenStreetNetDaemonApps.Apps.FrontDoorCameraMotion;
 [NetDaemonApp]
 public class MqttWatcher 
 {
+    private readonly IHaContext _ha;
     private readonly Entities _entities;
     
     private readonly ILogger _logger;
     private DateTimeOffset _lastLockWakeAtTime;
     private DateTimeOffset _lastFrontDoorImageNotifyTime;
+    private DateTimeOffset _lastScanNotificationTime = DateTimeOffset.Now;
 
     private CameraImageTaker _cameraImageTaker;
     private CameraImageNotifier _cameraImageNotifier;
-    
+    private TextNotifier? _textNotifier;
+    private SwitchEntity? _deadboltLatch;
+    private SwitchEntity? _doorknobLatch;
+    private LockEntity? _frontDoorLock;
+
     public MqttWatcher(IHaContext ha, INetDaemonScheduler scheduler)
     {
+        _ha = ha;
         _entities = new Entities(ha);
 
         var namespaceLastPart = GetType().Namespace?.Split('.').Last();
@@ -36,9 +43,9 @@ public class MqttWatcher
         _lastLockWakeAtTime = DateTimeOffset.Now - TimeSpan.FromMinutes(5);
         _lastFrontDoorImageNotifyTime = DateTimeOffset.Now - TimeSpan.FromMinutes(5);
 
-        _cameraImageNotifier = new CameraImageNotifier(_logger, ha);
+        _cameraImageNotifier = new CameraImageNotifier(ha);
 
-        _cameraImageTaker = new CameraImageTaker(_logger, ha);
+        _cameraImageTaker = new CameraImageTaker(ha);
             
         _logger.Information("Initialized {NamespaceLastPart} v0.01", namespaceLastPart);
         
@@ -50,6 +57,13 @@ public class MqttWatcher
 
     private async Task StartMqttListener()
     {
+        _textNotifier = new TextNotifier(_logger, _ha);
+        
+        _deadboltLatch = _entities.Switch.DeadboltDoorframeLatch;
+        _doorknobLatch = _entities.Switch.DoorknobDoorframeLatch;
+
+        _frontDoorLock = _entities.Lock.FrontDoor;
+        
         var mqttFactory = new MqttFactory();
 
         using var mqttClient = mqttFactory.CreateMqttClient();
@@ -76,10 +90,12 @@ public class MqttWatcher
 
         var mqttSubscribeOptions = 
             mqttFactory.CreateSubscribeOptionsBuilder()
-                .WithTopicFilter(f => { f.WithTopic(SECRETS.FrontDoorMotionZoneATopic); })
-                .WithTopicFilter(f => { f.WithTopic(SECRETS.DrivewayMotionZoneATopic); })
-                .WithTopicFilter(f => { f.WithTopic(SECRETS.FrontYardFrontDoorMotionTopic); })
-                .WithTopicFilter(f => { f.WithTopic(SECRETS.FrontYardDrivewayMotionTopic); })
+                .WithTopicFilter(f => { f.WithTopic(SECRETS.TopicFrontDoorMotionZoneA); })
+                .WithTopicFilter(f => { f.WithTopic(SECRETS.TopicDrivewayMotionZoneA); })
+                .WithTopicFilter(f => { f.WithTopic(SECRETS.TopicFrontYardFrontDoorMotion); })
+                .WithTopicFilter(f => { f.WithTopic(SECRETS.TopicFrontYardDrivewayMotion); })
+                .WithTopicFilter(f => { f.WithTopic(SECRETS.TopicFrontDoorNfcReaderTags); })
+                .WithTopicFilter(f => { f.WithTopic(SECRETS.TopicBackPorchPeopleAreas); })
                 .Build();
 
         await mqttClient.SubscribeAsync(mqttSubscribeOptions, CancellationToken.None);
@@ -100,7 +116,53 @@ public class MqttWatcher
         
         _logger.Information(
             "On topic: {TopicName}, received {Message}", e.ApplicationMessage.Topic, asciiPayload);
-        
+
+
+        if (e.ApplicationMessage.Topic == SECRETS.TopicFrontDoorNfcReaderTags)
+        {
+            _logger.Information("Tag scanned on topic: {Topic}", SECRETS.TopicFrontDoorNfcReaderTags);
+
+            _logger.Information("Mqtt payload is: '{Payload}'", asciiPayload);
+
+            var foundAuthorizedTag = false;
+
+            if (_deadboltLatch is null ||
+                _doorknobLatch is null ||
+                _frontDoorLock is null ||
+                _textNotifier is null)
+                throw new NullReferenceException();
+            
+            foreach (var tag in SECRETS.AuthorizedNfcTags)
+            {
+                if (tag.Uid != asciiPayload) continue;
+                
+                _deadboltLatch.TurnOn();
+                _doorknobLatch.TurnOn();
+
+                _logger.Debug("Front door latches open!");
+                    
+                _frontDoorLock.Unlock();
+
+                foundAuthorizedTag = true;
+
+                if (_lastScanNotificationTime >= DateTimeOffset.Now - TimeSpan.FromSeconds(20)) continue;
+                    
+                // Send notification about unrecognized UID
+                _textNotifier.NotifyDavid("Tag Scan at Front Door", $"Tag used was for: {tag.FriendlyName}");
+                        
+                _lastScanNotificationTime = DateTimeOffset.Now;
+            }
+
+            if (!foundAuthorizedTag)
+            {
+                // Send notification about unrecognized UID
+                _textNotifier.NotifyAll("UNAUTHORIZED TAG", 
+                    $@"Unauthorized tag was scanned at front door NFC reader.
+
+Tag UID is: {asciiPayload}");
+            }
+        }
+
         if (!LastLockWakeTimeWasMoreThanXMinutesAgo())
         {
             _logger.Information("Not waking lock/sending picture notification since timeout has not elapsed");
@@ -110,7 +172,7 @@ public class MqttWatcher
             return;
         }
         
-        if (e.ApplicationMessage.Topic == SECRETS.FrontDoorMotionZoneATopic && asciiPayload.Equals("triggered"))
+        if (e.ApplicationMessage.Topic == SECRETS.TopicFrontDoorMotionZoneA && asciiPayload.Equals("triggered"))
         {            
             _logger.Information("Waking front door lock/sending picture notification");
 
