@@ -59,7 +59,6 @@ public class Routines
         _entities.Switch.GuestBedroomMediaPcWol.TurnOn();
         
         // 2. Guest bed TV on
-        _entities.MediaPlayer._43TclRokuTv.TurnOn();
         
         // 3. Set AC to 68 for 1.25 hours if it's on cool mode already
         await new WeatherUtilities(_logger, _entities)
@@ -86,7 +85,6 @@ public class Routines
         _entities.Switch.GuestBedroomMediaPcWol.TurnOff();
         
         // 2. Guest bed TV off
-        _entities.MediaPlayer._43TclRokuTv.TurnOff();
         
         // 3. Set AC to 71
         await new WeatherUtilities(_logger, _entities)

@@ -72,7 +72,7 @@ public class ScheduledLights
             _sunriseStuffActivated = true;
             _sunsetStuffActivated = false;
 
-            TurnLightsOffAtMorning();
+            SetLightsAtMorning();
 
             return;
         }
@@ -84,7 +84,7 @@ public class ScheduledLights
             _sunsetStuffActivated = true;
             _sunriseStuffActivated = false;
             
-            TurnLightsOnAtSunset();
+            SetLightsAtSunset();
         }
     }
 
@@ -105,28 +105,31 @@ public class ScheduledLights
         _logger.Debug("");
     }
 
-    private void TurnLightsOnAtSunset()
+    private void SetLightsAtSunset()
     {
         _entities.Light.FrontPorchLights.TurnOn();
+        
         _entities.Switch.BackPorchChristmasLights.TurnOn();
         
         _entities.Light.DenLamp.TurnOn();
 
         _entities.Light.KitchenUndercabinetLights.TurnOn();
 
-        _logger.Debug("Lights turned on at sunset");
+        _logger.Debug("Lights set for sunset");
     }
     
-    private void TurnLightsOffAtMorning()
+    private void SetLightsAtMorning()
     {
         _entities.Light.BackPorchLights.TurnOff();
         
-        _entities.Light.FrontPorchLights.TurnOn();
+        _entities.Light.FrontPorchLights.TurnOff();
         
         _entities.Switch.BackPorchChristmasLights.TurnOff();
         
         _entities.Switch.LaundryRoomLights2.TurnOff();
         
-        _logger.Debug("Lights turned off at morning");
+        _entities.Switch.FoyerPlantGrowLights.TurnOn();
+        
+        _logger.Debug("Lights set for morning");
     }
 }

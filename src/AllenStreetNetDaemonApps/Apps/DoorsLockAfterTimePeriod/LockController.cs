@@ -35,8 +35,8 @@ public class LockController
 
         FrontDoorLock = new AutomaticallyLockableLock(_logger, textNotifier, TimeSpan.FromMinutes(3), _entities.Lock.FrontDoor);
         BackDoorLock = new AutomaticallyLockableLock(_logger, textNotifier, TimeSpan.FromMinutes(6), _entities.Lock.BackDoor);
-
-        InitializeLockDisableForHours();
+        
+        scheduler.RunIn(TimeSpan.FromSeconds(1), InitializeLockDisableForHours);
 
         // Set schedule for initial runs of things
         scheduler.RunIn(TimeSpan.FromSeconds(3), async () => await WorkLocks());
@@ -99,6 +99,8 @@ public class LockController
 
         _frontLockLastDisableText = "0.00";
         _backLockLastDisableText = "0.00";
+        
+        _logger.Information("Set lock disable textboxes to 0.00");
     }
 
     private async Task WorkLockDisableTimes()

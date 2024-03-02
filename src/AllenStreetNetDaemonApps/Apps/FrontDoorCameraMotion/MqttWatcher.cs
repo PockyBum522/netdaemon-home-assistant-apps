@@ -1,4 +1,5 @@
-﻿using MQTTnet;
+﻿using AllenStreetNetDaemonApps.Apps.DoorsLockAfterTimePeriod;
+using MQTTnet;
 using MQTTnet.Client;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
@@ -25,6 +26,7 @@ public class MqttWatcher
     private SwitchEntity? _deadboltLatch;
     private SwitchEntity? _doorknobLatch;
     private LockEntity? _frontDoorLock;
+    private readonly LockController _lockController;
 
     public MqttWatcher(IHaContext ha, INetDaemonScheduler scheduler)
     {
@@ -39,6 +41,8 @@ public class MqttWatcher
             .WriteTo.Console()
             .WriteTo.File($"logs/{namespaceLastPart}/{GetType().Name}_.log", rollingInterval: RollingInterval.Day)
             .CreateLogger();
+
+        _lockController = new LockController(ha, scheduler);
         
         _lastLockWakeAtTime = DateTimeOffset.Now - TimeSpan.FromMinutes(5);
         _lastFrontDoorImageNotifyTime = DateTimeOffset.Now - TimeSpan.FromMinutes(5);
@@ -141,8 +145,10 @@ public class MqttWatcher
 
                 _logger.Debug("Front door latches open!");
                     
-                _frontDoorLock.Unlock();
+                _lockController.FrontDoorLock.AddAutoLockTime();
 
+                await _lockController.FrontDoorLock.Unlock();
+                
                 foundAuthorizedTag = true;
 
                 if (_lastScanNotificationTime >= DateTimeOffset.Now - TimeSpan.FromSeconds(20)) continue;
