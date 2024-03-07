@@ -74,13 +74,13 @@ public class AutomaticallyLockableLock(ILogger logger, TextNotifier notifier, Ti
     /// </summary>
     /// <param name="timeBetweenAttempts">How long to wait in between attempts. Null gives a default of 10 seconds</param>
     /// <param name="retries">How many times to attempt unlocking before giving up</param>
-    public async Task Unlock(TimeSpan? timeBetweenAttempts = null, int retries = 3)
+    public async Task Unlock(TimeSpan? timeBetweenAttempts = null, int retries = 4)
     {
         while (retries-- > 0)
         {
             HomeAssistantLockEntity.Unlock();
 
-            await Task.Delay(timeBetweenAttempts ?? TimeSpan.FromSeconds(10));
+            await Task.Delay(timeBetweenAttempts ?? TimeSpan.FromSeconds(15));
 
             if (!IsLocked) break;
         }
@@ -91,10 +91,10 @@ public class AutomaticallyLockableLock(ILogger logger, TextNotifier notifier, Ti
             
             LastUnlockedAtTime = DateTimeOffset.Now;
             
-            return;
+            //return;
         }
         
-        SetLockAsFailed($"Could not unlock {Name} even after retries");
+        //SetLockAsFailed($"Could not unlock {Name} even after retries");
     }
 
     /// <summary>

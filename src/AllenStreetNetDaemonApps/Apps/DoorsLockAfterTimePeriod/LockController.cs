@@ -61,7 +61,7 @@ public class LockController
             RelatchFrontDoorLatches();
             
             // If the door is open, we'd better make damn sure the deadbolt retracts so it doesn't slam into the door frame latch when the door shuts
-            if (FrontDoorLock.IsLocked) await FrontDoorLock.Unlock(TimeSpan.FromSeconds(1), 20);
+            if (FrontDoorLock.IsLocked) await FrontDoorLock.Unlock(TimeSpan.FromSeconds(1), 3);
             
             FrontDoorLock.AddAutoLockTime();
 

@@ -126,7 +126,7 @@ public class KitchenLightsController
     {
         foreach (var ceilingLight in _kitchenCeilingLightsEntities)
         {
-            var lightAttributesDict = (System.Collections.Generic.Dictionary<string,object>?)ceilingLight.Attributes;
+            var lightAttributesDict = (Dictionary<string,object>?)ceilingLight.Attributes;
             
             if (lightAttributesDict is null)
                 throw new Exception("lightAttributesDict is null");
