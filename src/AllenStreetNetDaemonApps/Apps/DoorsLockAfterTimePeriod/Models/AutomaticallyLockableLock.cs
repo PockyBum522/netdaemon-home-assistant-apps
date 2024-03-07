@@ -55,7 +55,7 @@ public class AutomaticallyLockableLock(ILogger logger, TextNotifier notifier, Ti
         {
             HomeAssistantLockEntity.Lock();
 
-            await Task.Delay(timeBetweenAttempts ?? TimeSpan.FromSeconds(10));
+            await Task.Delay(timeBetweenAttempts ?? TimeSpan.FromSeconds(15));
 
             if (IsLocked) break;
         }
@@ -63,10 +63,10 @@ public class AutomaticallyLockableLock(ILogger logger, TextNotifier notifier, Ti
         if (IsLocked)
         {
             Logger.Debug("Lock {Name} was locked successfully", Name);
-            return;
+            // return;
         }
         
-        SetLockAsFailed($"Could not lock {Name} even after retries");
+        // SetLockAsFailed($"Could not lock {Name} even after retries");
     }
 
     /// <summary>
