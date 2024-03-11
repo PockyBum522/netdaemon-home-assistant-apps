@@ -79,7 +79,7 @@ public class Routines
         // Do the opposite of everything in turn on sequence
 
         // 1. Sleep guest bedroom PC 
-        _entities.Button.GuestbedroomSleep.CallService("turn_on");
+        //_entities.Button.GuestBedroomSleep.CallService("turn_on");
         
         // Reset switch
         _entities.Switch.GuestBedroomMediaPcWol.TurnOff();
@@ -162,8 +162,7 @@ public class Routines
         _entities.Light.MasterBedroomLights.TurnOff();
         
         // TVs
-        _entities.Switch.DenTv.TurnOff();
-        _entities.MediaPlayer.LgWebosSmartTv2.TurnOff();
+        _entities.MediaPlayer.DenLgTv.TurnOff();
     }
     
     private async Task CheckAllToggles()

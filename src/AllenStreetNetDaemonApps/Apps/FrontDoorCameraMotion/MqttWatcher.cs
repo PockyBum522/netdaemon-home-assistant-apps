@@ -66,7 +66,7 @@ public class MqttWatcher
         _deadboltLatch = _entities.Switch.DeadboltDoorframeLatch;
         _doorknobLatch = _entities.Switch.DoorknobDoorframeLatch;
 
-        _frontDoorLock = _entities.Lock.FrontDoor;
+        _frontDoorLock = _entities.Lock.BluetoothFrontDoorLock2;
         
         var mqttFactory = new MqttFactory();
 
@@ -182,8 +182,6 @@ Tag UID is: {asciiPayload}");
         {            
             _logger.Information("Waking front door lock/sending picture notification");
 
-            WakeFrontDoorLock();
-
             await NotifyUsersWithCameraImage();
             
             _lastFrontDoorImageNotifyTime = DateTimeOffset.Now;
@@ -289,12 +287,5 @@ Tag UID is: {asciiPayload}");
         //     _lastRunAtTime < xMinutesAgo);
         
         return _lastFrontDoorImageNotifyTime < xMinutesAgo;
-    }
-
-    private void WakeFrontDoorLock()
-    {
-        _entities.Button.FrontDoorWake.Press();
-
-        _logger.Information("Front door lock wake up command sent");
     }
 }

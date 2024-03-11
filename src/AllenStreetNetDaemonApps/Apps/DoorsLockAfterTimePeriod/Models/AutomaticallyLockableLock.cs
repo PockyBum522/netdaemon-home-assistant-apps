@@ -43,27 +43,17 @@ public class AutomaticallyLockableLock(ILogger logger, TextNotifier notifier, Ti
     /// <summary>
     /// Locks the lock
     /// </summary>
-    /// <param name="timeBetweenAttempts">How long to wait in between attempts. Null gives a default of 10 seconds</param>
-    public async Task Lock(TimeSpan? timeBetweenAttempts = null)
+    public async Task Lock()
     {
-        if (IsFailed("Could not attempt to lock, is failed") || 
-            IsManuallyDisabled("Could not attempt to lock, is manually disabled")) return;
-        
-        var attemptCounter = 3;
-        
-        while (attemptCounter-- > 0)
-        {
-            HomeAssistantLockEntity.Lock();
+        HomeAssistantLockEntity.Lock();
 
-            await Task.Delay(timeBetweenAttempts ?? TimeSpan.FromSeconds(15));
-
-            if (IsLocked) break;
-        }
+        if (IsLocked) return;
+        
+        await Task.Delay(5);
 
         if (IsLocked)
         {
             Logger.Debug("Lock {Name} was locked successfully", Name);
-            // return;
         }
         
         // SetLockAsFailed($"Could not lock {Name} even after retries");
@@ -72,26 +62,19 @@ public class AutomaticallyLockableLock(ILogger logger, TextNotifier notifier, Ti
     /// <summary>
     /// Unlocks the lock
     /// </summary>
-    /// <param name="timeBetweenAttempts">How long to wait in between attempts. Null gives a default of 10 seconds</param>
-    /// <param name="retries">How many times to attempt unlocking before giving up</param>
-    public async Task Unlock(TimeSpan? timeBetweenAttempts = null, int retries = 4)
+    public async Task Unlock()
     {
-        while (retries-- > 0)
-        {
-            HomeAssistantLockEntity.Unlock();
+        HomeAssistantLockEntity.Unlock();
 
-            await Task.Delay(timeBetweenAttempts ?? TimeSpan.FromSeconds(15));
-
-            if (!IsLocked) break;
-        }
+        if (!IsLocked) return;
+            
+        await Task.Delay(5);
         
         if (!IsLocked)
         {
             Logger.Debug("Lock {Name} was unlocked successfully", Name);
             
             LastUnlockedAtTime = DateTimeOffset.Now;
-            
-            //return;
         }
         
         //SetLockAsFailed($"Could not unlock {Name} even after retries");

@@ -38,7 +38,7 @@ public class HomeAssistantDashboardSwitchResetter
     private void GetAllSwitches()
     {
         _switchesToReset.Add(_entities.Switch.TvMediaPcWol);
-        _switchesToReset.Add(_entities.Switch.DavidDesktopWol2);
+        _switchesToReset.Add(_entities.Switch.DavidDesktopWol);
         _switchesToReset.Add(_entities.Switch.AlyssaDesktopWol);
         _switchesToReset.Add(_entities.Switch.GuestBedroomMediaPcWol);
         

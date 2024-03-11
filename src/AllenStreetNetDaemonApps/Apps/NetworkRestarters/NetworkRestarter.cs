@@ -312,7 +312,7 @@ public class NetworkRestarter
     
     private async Task TurnOffNetworkClosetCamsPoeSwitch()
     {
-        var entityToWork = _entities.Switch.NetworkPowerNetworkClosetPoeCameras4PortSwitch2;
+        var entityToWork = _entities.Switch.NetworkPowerNetworkClosetPoeCameras4PortSwitch;
         
         _logger.Information("_entities.Switch.NetworkPowerNetworkClosetPoeCameras4PortSwitch2 State: {State}", entityToWork.State);
 
@@ -327,7 +327,7 @@ public class NetworkRestarter
     
     private async Task TurnOnNetworkClosetCamsPoeSwitch()
     {
-        var entityToWork = _entities.Switch.NetworkPowerNetworkClosetPoeCameras4PortSwitch2;
+        var entityToWork = _entities.Switch.NetworkPowerNetworkClosetPoeCameras4PortSwitch;
         
         _logger.Information("_entities.Switch.NetworkPowerNetworkClosetPoeCameras4PortSwitch2 State: {State}", entityToWork.State);
 

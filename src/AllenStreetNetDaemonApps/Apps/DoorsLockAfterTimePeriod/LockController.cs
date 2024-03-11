@@ -33,8 +33,8 @@ public class LockController
 
         var textNotifier = new TextNotifier(_logger, ha);
 
-        FrontDoorLock = new AutomaticallyLockableLock(_logger, textNotifier, TimeSpan.FromMinutes(3), _entities.Lock.FrontDoor);
-        BackDoorLock = new AutomaticallyLockableLock(_logger, textNotifier, TimeSpan.FromMinutes(6), _entities.Lock.BackDoor);
+        FrontDoorLock = new AutomaticallyLockableLock(_logger, textNotifier, TimeSpan.FromMinutes(3), _entities.Lock.BluetoothFrontDoorLock2);
+        BackDoorLock = new AutomaticallyLockableLock(_logger, textNotifier, TimeSpan.FromMinutes(6), _entities.Lock.BluetoothBackDoorLock2);
         
         scheduler.RunIn(TimeSpan.FromSeconds(1), InitializeLockDisableForHours);
 
@@ -54,14 +54,14 @@ public class LockController
 
     private async Task CheckFrontDoor()
     {
-        if ((_entities.BinarySensor.FrontDoorOpen.State ?? "closed").ToLower() == "open" ||
-            (_entities.BinarySensor.FrontDoorReedSwitch.State ?? "off").ToLower() == "on")
+        // if ((_entities.BinarySensor.FrontDoorOpen.State ?? "closed").ToLower() == "open" ||
+        if ((_entities.BinarySensor.FrontDoorReedSwitch.State ?? "off").ToLower() == "on")
         {
             // If the door is open then we're done with these
             RelatchFrontDoorLatches();
             
             // If the door is open, we'd better make damn sure the deadbolt retracts so it doesn't slam into the door frame latch when the door shuts
-            if (FrontDoorLock.IsLocked) await FrontDoorLock.Unlock(TimeSpan.FromSeconds(1), 3);
+            if (FrontDoorLock.IsLocked) await FrontDoorLock.Unlock();
             
             FrontDoorLock.AddAutoLockTime();
 
@@ -74,8 +74,8 @@ public class LockController
 
     private async Task CheckBackDoor()
     {
-        if ((_entities.BinarySensor.BackDoorOpen.State ?? "closed").ToLower() == "open" ||
-            (_entities.BinarySensor.BackDoorReedSwitch.State ?? "off").ToLower() == "on")
+        //if ((_entities.BinarySensor.BackDoorOpen.State ?? "closed").ToLower() == "open" ||
+        if ((_entities.BinarySensor.BackDoorReedSwitch.State ?? "off").ToLower() == "on")
         {
             BackDoorLock.AddAutoLockTime();
             

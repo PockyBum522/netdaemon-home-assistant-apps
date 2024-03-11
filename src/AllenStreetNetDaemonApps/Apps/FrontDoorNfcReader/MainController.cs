@@ -145,9 +145,6 @@ public class MainController
             return;
         }
         
-        // Wake the lock because we're probably about to send an unlock command, this should make that a hair faster
-        _entities.Button.FrontDoorWake.Press();
-        
         // Otherwise:
         var udpDataAsString = ToHexString(udpResult.Buffer);
         
@@ -190,7 +187,7 @@ public class MainController
         doorknobLatch.TurnOn();
         
         // We can try unlocking here to get a head start
-        _entities.Lock.FrontDoor.Unlock();
+        _entities.Lock.BluetoothFrontDoorLock2.Unlock();
     }
 
     private static NfcTag LookupTagByUid(string uid)
