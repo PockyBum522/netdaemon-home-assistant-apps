@@ -1,7 +1,4 @@
-﻿using Renci.SshNet;
-using Renci.SshNet.Common;
-
-namespace AllenStreetNetDaemonApps.Apps.NetworkRestarters;
+﻿namespace AllenStreetNetDaemonApps.Apps.NetworkRestarters;
 
 [NetDaemonApp]
 public class PoeCamerasRestarter
