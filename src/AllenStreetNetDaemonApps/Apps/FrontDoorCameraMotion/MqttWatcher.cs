@@ -138,6 +138,8 @@ public class MqttWatcher
             {
                 if (tag.Uid != asciiPayload) continue;
                 
+                if (_lastScanNotificationTime >= DateTimeOffset.Now - TimeSpan.FromSeconds(4)) continue;
+                
                 _deadboltLatch.TurnOn();
                 _doorknobLatch.TurnOn();
 
@@ -149,8 +151,7 @@ public class MqttWatcher
                 
                 foundAuthorizedTag = true;
 
-                if (_lastScanNotificationTime >= DateTimeOffset.Now - TimeSpan.FromSeconds(20)) continue;
-                    
+                
                 // Send notification about unrecognized UID
                 //_textNotifier.NotifyDavid("Tag Scan at Front Door", $"Tag used was for: {tag.FriendlyName}");
                         
