@@ -4,7 +4,7 @@
 # READ COMMENTS CAREFULLY
 
 # Local paths on your computer
-$solutionPath = "D:\source\repos\PockyBum522 Github\netdaemon-home-assistant-apps\src\AllenStreetNetDaemonApps"
+$solutionPath = "D:\repos\netdaemon-home-assistant-apps\src\AllenStreetNetDaemonApps"
 $solutionFilename = "AllenStreetNetDaemonApps.csproj"
 
 # ND folder served up by a samba addon in HA

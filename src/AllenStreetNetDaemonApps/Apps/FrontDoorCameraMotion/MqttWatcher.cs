@@ -152,7 +152,7 @@ public class MqttWatcher
                 if (_lastScanNotificationTime >= DateTimeOffset.Now - TimeSpan.FromSeconds(20)) continue;
                     
                 // Send notification about unrecognized UID
-                _textNotifier.NotifyDavid("Tag Scan at Front Door", $"Tag used was for: {tag.FriendlyName}");
+                //_textNotifier.NotifyDavid("Tag Scan at Front Door", $"Tag used was for: {tag.FriendlyName}");
                         
                 _lastScanNotificationTime = DateTimeOffset.Now;
             }
@@ -160,10 +160,10 @@ public class MqttWatcher
             if (!foundAuthorizedTag)
             {
                 // Send notification about unrecognized UID
-                _textNotifier.NotifyAll("UNAUTHORIZED TAG", 
-                    $@"Unauthorized tag was scanned at front door NFC reader.
-
-Tag UID is: {asciiPayload}");
+//                 _textNotifier.NotifyAll("UNAUTHORIZED TAG", 
+//                     $@"Unauthorized tag was scanned at front door NFC reader.
+//
+// Tag UID is: {asciiPayload}");
             }
         }
 

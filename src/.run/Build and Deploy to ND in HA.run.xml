@@ -1,6 +1,6 @@
 ﻿<component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Build and Deploy to ND in HA" type="ShConfigurationType">
-    <option name="SCRIPT_TEXT" value="$scriptPath = &quot;D:\source\repos\PockyBum522 Github\netdaemon-home-assistant-apps\src\Scripts\Build and deploy over LAN.ps1&quot;; &amp; pwsh $scriptPath" />
+    <option name="SCRIPT_TEXT" value="$scriptPath = &quot;D:\repos\netdaemon-home-assistant-apps\src\Scripts\Build and deploy over LAN.ps1&quot;; &amp; pwsh $scriptPath" />
     <option name="INDEPENDENT_SCRIPT_PATH" value="false" />
     <option name="SCRIPT_PATH" value="$PROJECT_DIR$/Scripts/Build and deploy over LAN.ps1" />
     <option name="SCRIPT_OPTIONS" value="" />
