@@ -132,7 +132,9 @@ public class MqttWatcher
                 _doorknobLatch is null ||
                 _frontDoorLock is null ||
                 _textNotifier is null)
+            {
                 throw new NullReferenceException();
+            }
             
             foreach (var tag in SECRETS.AuthorizedNfcTags)
             {
