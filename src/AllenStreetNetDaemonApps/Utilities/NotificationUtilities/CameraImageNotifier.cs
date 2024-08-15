@@ -47,26 +47,26 @@ public class CameraImageNotifier
         _logger.Information("Notifying [DAVID] LOCAL: {LocalPath}", localFullPath);
         _logger.Information("Notifying [DAVID] MEDIA: {MediaPath}", mediaFullPathWithUrl);
         
-        _haContext.CallService("notify", "david_desktop", data: new
-        {
-            title = notifyTitle,
-            message = notifyBody,
-            data = new
-            {
-                image = localFullPath,
-                duration = 3
-            }
-        });
+        // _haContext.CallService("notify", "david_desktop", data: new
+        // {
+        //     title = notifyTitle,
+        //     message = notifyBody,
+        //     data = new
+        //     {
+        //         image = localFullPath,
+        //         duration = 3
+        //     }
+        // });
         
-        _haContext.CallService("notify", "mobile_app_pixel_fold", data: new
-        {
-            title = notifyTitle,
-            message = notifyBody,
-            data = new
-            {
-                image = mediaFullPathWithUrl
-            }
-        });
+        // _haContext.CallService("notify", "mobile_app_pixel_fold", data: new
+        // {
+        //     title = notifyTitle,
+        //     message = notifyBody,
+        //     data = new
+        //     {
+        //         image = mediaFullPathWithUrl
+        //     }
+        // });
     }
     
     public void NotifyAlyssa(string notifyTitle, string notifyBody, string imageFileName)
@@ -82,26 +82,38 @@ public class CameraImageNotifier
         _logger.Information("Notifying [ALYSSA] LOCAL: {LocalPath}", localFullPath);
         _logger.Information("Notifying [ALYSSA] MEDIA: {MediaPath}", mediaFullPathWithUrl);
         
-        _haContext.CallService("notify", "mobile_app_" + SECRETS.AlyssaiPhoneMobileAppId, data: new
-        {
-            title = notifyTitle,
-            message = notifyBody,
-            data = new
-            {
-                image = mediaFullPathWithUrl
-                
-                // This works, you have to hold down on the notification to get to options
-                // actions = new[]
-                // {
-                //     new 
-                //     {
-                //         action = "OPEN",
-                //         title = "View",
-                //         uri = "https://google.com"    
-                //     }
-                // }
-            }
-        });
+        // This is what was running for a while as working:
+        // _haContext.CallService("notify", "mobile_app_" + SECRETS.AlyssaiPhoneMobileAppId, data: new
+        // {
+        //     title = notifyTitle,
+        //     message = notifyBody,
+        //     data = new
+        //     {
+        //         image = mediaFullPathWithUrl
+        //     }
+        // });
+        
+        // Reference, don't know why I wasn't using the extra bit in the middle
+        // _haContext.CallService("notify", "mobile_app_" + SECRETS.AlyssaiPhoneMobileAppId, data: new
+        // {
+        //     title = notifyTitle,
+        //     message = notifyBody,
+        //     data = new
+        //     {
+        //         image = mediaFullPathWithUrl
+        //         
+        //         // This works, you have to hold down on the notification to get to options
+        //         // actions = new[]
+        //         // {
+        //         //     new 
+        //         //     {
+        //         //         action = "OPEN",
+        //         //         title = "View",
+        //         //         uri = "https://google.com"    
+        //         //     }
+        //         // }
+        //     }
+        // });
     }
     
     // public void NotifyAll(string notifyTitle, string notifyBody)

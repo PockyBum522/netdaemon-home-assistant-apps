@@ -21,34 +21,34 @@ public class TextNotifier
             message = notifyBody
         }); 
         
-        _haContext.CallService("notify", "tv_desktop", data: new
-        {
-            title = notifyTitle,
-            message = notifyBody
-        });
+        // _haContext.CallService("notify", "tv_desktop", data: new
+        // {
+        //     title = notifyTitle,
+        //     message = notifyBody
+        // });
     }
     
     public void NotifyDavid(string notifyTitle, string notifyBody, string? notificationId = null)
     {
         _logger.Information("Notifying [DAVID]: {Title} | {Body}", notifyTitle, notifyBody);
         
-        _haContext.CallService("notify", "david_desktop", data: new
-        {
-            title = notifyTitle,
-            message = notifyBody
-        });
+        // _haContext.CallService("notify", "david_desktop", data: new
+        // {
+        //     title = notifyTitle,
+        //     message = notifyBody
+        // });
         
-        _haContext.CallService("notify", "david_laptop", data: new
-        {
-            title = notifyTitle,
-            message = notifyBody
-        });
+        // _haContext.CallService("notify", "david_laptop", data: new
+        // {
+        //     title = notifyTitle,
+        //     message = notifyBody
+        // });
         
-        _haContext.CallService("notify", "mobile_app_pixel_fold", data: new
-        {
-            title = notifyTitle,
-            message = notifyBody
-        });
+        // _haContext.CallService("notify", "mobile_app_pixel_fold", data: new
+        // {
+        //     title = notifyTitle,
+        //     message = notifyBody
+        // });
         
         // _haContext.CallService("notify", "guest_bedroom", data: new
         // {
@@ -79,17 +79,17 @@ public class TextNotifier
 
         if (!usersToExclude.Contains(WhoToNotify.General)) NotifyGeneral(notifyTitle, notifyBody);
         
-        if (!usersToExclude.Contains(WhoToNotify.David)) NotifyDavid(notifyTitle, notifyBody);
-        
-        if (!usersToExclude.Contains(WhoToNotify.Alyssa)) NotifyAlyssa(notifyTitle, notifyBody);
+        // if (!usersToExclude.Contains(WhoToNotify.David)) NotifyDavid(notifyTitle, notifyBody);
+        //
+        // if (!usersToExclude.Contains(WhoToNotify.Alyssa)) NotifyAlyssa(notifyTitle, notifyBody);
     }
     
     public void NotifyUsersInHa(string notifyTitle, string notifyBody, List<WhoToNotify> usersToNotify)
     {
         if (usersToNotify.Contains(WhoToNotify.General)) NotifyGeneral(notifyTitle, notifyBody);
         
-        if (usersToNotify.Contains(WhoToNotify.David)) NotifyDavid(notifyTitle, notifyBody);
-        
-        if (usersToNotify.Contains(WhoToNotify.Alyssa)) NotifyAlyssa(notifyTitle, notifyBody);
+        // if (usersToNotify.Contains(WhoToNotify.David)) NotifyDavid(notifyTitle, notifyBody);
+        //
+        // if (usersToNotify.Contains(WhoToNotify.Alyssa)) NotifyAlyssa(notifyTitle, notifyBody);
     }
 }
