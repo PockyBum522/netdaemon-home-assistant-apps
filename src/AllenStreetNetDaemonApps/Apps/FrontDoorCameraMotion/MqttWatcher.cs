@@ -17,6 +17,8 @@ public class MqttWatcher
     private DateTimeOffset _lastLockWakeAtTime;
     private DateTimeOffset _lastFrontDoorImageNotifyTime;
     private DateTimeOffset _lastScanNotificationTime = DateTimeOffset.Now;
+    
+    private DateTimeOffset _lastGarageOpenTime = DateTimeOffset.Now;
 
     private CameraImageTaker _cameraImageTaker;
     private CameraImageNotifier _cameraImageNotifier;
@@ -97,6 +99,7 @@ public class MqttWatcher
                 .WithTopicFilter(f => { f.WithTopic(SECRETS.TopicFrontYardFrontDoorMotion); })
                 .WithTopicFilter(f => { f.WithTopic(SECRETS.TopicFrontYardDrivewayMotion); })
                 .WithTopicFilter(f => { f.WithTopic(SECRETS.TopicFrontDoorNfcReaderTags); })
+                .WithTopicFilter(f => { f.WithTopic(SECRETS.TopicDenTouchscreenButtons); })
                 .WithTopicFilter(f => { f.WithTopic(SECRETS.TopicBackPorchPeopleAreas); })
                 .Build();
 
@@ -105,11 +108,11 @@ public class MqttWatcher
         _logger.Information("MQTT client subscribed to topics");
 
         // Pause forever to wait for incoming messages
-        while (true){ await Task.Delay(9999); }
+        while (true){ await Task.Delay(1000); }
      
         // ReSharper disable once FunctionNeverReturns because it's not supposed to
     }
-
+    
     private async Task HandleIncomingMessage(MqttApplicationMessageReceivedEventArgs e)
     {
         var rawPayload = e.ApplicationMessage.PayloadSegment;
@@ -118,8 +121,9 @@ public class MqttWatcher
         
         _logger.Information(
             "On topic: {TopicName}, received {Message}", e.ApplicationMessage.Topic, asciiPayload);
-
-
+     
+        await checkIfDenTouchscreenButtons(e.ApplicationMessage.Topic, asciiPayload);
+        
         if (e.ApplicationMessage.Topic == SECRETS.TopicFrontDoorNfcReaderTags)
         {
             _logger.Information("Tag scanned on topic: {Topic}", SECRETS.TopicFrontDoorNfcReaderTags);
@@ -169,7 +173,7 @@ public class MqttWatcher
 // Tag UID is: {asciiPayload}");
             }
         }
-
+        
         if (!LastLockWakeTimeWasMoreThanXMinutesAgo())
         {
             _logger.Information("Not waking lock/sending picture notification since timeout has not elapsed");
@@ -183,9 +187,60 @@ public class MqttWatcher
         {            
             _logger.Information("Waking front door lock/sending picture notification");
 
-            await NotifyUsersWithCameraImage();
+            // Disabled to see if it's what's causing the delay on firing the front door unlatch
+            //await NotifyUsersWithCameraImage();
             
             _lastFrontDoorImageNotifyTime = DateTimeOffset.Now;
+        }
+    }
+
+    private async Task checkIfDenTouchscreenButtons(string topic, string asciiPayload)
+    {
+        if (topic != SECRETS.TopicDenTouchscreenButtons) return;
+        
+        if (asciiPayload.ToLower() == "garage_button_pressed")
+        {
+            // If this button has already been pressed within the last 15 seconds, then user might want to stop garage midway, make it so another button press immediately activates the button 
+            if (_lastGarageOpenTime + TimeSpan.FromSeconds(15) > DateTimeOffset.Now)
+            {
+                _lastGarageOpenTime = DateTimeOffset.Now;
+                
+                _entities.Switch.OpenGarageDoor.TurnOn();
+                
+                return;
+            }
+            
+            _lastGarageOpenTime = DateTimeOffset.Now;
+            
+            // Delay to give user time to walk to garage
+            await Task.Delay(
+                TimeSpan.FromSeconds(8));
+            
+            _entities.Switch.OpenGarageDoor.TurnOn();    
+        }
+        
+        if (asciiPayload.ToLower() == "den_lights_button_pressed")
+        {
+            if (_entities.Light.DenLights.IsOn())
+            {
+                _entities.Light.DenLights.TurnOff();
+            }
+            else
+            {
+                _entities.Light.DenLights.TurnOn();   
+            }
+        }
+        
+        if (asciiPayload.ToLower() == "tv_power_button_pressed")
+        {
+            if (_entities.MediaPlayer.DenLgTv.IsOn())
+            {
+                _entities.MediaPlayer.DenLgTv.TurnOff();    
+            }
+            else
+            {
+                _entities.MediaPlayer.DenLgTv.TurnOn();
+            }
         }
     }
 
