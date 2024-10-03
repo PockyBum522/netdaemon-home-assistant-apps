@@ -67,7 +67,7 @@ public class Routines
         // 4. When guest bedroom lightswitch gets wired in, turn it on
 
         // 5. If guest bedroom lights are on, turn them off
-        _entities.Group.GroupBackBedroomLights.CallService("turn_off");
+        //_entities.Group.GroupBackBedroomLights.CallService("turn_off");
 
         // Reset switch state
         _entities.Switch.GuestBedroomMediaPcWol.TurnOff();
@@ -93,7 +93,7 @@ public class Routines
         // 4. When guest bedroom lightswitch gets wired in, turn it on
 
         // 5. If guest bedroom lights are on, turn them off
-        _entities.Group.GroupBackBedroomLights.CallService("turn_off");
+        //_entities.Group.GroupBackBedroomLights.CallService("turn_off");
 
         // Reset switch state
         _entities.Switch.GuestBedroomMediaPcWol.TurnOff();

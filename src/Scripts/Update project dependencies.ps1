@@ -1,4 +1,4 @@
-Set-Location "D:\source\repos\PockyBum522 Github\netdaemon-home-assistant-apps\src\AllenStreetNetDaemonApps"
+Set-Location "D:\repos\netdaemon-home-assistant-apps\src\AllenStreetNetDaemonApps"
 
 # Update all nugets to latest versions
 $regex = 'PackageReference Include="([^"]*)" Version="([^"]*)"'
@@ -18,4 +18,4 @@ ForEach ($file in Get-ChildItem . -Recurse | Where-Object { $_.Extension -like "
     }
 }
 
-Set-Location "D:\source\repos\PockyBum522 Github\netdaemon-home-assistant-apps\src\Scripts"
+Set-Location "D:\repos\netdaemon-home-assistant-apps\src\Scripts"

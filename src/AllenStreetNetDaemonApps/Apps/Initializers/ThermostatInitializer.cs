@@ -29,6 +29,12 @@ public class ThermostatInitializer
 
     private async Task SetThermostatOnceTemperatureFetched()
     {
-        await new WeatherUtilities(_logger, _entities).SetAirConditioningByOutsideTemperature(71.0);
+        
+        var testState = _entities.Climate.HouseHvac.State;
+
+        Console.WriteLine();
+
+        
+        await new WeatherUtilities(_logger, _entities).SetAirConditioningByOutsideTemperature(73.0);
     }
 }

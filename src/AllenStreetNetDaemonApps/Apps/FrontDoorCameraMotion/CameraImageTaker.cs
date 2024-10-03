@@ -39,8 +39,8 @@ public class CameraImageTaker
         var fullPathToMedia = Path.Join(MediaSnapshotsDirectory, newImageFilename);
         var fullPathToLocal = Path.Join(CameraSnapshotsDirectory, newImageFilename);
         
-        _entities.Camera.FrontDoor.Snapshot(fullPathToMedia);
-        _entities.Camera.FrontDoor.Snapshot(fullPathToLocal);
+        //_entities.Camera.FrontDoor.Snapshot(fullPathToMedia);
+        //_entities.Camera.FrontDoor.Snapshot(fullPathToLocal);
         
         _logger.Debug("Saving images to: {MediaPath} and {LocalPath}", fullPathToMedia, fullPathToLocal);
         
@@ -81,8 +81,8 @@ public class CameraImageTaker
         var fullPathToMedia = Path.Join(MediaSnapshotsDirectory, newImageFilename);
         var fullPathToLocal = Path.Join(CameraSnapshotsDirectory, newImageFilename);
         
-        _entities.Camera.FrontYardFromSwCorner.Snapshot(fullPathToMedia);
-        _entities.Camera.FrontYardFromSwCorner.Snapshot(fullPathToLocal);
+        // _entities.Camera.FrontYardFromSwCorner.Snapshot(fullPathToMedia);
+        // _entities.Camera.FrontYardFromSwCorner.Snapshot(fullPathToLocal);
         
         _logger.Debug("Saving images to: {MediaPath} and {LocalPath}", fullPathToMedia, fullPathToLocal);
         
