@@ -37,6 +37,9 @@ public class NetworkRestarter
         // ReSharper disable once AsyncVoidLambda because I'm fairly sure it is useless
         scheduler.RunEvery(TimeSpan.FromSeconds(2), async () => await CheckAllToggles());
         
+        // For testing, uncomment this
+        // scheduler.RunIn(TimeSpan.FromSeconds(2), async () => await RestartAllNetworkEquipment());
+        
         _textNotifier = new TextNotifier(_logger, ha);
         
         _logger.Information("Initialized {NamespaceLastPart} v0.01", namespaceLastPart);
@@ -131,14 +134,14 @@ public class NetworkRestarter
         await Task.Delay(TimeSpan.FromSeconds(60));
             
         await TurnOnNetworkClosetEquipment();
-
+        
         // Wait for main router to come back up. Timed at 60 seconds, so let's wait just a hair longer to start auxiliary switches 
         await Task.Delay(TimeSpan.FromSeconds(70));
         
         await TurnOnMasterBathroomCabinetNetworkEquipment();
             
         await TurnOnLaundryRoomNetworkEquipment();
-
+        
         await TurnOnNetworkClosetCamsPoeSwitch();
         
         // Wait for laundry switch to come back up, this can be removed when garage router is directly connected to main router

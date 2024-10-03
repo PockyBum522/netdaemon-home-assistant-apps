@@ -26,8 +26,8 @@ public class ScheduledAirConditioning
             .WriteTo.File($"logs/{namespaceLastPart}/{GetType().Name}_.log", rollingInterval: RollingInterval.Day)
             .CreateLogger();
         
-        scheduler.RunIn(TimeSpan.FromSeconds(10), () => _ = CheckAllScheduledTasks());
-        scheduler.RunEvery(TimeSpan.FromSeconds(120), () => _ = CheckAllScheduledTasks());
+        scheduler.RunIn(TimeSpan.FromSeconds(10), async () => await CheckAllScheduledTasks());
+        scheduler.RunEvery(TimeSpan.FromSeconds(120), async () => await CheckAllScheduledTasks());
         
         _logger.Information("Initialized {NamespaceLastPart} v0.01", namespaceLastPart);
     }

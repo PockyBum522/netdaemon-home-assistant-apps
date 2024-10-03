@@ -73,7 +73,7 @@ public class MqttWatcher
         using var mqttClient = mqttFactory.CreateMqttClient();
         
         var mqttClientOptions = new MqttClientOptionsBuilder()
-            .WithClientId("cs4ha_client")
+            .WithClientId("cs4ha_client_" + DateTime.Now.ToString("ffff"))
             .WithTcpServer("192.168.1.25", 1883)
             .WithCredentials(SECRETS.MqttUsername, SECRETS.MqttPassword)
             .Build();
