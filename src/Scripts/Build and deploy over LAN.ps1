@@ -36,7 +36,7 @@ Write-Host "Built and deployed, now restarting ND addon"
 
 # You will unfortunately need to turn off protected mode on the "terminal & ssh” addon for this line to work:
 # Replace options in below line with your correct user, host, private key path, port, and addon ID
-ssh pockybum522-ha-ssh@192.168.1.25 -i D:\keys\DAVID-LAPTOP-2023-12-24_TO_HOME_ASSISTANT_SSH_ADDON -p 3248 -m hmac-sha2-512-etm@openssh.com 'sudo docker restart addon_c6a2317c_netdaemon4'
+ssh pockybum522-ha-ssh@192.168.1.25 -i D:\keys\DAVID-DESKTOP-2024-10-03 -m hmac-sha2-512-etm@openssh.com 'sudo docker restart addon_c6a2317c_netdaemon4'
 
 Write-Host "ND addon restarted - Script execution completed."
 Write-Host ""
@@ -49,4 +49,4 @@ if ($key.Character -eq 'y')
 	explorer "\\192.168.1.25\config\netdaemon4\logs"
 }
 
-Set-Location "D:\source\repos\PockyBum522 Github\netdaemon-home-assistant-apps\src\Scripts"
+Set-Location "D:\repos\netdaemon-home-assistant-apps\src\Scripts"

@@ -47,7 +47,7 @@ public class WeatherUtilities
         {
             case > 65:
                 modeString = "cool";
-                setPoint = 71.0;
+                setPoint = coolSetPoint;
                 break;
             
             case < 60:
