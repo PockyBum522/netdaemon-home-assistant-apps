@@ -17,12 +17,12 @@ public class ThermostatWrapper
 
         _entities = new Entities(_ha);
         
-        restoreSavedMode();
+        _logger.Information("Finished initializing ThermostatWrapper, current state: {@CurrentState}", CurrentThermostatState);
     }
 
     public void RestoreSavedModeToThermostat()
     {
-        restoreSavedMode();
+        restoreSavedState();
         
         SetThermostatTo(CurrentThermostatState);
     }
@@ -40,30 +40,46 @@ public class ThermostatWrapper
         _entities.Climate.HouseHvac.SetHvacMode(loweredMode);
         _entities.Climate.HouseHvac.SetTemperature(state.SetPoint);
     }
+
+    public double GetCurrentSetpointInHa()
+    {
+        // This is all so dumb. I don't care, this doesn't need to be the least bit performant
+        
+        var numericEntity = new NumericEntity(_ha, "climate.house_hvac");
+
+        dynamic dynamicAttributes = numericEntity.Attributes ?? throw new Exception("Attributes is null");
+        
+        return double.Parse(dynamicAttributes["temperature"].ToString());
+    }
     
     public void CheckThermostatStateInHa()
     {
-        var thermostatWrapper = new ThermostatWrapper(_logger, _ha);
+        var currentSetpoint = GetCurrentSetpointInHa();
+        var currentMode = _entities.Climate.HouseHvac.State ?? "unknown";
 
-        _logger.Information("{@StateDeconstructed}", _entities.Climate.HouseHvac);
+        restoreSavedState(); // Make sure our CurrentThermostatState is up to date
         
-        // var thermostatStateInHa = _entities.Climate.HouseHvac.EntityState;
-        // if (thermostatStateInHa is null ||
-        //     thermostatStateInHa.Attributes is null)
-        // {
-        //     throw new Exception("Thermostat state in HA is null");
-        // }
-        //
-        //
-        //
-        // var thermostatModeInHa = thermostatStateInHa.Attributes.CurrentTemperature;
-        // var thermostatSetpointInHa = thermostatStateInHa.Attributes.;
-        //
-        // if ( != ThermostatWrapper.CurrentThermostatState.Mode)
-        // ThermostatWrapper.CurrentThermostatState.Mode = 
+        // Make linter happy:
+        var setpointDifference = Math.Abs(CurrentThermostatState.SetPoint - currentSetpoint);
+        
+        if (setpointDifference > 0.2)
+        {
+            _logger.Information("Thermostat persistent file is out of sync. Setpoint was {LastSetpoint} and now settings to {NewSetpoint} and saving to persistent", CurrentThermostatState.SetPoint, currentSetpoint);
+            
+            CurrentThermostatState.SetPoint = currentSetpoint;
+            savePersistentThermostatState(CurrentThermostatState);
+        }
+
+        if (!CurrentThermostatState.Mode.Equals(currentMode, StringComparison.InvariantCultureIgnoreCase))
+        {
+            _logger.Information("Thermostat persistent file is out of sync. Mode was {LastMode} and now settings to {NewMode} and saving to persistent", CurrentThermostatState.Mode, currentMode);
+
+            CurrentThermostatState.Mode = currentMode;
+            savePersistentThermostatState(CurrentThermostatState);
+        }
     }
 
-    private void restoreSavedMode()
+    private void restoreSavedState()
     {
         var stateFilePath = Path.Combine(SECRETS.ThermostatSavedStateDirectory, "saved-state.json");
         
@@ -73,9 +89,7 @@ public class ThermostatWrapper
         
         var fetchedState = JsonConvert.DeserializeObject<ThermostatState>(jsonString) ?? new ThermostatState();
         
-        _logger.Information("Restoring thermostat saved state: {SavedMode} at {SavedTemperature} and sending to ESP32", fetchedState.Mode, fetchedState.SetPoint);
-        
-        //SetThermostatTo(fetchedState);
+        _logger.Information("Restoring thermostat saved state: {SavedMode} at {SavedTemperature}", fetchedState.Mode, fetchedState.SetPoint);
         
         CurrentThermostatState.Mode = fetchedState.Mode;
         CurrentThermostatState.SetPoint = fetchedState.SetPoint;

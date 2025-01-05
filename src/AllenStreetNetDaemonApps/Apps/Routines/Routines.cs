@@ -118,24 +118,24 @@ public class Routines
 
     private void HouseOccupiedRoutine()
     {
-        if (_entities.Climate.HouseHvac.State == "cool")
-            _entities.Climate.HouseHvac.SetTemperature(70.0);
-        
-        if (_entities.Climate.HouseHvac.State == "heat")
-            _entities.Climate.HouseHvac.SetTemperature(66.0);
-
-        //_entities.Switch.DenLamp.TurnOn();
+        // if (_entities.Climate.HouseHvac.State == "cool")
+        //     _entities.Climate.HouseHvac.SetTemperature(70.0);
+        //
+        // if (_entities.Climate.HouseHvac.State == "heat")
+        //     _entities.Climate.HouseHvac.SetTemperature(66.0);
+        //
+        // //_entities.Switch.DenLamp.TurnOn();
         
         _logger.Debug("House set to occupied mode");
     }
 
     private void GoingToBedRoutine()
     {
-        if (_entities.Climate.HouseHvac.State == "cool")
-            _entities.Climate.HouseHvac.SetTemperature(70.0);
-        
-        if (_entities.Climate.HouseHvac.State == "heat")
-            _entities.Climate.HouseHvac.SetTemperature(66.0);
+        // if (_entities.Climate.HouseHvac.State == "cool")
+        //     _entities.Climate.HouseHvac.SetTemperature(70.0);
+        //
+        // if (_entities.Climate.HouseHvac.State == "heat")
+        //     _entities.Climate.HouseHvac.SetTemperature(66.0);
 
         TurnOffEverything();
 
@@ -144,11 +144,11 @@ public class Routines
 
     private void WakingUpRoutine()
     {
-        if (_entities.Climate.HouseHvac.State == "cool")
-            _entities.Climate.HouseHvac.SetTemperature(70.0);
-        
-        if (_entities.Climate.HouseHvac.State == "heat")
-            _entities.Climate.HouseHvac.SetTemperature(66.0);
+        // if (_entities.Climate.HouseHvac.State == "cool")
+        //     _entities.Climate.HouseHvac.SetTemperature(70.0);
+        //
+        // if (_entities.Climate.HouseHvac.State == "heat")
+        //     _entities.Climate.HouseHvac.SetTemperature(66.0);
 
         _logger.Debug("House set to morning mode");
     }

@@ -128,6 +128,7 @@ public class MqttWatcher
         await mqttClient.SubscribeAsync(mqttSubscribeOptions, CancellationToken.None);
 
         _logger.Information("MQTT client subscribed to topics");
+        _logger.Information("MQTT client connected: {StatusMqtt}", mqttClient.IsConnected);
 
         // Pause forever to wait for incoming messages
         while (true){ await Task.Delay(1000); }

@@ -1,4 +1,5 @@
-﻿using CoordinateSharp;
+﻿using AllenStreetNetDaemonApps.Apps.FrontDoorCameraMotion;
+using CoordinateSharp;
 
 namespace AllenStreetNetDaemonApps.Apps.Scheduled;
 
@@ -25,13 +26,27 @@ public class ScheduledAirConditioning
             .WriteTo.Console()
             .WriteTo.File($"logs/{namespaceLastPart}/{GetType().Name}_.log", rollingInterval: RollingInterval.Day)
             .CreateLogger();
+
+        var runFirstAfter = MqttWatcher.MqttSetupDelaySeconds + 10;
         
-        scheduler.RunIn(TimeSpan.FromSeconds(10), async () => await CheckAllScheduledTasks());
-        scheduler.RunEvery(TimeSpan.FromSeconds(120), async () => await CheckAllScheduledTasks());
+        // Make sure this runs before the next line after
+        scheduler.RunIn(TimeSpan.FromSeconds(runFirstAfter - 5), InitializeThermostatOnceMqttUp);
+        scheduler.RunIn(TimeSpan.FromSeconds(runFirstAfter), async () => await CheckAllScheduledTasks());
+        
+        // Keep in mind this will mess with the thermostat init if you set this to shorter than runFirstAfter
+        scheduler.RunEvery(TimeSpan.FromSeconds(runFirstAfter * 2), async () => await CheckAllScheduledTasks()); 
         
         _logger.Information("Initialized {NamespaceLastPart} v0.01", namespaceLastPart);
     }
 
+    private void InitializeThermostatOnceMqttUp()
+    {
+        var thermostatWrapper = new ThermostatWrapper(_logger, _ha);
+            
+        _logger.Information("Setting thermostat to saved mode from {ThisName}", nameof(InitializeThermostatOnceMqttUp));
+        thermostatWrapper.RestoreSavedModeToThermostat();
+    }
+    
     private async Task CheckAllScheduledTasks()
     {
         _logger.Debug("Starting: {ThisMethodName}", nameof(CheckAllScheduledTasks));
@@ -65,10 +80,8 @@ public class ScheduledAirConditioning
         //LogDebugInfo(currentTime, sunsetTime, sunriseTime, middleOfTheNightTime);
 
         // Check if thermostat was changed manually, if so, save it to the persistent
-        
         var thermostatWrapper = new ThermostatWrapper(_logger, _ha);
-
-        thermostatWrapper.CheckThermostatStateInHa();
+        thermostatWrapper.CheckThermostatStateInHa();        
         
         // Middle of the night
         if (currentTime > middleOfTheNightTime  &&
@@ -86,17 +99,24 @@ public class ScheduledAirConditioning
     
     private void setThermostatToEnergySavings()
     {
+        var thermostatWrapper = new ThermostatWrapper(_logger, _ha);
+        
         var thermostatNewState = new ThermostatWrapper.ThermostatState();
-            
-        thermostatNewState.SetPoint = 73;
+
+        if (_entities.Climate.HouseHvac.State == "cool" &&
+            thermostatWrapper.GetCurrentSetpointInHa() >= 73.0)
+        {
+            return;
+        }
+        
+        thermostatNewState.SetPoint = 73.0;
             
         if (_entities.Climate.HouseHvac.State == "heat")
             thermostatNewState.SetPoint = 65.5;
 
         thermostatNewState.Mode = _entities.Climate.HouseHvac.State ?? "unknown";
-            
-        var thermostatWrapper = new ThermostatWrapper(_logger, _ha);
-            
+        
+        _logger.Information("Setting thermostat to saved mode from {ThisName}", nameof(setThermostatToEnergySavings));
         thermostatWrapper.SetThermostatTo(thermostatNewState);
     }
 
@@ -112,33 +132,5 @@ public class ScheduledAirConditioning
             currentTime > modifiedSunsetTime);
 
         _logger.Debug("");
-    }
-
-    private void SetLightsAtSunset()
-    {
-        _entities.Light.FrontPorchLights.TurnOn();
-        
-        _entities.Switch.BackPorchChristmasLights.TurnOn();
-        
-        _entities.Light.DenLamp.TurnOn();
-
-        _entities.Light.KitchenUndercabinetLights.TurnOn();
-
-        _logger.Debug("Lights set for sunset");
-    }
-    
-    private void SetLightsAtMorning()
-    {
-        _entities.Light.BackPorchLights.TurnOff();
-        
-        _entities.Light.FrontPorchLights.TurnOff();
-        
-        _entities.Switch.BackPorchChristmasLights.TurnOff();
-        
-        _entities.Switch.LaundryRoomLights.TurnOff();
-        
-        _entities.Switch.FoyerPlantGrowLights.TurnOn();
-        
-        _logger.Debug("Lights set for morning");
     }
 }
