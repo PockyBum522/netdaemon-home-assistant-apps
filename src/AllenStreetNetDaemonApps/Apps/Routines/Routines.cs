@@ -61,14 +61,16 @@ public class Routines
         // 2. Guest bed TV on
         
         // 3. Set AC to 68 for 1.25 hours if it's on cool mode already
-        await new WeatherUtilities(_logger, _entities)
-            .SetAirConditioningByOutsideTemperature(68.0);
+        // await new WeatherUtilities(_logger, _entities)
+        //     .SetAirConditioningByOutsideTemperature(68.0);
 
         // 4. When guest bedroom lightswitch gets wired in, turn it on
 
         // 5. If guest bedroom lights are on, turn them off
         //_entities.Group.GroupBackBedroomLights.CallService("turn_off");
 
+        await Task.Delay(TimeSpan.FromSeconds(1)); // Make compiler happy
+        
         // Reset switch state
         _entities.Switch.GuestBedroomMediaPcWol.TurnOff();
     }
@@ -81,14 +83,16 @@ public class Routines
         // 1. Sleep guest bedroom PC 
         //_entities.Button.GuestBedroomSleep.CallService("turn_on");
         
+        await Task.Delay(TimeSpan.FromSeconds(1)); // Make compiler happy
+        
         // Reset switch
         _entities.Switch.GuestBedroomMediaPcWol.TurnOff();
         
         // 2. Guest bed TV off
         
         // 3. Set AC to 71
-        await new WeatherUtilities(_logger, _entities)
-            .SetAirConditioningByOutsideTemperature(71.0);
+        // await new WeatherUtilities(_logger, _entities)
+        //     .SetAirConditioningByOutsideTemperature(71.0);
 
         // 4. When guest bedroom lightswitch gets wired in, turn it on
 

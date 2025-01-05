@@ -1,9 +1,12 @@
-﻿using AllenStreetNetDaemonApps.Apps.DoorsLockAfterTimePeriod;
+﻿using System.Buffers;
+using AllenStreetNetDaemonApps.Apps.DoorsLockAfterTimePeriod;
 using MQTTnet;
-using MQTTnet.Client;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+using MQTTnet.Extensions.TopicTemplate;
+using MQTTnet.Packets;
+using MQTTnet.Protocol;
 
 namespace AllenStreetNetDaemonApps.Apps.FrontDoorCameraMotion;
 
@@ -27,6 +30,9 @@ public class MqttWatcher
     private SwitchEntity? _doorknobLatch;
     private LockEntity? _frontDoorLock;
     private readonly LockController _lockController;
+    private readonly string _clientIdString;
+    
+    public const int MqttSetupDelaySeconds = 30;
 
     public MqttWatcher(IHaContext ha, INetDaemonScheduler scheduler)
     {
@@ -55,9 +61,23 @@ public class MqttWatcher
         
         // For Testing:
         //scheduler.RunIn(TimeSpan.FromSeconds(15), async () => await NotifyUsersWithCameraImage());
-        
-        scheduler.RunIn(TimeSpan.FromSeconds(10), async () => await StartMqttListener());
+
+        if (Environment.UserDomainName.ToLower().Contains("david"))
+        {
+            scheduler.RunIn(TimeSpan.FromSeconds(3), async () => await StartMqttListener());
+
+            _clientIdString = "nd_testing_client_" + DateTime.Now.ToString("ffff");
+        }
+        else
+        {
+            // Hold off for a bit to make sure Mosquitto is up and ready
+            scheduler.RunIn(TimeSpan.FromSeconds(MqttSetupDelaySeconds), async () => await StartMqttListener());
+            
+            _clientIdString = "ha_nd_client_" + DateTime.Now.ToString("ffff");
+        }
     }
+    
+    
 
     private async Task StartMqttListener()
     {
@@ -68,12 +88,12 @@ public class MqttWatcher
 
         _frontDoorLock = _entities.Lock.BluetoothFrontDoorLock2;
         
-        var mqttFactory = new MqttFactory();
+        var mqttFactory = new MqttClientFactory();
 
         using var mqttClient = mqttFactory.CreateMqttClient();
         
         var mqttClientOptions = new MqttClientOptionsBuilder()
-            .WithClientId("cs4ha_client_" + DateTime.Now.ToString("ffff"))
+            .WithClientId(_clientIdString)
             .WithTcpServer("192.168.1.25", 1883)
             .WithCredentials(SECRETS.MqttUsername, SECRETS.MqttPassword)
             .Build();
@@ -82,6 +102,8 @@ public class MqttWatcher
         {
             if (e.ClientWasConnected)
             {
+                await Task.Delay(TimeSpan.FromSeconds(5));
+                
                 // Use the current options as the new options.
                 await mqttClient.ConnectAsync(mqttClient.Options);
             }
@@ -112,12 +134,10 @@ public class MqttWatcher
      
         // ReSharper disable once FunctionNeverReturns because it's not supposed to
     }
-    
+
     private async Task HandleIncomingMessage(MqttApplicationMessageReceivedEventArgs e)
     {
-        var rawPayload = e.ApplicationMessage.PayloadSegment;
-
-        var asciiPayload = System.Text.Encoding.ASCII.GetString(rawPayload);
+        var asciiPayload = System.Text.Encoding.ASCII.GetString(e.ApplicationMessage.Payload.ToArray());
         
         _logger.Information(
             "On topic: {TopicName}, received {Message}", e.ApplicationMessage.Topic, asciiPayload);
@@ -213,8 +233,7 @@ public class MqttWatcher
             _lastGarageOpenTime = DateTimeOffset.Now;
             
             // Delay to give user time to walk to garage
-            await Task.Delay(
-                TimeSpan.FromSeconds(8));
+            await Task.Delay(TimeSpan.FromSeconds(8));
             
             _entities.Switch.OpenGarageDoor.TurnOn();    
         }

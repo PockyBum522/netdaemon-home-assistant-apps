@@ -1,4 +1,6 @@
-﻿namespace AllenStreetNetDaemonApps.Apps.Initializers;
+﻿using AllenStreetNetDaemonApps.Apps.FrontDoorCameraMotion;
+
+namespace AllenStreetNetDaemonApps.Apps.Initializers;
 
 [NetDaemonApp]
 public class ThermostatInitializer
@@ -24,11 +26,13 @@ public class ThermostatInitializer
         
         _logger.Information("Initialized {NamespaceLastPart} v0.01", namespaceLastPart);
         
-        scheduler.RunIn(TimeSpan.FromSeconds(10), async () => await SetThermostatOnceTemperatureFetched());
+        scheduler.RunIn(TimeSpan.FromSeconds(MqttWatcher.MqttSetupDelaySeconds + 10), SetThermostatOnceTemperatureFetched);
     }
 
-    private async Task SetThermostatOnceTemperatureFetched()
+    private void SetThermostatOnceTemperatureFetched()
     {
-        await new WeatherUtilities(_logger, _entities).SetAirConditioningByOutsideTemperature(73.0);
+        var thermostatWrapper = new ThermostatWrapper(_logger, _ha);
+            
+        thermostatWrapper.RestoreSavedModeToThermostat();
     }
 }

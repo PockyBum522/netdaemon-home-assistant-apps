@@ -64,27 +64,40 @@ public class ScheduledAirConditioning
         
         //LogDebugInfo(currentTime, sunsetTime, sunriseTime, middleOfTheNightTime);
 
-        // Sunrise
+        // Check if thermostat was changed manually, if so, save it to the persistent
+        
+        var thermostatWrapper = new ThermostatWrapper(_logger, _ha);
+
+        thermostatWrapper.CheckThermostatStateInHa();
+        
+        // Middle of the night
         if (currentTime > middleOfTheNightTime  &&
             currentTime < middleOfTheNightTimeStop &&
             !_middleOfTheNightStuffActivated)
         {
-            var modeString = "off";
-            const int setPoint = 73;
-
-            // Keep using whatever mode we were on
-            modeString = _entities.Climate.HouseHvac.State;
-
-            _entities.Climate.HouseHvac.SetHvacMode(modeString);
-            _entities.Climate.HouseHvac.SetTemperature(setPoint);
-            
-            _logger.Information("Now setting thermostat to {SetPoint} and HVAC mode: {HvacMode}", setPoint, modeString);
+            setThermostatToEnergySavings();
             
             // Give a sec to log in case we shut down the scheduled task right after this 
             await Task.Delay(1000);
             
             _middleOfTheNightStuffActivated = true;
         }
+    }
+    
+    private void setThermostatToEnergySavings()
+    {
+        var thermostatNewState = new ThermostatWrapper.ThermostatState();
+            
+        thermostatNewState.SetPoint = 73;
+            
+        if (_entities.Climate.HouseHvac.State == "heat")
+            thermostatNewState.SetPoint = 65.5;
+
+        thermostatNewState.Mode = _entities.Climate.HouseHvac.State ?? "unknown";
+            
+        var thermostatWrapper = new ThermostatWrapper(_logger, _ha);
+            
+        thermostatWrapper.SetThermostatTo(thermostatNewState);
     }
 
     private void LogDebugInfo(TimeOnly currentTime, DateTimeOffset sunsetTime, DateTimeOffset sunriseTime, TimeOnly modifiedSunsetTime, TimeOnly modifiedSunriseTime)
