@@ -460,3 +460,4 @@ SECRETS.cs
 src/AllenStreetNetDaemonApps/NetDaemonCodegen/EntityMetaData.json
 src/AllenStreetNetDaemonApps/NetDaemonCodegen/ServicesMetaData.json
 src/AllenStreetNetDaemonApps/tik-routr-priv
+src/scripts/SECRETS.env
