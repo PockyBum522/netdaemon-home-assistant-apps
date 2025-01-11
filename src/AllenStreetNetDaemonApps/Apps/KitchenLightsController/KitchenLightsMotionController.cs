@@ -20,7 +20,7 @@ public class KitchenLightsMotionController
         
         _logger = new LoggerConfiguration()
             .Enrich.WithProperty("netDaemonLogging", $"Serilog{GetType().Name}Context")
-            .MinimumLevel.Verbose()
+            .MinimumLevel.Information()
             .WriteTo.Console()
             .WriteTo.File($"logs/{namespaceLastPart}/{GetType().Name}_.log", rollingInterval: RollingInterval.Day)
             .CreateLogger();
