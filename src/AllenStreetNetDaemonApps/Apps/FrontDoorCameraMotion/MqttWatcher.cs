@@ -144,9 +144,9 @@ public class MqttWatcher
         
         if (e.ApplicationMessage.Topic == SECRETS.TopicFrontDoorNfcReaderTags)
         {
-            _logger.Information("Tag scanned on topic: {Topic}", SECRETS.TopicFrontDoorNfcReaderTags);
+            _logger.Debug("Tag scanned on topic: {Topic}", SECRETS.TopicFrontDoorNfcReaderTags);
 
-            _logger.Information("Mqtt payload is: '{Payload}'", asciiPayload);
+            _logger.Debug("Mqtt payload is: '{Payload}'", asciiPayload);
 
             var foundAuthorizedTag = false;
 
