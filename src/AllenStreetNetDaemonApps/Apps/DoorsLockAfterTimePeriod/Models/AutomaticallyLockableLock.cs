@@ -1,10 +1,9 @@
 ﻿namespace AllenStreetNetDaemonApps.Apps.DoorsLockAfterTimePeriod.Models;
 
-public class AutomaticallyLockableLock(ILogger logger, TextNotifier notifier, TimeSpan autoLockDuration, LockEntity homeAssistantLockEntity)
+public class AutomaticallyLockableLock(ILogger logger, TimeSpan autoLockDuration, LockEntity homeAssistantLockEntity)
 {
     // Injected
-    private ILogger Logger { get; } = logger;
-    private TextNotifier Notifier { get; } = notifier;
+    private ILogger _logger { get; } = logger;
 
     // Properties
     public LockEntity HomeAssistantLockEntity { get; } = homeAssistantLockEntity;
@@ -24,14 +23,14 @@ public class AutomaticallyLockableLock(ILogger logger, TextNotifier notifier, Ti
     /// </summary>
     public async Task CheckIfShouldAutoLock()
     {
-        Logger.Verbose("Checking if {Name} should auto-lock: (Now:{Now} > LockAt:{LockAtTime}): {LogicalResult}",
+        _logger.Verbose("Checking if {Name} should auto-lock: (Now:{Now} > LockAt:{LockAtTime}): {LogicalResult}",
             Name, DateTimeOffset.Now.GetTimeOnly(), LockAtTime.GetTimeOnly(), DateTimeOffset.Now > LockAtTime);
         
         if (IsLocked) return;
 
         if (IsManuallyDisabled("Could not attempt to operate, lock manually disabled")) return;
         
-        Logger.Debug("Checking if {Name} should auto-lock: (Now:{Now} > LockAt:{LockAtTime}): {LogicalResult}",
+        _logger.Debug("Checking if {Name} should auto-lock: (Now:{Now} > LockAt:{LockAtTime}): {LogicalResult}",
             Name, DateTimeOffset.Now.GetTimeOnly(), LockAtTime.GetTimeOnly(), DateTimeOffset.Now > LockAtTime);
         
         if (LockAtTime < DateTimeOffset.Now)
@@ -53,7 +52,7 @@ public class AutomaticallyLockableLock(ILogger logger, TextNotifier notifier, Ti
 
         if (IsLocked)
         {
-            Logger.Debug("Lock {Name} was locked successfully", Name);
+            _logger.Debug("Lock {Name} was locked successfully", Name);
         }
         
         // SetLockAsFailed($"Could not lock {Name} even after retries");
@@ -72,7 +71,7 @@ public class AutomaticallyLockableLock(ILogger logger, TextNotifier notifier, Ti
         
         if (!IsLocked)
         {
-            Logger.Debug("Lock {Name} was unlocked successfully", Name);
+            _logger.Debug("Lock {Name} was unlocked successfully", Name);
             
             LastUnlockedAtTime = DateTimeOffset.Now;
         }
@@ -103,7 +102,7 @@ public class AutomaticallyLockableLock(ILogger logger, TextNotifier notifier, Ti
             LockAtTime = DateTimeOffset.Now + maxTimeUntilLocking;
         }
         
-        Logger.Debug("Adding time to auto-lock for {Name}, will now auto-lock at: {NewTime}", Name, LockAtTime.GetTimeOnly());
+        _logger.Debug("Adding time to auto-lock for {Name}, will now auto-lock at: {NewTime}", Name, LockAtTime.GetTimeOnly());
     }
 
     /// <summary>
@@ -113,7 +112,7 @@ public class AutomaticallyLockableLock(ILogger logger, TextNotifier notifier, Ti
     {
         AutoLockActive = false;
         
-        Logger.Debug("Disabled auto-lock for {Name}", Name);
+        _logger.Debug("Disabled auto-lock for {Name}", Name);
     }
 
     /// <summary>
@@ -123,25 +122,14 @@ public class AutomaticallyLockableLock(ILogger logger, TextNotifier notifier, Ti
     {
         AutoLockActive = true;
 
-        Logger.Verbose("Enabled auto-lock for {Name}", Name);
+        _logger.Verbose("Enabled auto-lock for {Name}", Name);
     }
 
-    private bool IsFailed(string message)
-    {
-        if (Failed)
-        {
-            Logger.Error("{Message} {Name}, is failed", message, Name);
-            return true;
-        }
-        
-        return false;
-    }
-    
     private bool IsManuallyDisabled(string message)
     {
         if (!AutoLockActive)
         {
-            Logger.Debug("{Message} {Name}, is manually disabled", message, Name);
+            _logger.Debug("{Message} {Name}, is manually disabled", message, Name);
             return true;
         }
 
@@ -150,11 +138,11 @@ public class AutomaticallyLockableLock(ILogger logger, TextNotifier notifier, Ti
 
     private void SetLockAsFailed(string message)
     {
-        Logger.Error("{Message}", message);
+        _logger.Error("{Message}", message);
 
         Failed = true;
 
-        Logger.Debug("{Name} now set as failed", Name);
+        _logger.Debug("{Name} now set as failed", Name);
     }
 
     private bool GetLockedState()

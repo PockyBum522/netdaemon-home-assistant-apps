@@ -103,6 +103,7 @@ public class HomeAssistantDashboardSwitchResetter
     {
         foreach (var pair in list1)
         {
+            // ReSharper disable once UsageOfDefaultStructEquality because this is fine as I care about readability over performance here.
             if (!list2.Contains(pair)) return false;
         }
 

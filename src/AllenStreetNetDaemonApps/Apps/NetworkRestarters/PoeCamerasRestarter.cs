@@ -3,7 +3,6 @@
 [NetDaemonApp]
 public class PoeCamerasRestarter
 {
-    private readonly IHaContext _ha;
     private readonly ILogger _logger;
     private readonly Entities _entities;
     
@@ -13,9 +12,7 @@ public class PoeCamerasRestarter
     
     public PoeCamerasRestarter(IHaContext ha, INetDaemonScheduler scheduler)
     {
-        _ha = ha;
-
-        _entities = new Entities(_ha);
+        _entities = new Entities(ha);
 
         var namespaceLastPart = GetType().Namespace?.Split('.').Last();
 

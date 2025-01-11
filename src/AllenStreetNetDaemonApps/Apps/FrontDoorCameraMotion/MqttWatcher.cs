@@ -52,7 +52,7 @@ public class MqttWatcher
 
         _cameraImageNotifier = new CameraImageNotifier(ha);
 
-        _cameraImageTaker = new CameraImageTaker(ha);
+        _cameraImageTaker = new CameraImageTaker();
             
         _logger.Information("Initialized {NamespaceLastPart} v0.01", namespaceLastPart);
         
@@ -261,80 +261,80 @@ public class MqttWatcher
         }
     }
 
-    private async Task NotifyUsersWithCameraImage()
-    {
-        if (!LastDoorImageNotificationWasMoreThanXMinutesAgo()) return;
-            
-        var newImageFilename = _cameraImageTaker.CaptureFontDoorImage();
-        var newFarImageFilename = _cameraImageTaker.CaptureFontDoorImageFromFarCam();
+    // private async Task NotifyUsersWithCameraImage()
+    // {
+    //     if (!LastDoorImageNotificationWasMoreThanXMinutesAgo()) return;
+    //         
+    //     var newImageFilename = _cameraImageTaker.CaptureFontDoorImage();
+    //     var newFarImageFilename = _cameraImageTaker.CaptureFontDoorImageFromFarCam();
+    //
+    //     _logger.Information("New image path is: {Path}", newImageFilename);
+    //
+    //     // Increase this if notifications ever come through without images
+    //     // Offset if this runs twice rapidly to hopefully stop a race condition where _lastRunAtTime isn't updated as fast as it needs to be
+    //     await Task.Delay(new Random().Next(2000, 2200));
+    //
+    //     var stackedPath = StackPicturesVertically(newImageFilename, newFarImageFilename);
+    //     _logger.Information("Stacked image path is: {Path}", newImageFilename);
+    //     
+    //     // Needs to be 20? 30s? (a while) for the image to be ready to serve over nabu casa url and media folder
+    //     await Task.Delay(new Random().Next(20000, 21000));
+    //     
+    //     _cameraImageNotifier.NotifyDavid("Front Door Motion", "", stackedPath); 
+    //     _cameraImageNotifier.NotifyAlyssa("Front Door Motion", "", stackedPath);
+    //     _cameraImageNotifier.NotifyGeneral("Front Door Motion", "", stackedPath);    
+    //
+    //     await Task.Delay(2000);
+    // }
 
-        _logger.Information("New image path is: {Path}", newImageFilename);
-
-        // Increase this if notifications ever come through without images
-        // Offset if this runs twice rapidly to hopefully stop a race condition where _lastRunAtTime isn't updated as fast as it needs to be
-        await Task.Delay(new Random().Next(2000, 2200));
-
-        var stackedPath = StackPicturesVertically(newImageFilename, newFarImageFilename);
-        _logger.Information("Stacked image path is: {Path}", newImageFilename);
-        
-        // Needs to be 20? 30s? (a while) for the image to be ready to serve over nabu casa url and media folder
-        await Task.Delay(new Random().Next(20000, 21000));
-        
-        _cameraImageNotifier.NotifyDavid("Front Door Motion", "", stackedPath); 
-        _cameraImageNotifier.NotifyAlyssa("Front Door Motion", "", stackedPath);
-        _cameraImageNotifier.NotifyGeneral("Front Door Motion", "", stackedPath);    
-    
-        await Task.Delay(2000);
-    }
-
-    private string StackPicturesVertically(string newImageFilename, string newFarImageFilename)
-    {
-        using var closeImage = Image.Load<Rgba32>(Path.Join(SECRETS.CameraSnapshotDirectory, newImageFilename));
-        using var farImage = Image.Load<Rgba32>(Path.Join(SECRETS.CameraSnapshotDirectory, newFarImageFilename));
-        
-        var newHeight = (closeImage.Height + farImage.Height) / 2;
-        
-        var newWidth = closeImage.Width;
-
-        if (farImage.Width > closeImage.Width)
-            newWidth = farImage.Width;
-
-        using var outputImage = new Image<Rgba32>(newWidth, newHeight);
-        
-        var closeImageHalfHeight = closeImage.Height / 2;
-
-        // closeImage.Mutate(
-        //     i => i.Crop(
-        //         new Rectangle(0, 0, closeImage.Width, closeImageHalfHeight + 50)));
-        
-        // take the 2 source images and draw them onto the image
-        outputImage.Mutate(o => o
-                .DrawImage(closeImage, new Point(0, 0), 1f) // draw the first one top left
-                .DrawImage(farImage, new Point(0, closeImageHalfHeight + 50), 1f) // draw the second next to it
-        );
-
-        // foreach (var font in SystemFonts.)
-        // {
-        //     _logger.Warning("{FontName}", font.Name);
-        // }
-        
-        // outputImage.Mutate(o => o.DrawText(
-        //     DateTimeOffset.Now.ToString("F"),
-        //     SystemFonts.CreateFont("Arial", 25),
-        //     new Color(Rgba32.ParseHex("#FFFFFFFFFFF")),
-        //     new PointF(10, outputImage.Height - 200)
-        //     ));
-        
-        var fileSafeTimestamp = DateTimeOffset.Now.ToString("yyyy-MM-dd_HH-mm-ss.ff");
-
-        var stackedImageFilename = "vertStacked_" + fileSafeTimestamp + ".png";
-
-        var fullPathToMedia = Path.Join(SECRETS.CameraSnapshotDirectory, stackedImageFilename);
-        
-        outputImage.Save(fullPathToMedia);
-        
-        return stackedImageFilename;
-    }
+    // private string StackPicturesVertically(string newImageFilename, string newFarImageFilename)
+    // {
+    //     using var closeImage = Image.Load<Rgba32>(Path.Join(SECRETS.CameraSnapshotDirectory, newImageFilename));
+    //     using var farImage = Image.Load<Rgba32>(Path.Join(SECRETS.CameraSnapshotDirectory, newFarImageFilename));
+    //     
+    //     var newHeight = (closeImage.Height + farImage.Height) / 2;
+    //     
+    //     var newWidth = closeImage.Width;
+    //
+    //     if (farImage.Width > closeImage.Width)
+    //         newWidth = farImage.Width;
+    //
+    //     using var outputImage = new Image<Rgba32>(newWidth, newHeight);
+    //     
+    //     var closeImageHalfHeight = closeImage.Height / 2;
+    //
+    //     // closeImage.Mutate(
+    //     //     i => i.Crop(
+    //     //         new Rectangle(0, 0, closeImage.Width, closeImageHalfHeight + 50)));
+    //     
+    //     // take the 2 source images and draw them onto the image
+    //     outputImage.Mutate(o => o
+    //             .DrawImage(closeImage, new Point(0, 0), 1f) // draw the first one top left
+    //             .DrawImage(farImage, new Point(0, closeImageHalfHeight + 50), 1f) // draw the second next to it
+    //     );
+    //
+    //     // foreach (var font in SystemFonts.)
+    //     // {
+    //     //     _logger.Warning("{FontName}", font.Name);
+    //     // }
+    //     
+    //     // outputImage.Mutate(o => o.DrawText(
+    //     //     DateTimeOffset.Now.ToString("F"),
+    //     //     SystemFonts.CreateFont("Arial", 25),
+    //     //     new Color(Rgba32.ParseHex("#FFFFFFFFFFF")),
+    //     //     new PointF(10, outputImage.Height - 200)
+    //     //     ));
+    //     
+    //     var fileSafeTimestamp = DateTimeOffset.Now.ToString("yyyy-MM-dd_HH-mm-ss.ff");
+    //
+    //     var stackedImageFilename = "vertStacked_" + fileSafeTimestamp + ".png";
+    //
+    //     var fullPathToMedia = Path.Join(SECRETS.CameraSnapshotDirectory, stackedImageFilename);
+    //     
+    //     outputImage.Save(fullPathToMedia);
+    //     
+    //     return stackedImageFilename;
+    // }
 
     private bool LastLockWakeTimeWasMoreThanXMinutesAgo()
     {
@@ -348,17 +348,17 @@ public class MqttWatcher
         
         return _lastLockWakeAtTime < xMinutesAgo;
     }
-
-    private bool LastDoorImageNotificationWasMoreThanXMinutesAgo()
-    {
-        var xMinutesAgo = DateTimeOffset.Now - TimeSpan.FromMinutes(3);
-
-        // _logger.Debug("Two minutes ago: {TwoMinutesAgo}", xMinutesAgo);
-        // _logger.Debug("_lastLockWakeTime: {LastLockWakeTime}", _lastRunAtTime);
-        // _logger.Debug(
-        //     "_lastLockWakeTime < twoMinutesAgo: {LastWakeTimeMoreThanTwoMinutesAgo}",
-        //     _lastRunAtTime < xMinutesAgo);
-        
-        return _lastFrontDoorImageNotifyTime < xMinutesAgo;
-    }
+    //
+    // private bool LastDoorImageNotificationWasMoreThanXMinutesAgo()
+    // {
+    //     var xMinutesAgo = DateTimeOffset.Now - TimeSpan.FromMinutes(3);
+    //
+    //     // _logger.Debug("Two minutes ago: {TwoMinutesAgo}", xMinutesAgo);
+    //     // _logger.Debug("_lastLockWakeTime: {LastLockWakeTime}", _lastRunAtTime);
+    //     // _logger.Debug(
+    //     //     "_lastLockWakeTime < twoMinutesAgo: {LastWakeTimeMoreThanTwoMinutesAgo}",
+    //     //     _lastRunAtTime < xMinutesAgo);
+    //     
+    //     return _lastFrontDoorImageNotifyTime < xMinutesAgo;
+    // }
 }

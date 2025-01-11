@@ -33,8 +33,8 @@ public class LockController
 
         var textNotifier = new TextNotifier(_logger, ha);
 
-        FrontDoorLock = new AutomaticallyLockableLock(_logger, textNotifier, TimeSpan.FromMinutes(3), _entities.Lock.BluetoothFrontDoorLock2);
-        BackDoorLock = new AutomaticallyLockableLock(_logger, textNotifier, TimeSpan.FromMinutes(6), _entities.Lock.BluetoothBackDoorLock2);
+        FrontDoorLock = new AutomaticallyLockableLock(_logger, TimeSpan.FromMinutes(3), _entities.Lock.BluetoothFrontDoorLock2);
+        BackDoorLock = new AutomaticallyLockableLock(_logger, TimeSpan.FromMinutes(6), _entities.Lock.BluetoothBackDoorLock2);
         
         scheduler.RunIn(TimeSpan.FromSeconds(1), InitializeLockDisableForHours);
 
@@ -114,8 +114,8 @@ public class LockController
         if (frontLockDisableText == "0.00" &&
             backLockDisableText == "0.00") return;
         
-        var frontLockDisableValue = decimal.Parse(frontLockDisableText ?? "0.00");
-        var backLockDisableValue = decimal.Parse(backLockDisableText ?? "0.00");
+        var frontLockDisableValue = decimal.Parse(frontLockDisableText);
+        var backLockDisableValue = decimal.Parse(backLockDisableText);
         
         if (_frontLockLastDisableText != frontLockDisableText)
         {

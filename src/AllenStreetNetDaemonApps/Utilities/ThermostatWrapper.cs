@@ -17,7 +17,7 @@ public class ThermostatWrapper
 
         _entities = new Entities(_ha);
         
-        _logger.Information("Finished initializing ThermostatWrapper, current state: {@CurrentState}", CurrentThermostatState);
+        _logger.Debug("Finished initializing ThermostatWrapper, current state: {@CurrentState}", CurrentThermostatState);
     }
 
     public void RestoreSavedModeToThermostat()
@@ -33,7 +33,7 @@ public class ThermostatWrapper
         
         if (loweredMode.Contains("unknown")) return;
         
-        _logger.Information("Setting thermostat to {NewMode} at {NewTemperature}", state.Mode, state.SetPoint);
+        _logger.Debug("Setting thermostat to {NewMode} at {NewTemperature}", state.Mode, state.SetPoint);
         
         savePersistentThermostatState(state);
         
@@ -89,7 +89,7 @@ public class ThermostatWrapper
         
         var fetchedState = JsonConvert.DeserializeObject<ThermostatState>(jsonString) ?? new ThermostatState();
         
-        _logger.Information("Restoring thermostat saved state: {SavedMode} at {SavedTemperature}", fetchedState.Mode, fetchedState.SetPoint);
+        _logger.Debug("Restoring thermostat saved state: {SavedMode} at {SavedTemperature}", fetchedState.Mode, fetchedState.SetPoint);
         
         CurrentThermostatState.Mode = fetchedState.Mode;
         CurrentThermostatState.SetPoint = fetchedState.SetPoint;

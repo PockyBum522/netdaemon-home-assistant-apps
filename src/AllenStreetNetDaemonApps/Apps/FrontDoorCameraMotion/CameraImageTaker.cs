@@ -2,15 +2,13 @@
 
 public class CameraImageTaker
 {
-    private readonly Entities _entities;
-    
     private readonly ILogger _logger;
     private readonly DateTimeOffset _lastMotionSeenAt;
 
-    private string CameraSnapshotsDirectory => SECRETS.CameraSnapshotDirectory;
-    private string MediaSnapshotsDirectory => SECRETS.MediaSnapshotDirectory;
+    private string _cameraSnapshotsDirectory => SECRETS.CameraSnapshotDirectory;
+    private string _mediaSnapshotsDirectory => SECRETS.MediaSnapshotDirectory;
     
-    public CameraImageTaker(IHaContext ha)
+    public CameraImageTaker()
     {
         var namespaceLastPart = GetType().Namespace?.Split('.').Last();
         
@@ -21,8 +19,6 @@ public class CameraImageTaker
             .WriteTo.File($"logs/{namespaceLastPart}/{GetType().Name}_.log", rollingInterval: RollingInterval.Day)
             .CreateLogger();
         
-        _entities = new Entities(ha);
-        
         _lastMotionSeenAt = DateTimeOffset.Now;
     }
 
@@ -30,14 +26,14 @@ public class CameraImageTaker
     {
         _logger.Debug("CaptureFontDoorImage last motion at: {LastMotionAt}, current time: {Now}", _lastMotionSeenAt, DateTimeOffset.Now);
 
-        Directory.CreateDirectory(CameraSnapshotsDirectory);
+        Directory.CreateDirectory(_cameraSnapshotsDirectory);
 
         var fileSafeTimestamp = DateTimeOffset.Now.ToString("yyyy-MM-dd_HH-mm-ss.ff");
 
         var newImageFilename = "frontDoorCamClose_" + fileSafeTimestamp + ".jpg";
 
-        var fullPathToMedia = Path.Join(MediaSnapshotsDirectory, newImageFilename);
-        var fullPathToLocal = Path.Join(CameraSnapshotsDirectory, newImageFilename);
+        var fullPathToMedia = Path.Join(_mediaSnapshotsDirectory, newImageFilename);
+        var fullPathToLocal = Path.Join(_cameraSnapshotsDirectory, newImageFilename);
         
         //_entities.Camera.FrontDoor.Snapshot(fullPathToMedia);
         //_entities.Camera.FrontDoor.Snapshot(fullPathToLocal);
@@ -51,7 +47,7 @@ public class CameraImageTaker
 
     private void DeleteImagesOlderThan(TimeSpan howLongAgoToDelete)
     {
-        var filesToCheck = Directory.GetFiles(CameraSnapshotsDirectory);
+        var filesToCheck = Directory.GetFiles(_cameraSnapshotsDirectory);
 
         foreach (var filePath in filesToCheck)
         {
@@ -72,14 +68,14 @@ public class CameraImageTaker
     {
         _logger.Debug("CaptureFontDoorImageFromFarCam last motion at: {LastMotionAt}, current time: {Now}", _lastMotionSeenAt, DateTimeOffset.Now);
 
-        Directory.CreateDirectory(CameraSnapshotsDirectory);
+        Directory.CreateDirectory(_cameraSnapshotsDirectory);
 
         var fileSafeTimestamp = DateTimeOffset.Now.ToString("yyyy-MM-dd_HH-mm-ss.ff");
 
         var newImageFilename = "frontDoorCamFar_" + fileSafeTimestamp + ".jpg";
 
-        var fullPathToMedia = Path.Join(MediaSnapshotsDirectory, newImageFilename);
-        var fullPathToLocal = Path.Join(CameraSnapshotsDirectory, newImageFilename);
+        var fullPathToMedia = Path.Join(_mediaSnapshotsDirectory, newImageFilename);
+        var fullPathToLocal = Path.Join(_cameraSnapshotsDirectory, newImageFilename);
         
         // _entities.Camera.FrontYardFromSwCorner.Snapshot(fullPathToMedia);
         // _entities.Camera.FrontYardFromSwCorner.Snapshot(fullPathToLocal);

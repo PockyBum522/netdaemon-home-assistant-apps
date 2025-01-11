@@ -4,7 +4,7 @@
 public class Routines
 {
     private readonly IHaContext _ha;
-    private readonly Serilog.ILogger _logger;
+    private readonly ILogger _logger;
     private readonly Entities _entities;
     
     private readonly InputBooleanEntity _houseAwayToggle;
@@ -240,7 +240,7 @@ public class Routines
             
             await StopExerciseRoutine();
             
-            return;
+            //return;
         }
     }
 }

@@ -70,7 +70,7 @@ public class ScheduledAirConditioning
         
         _logger.Debug("Sunset time gotten: {SunsetTime}", sunsetTime);
 
-        var sunriseTime = celestialTimes.SunRise ?? throw new Exception();
+        //var sunriseTime = celestialTimes.SunRise ?? throw new Exception();
 
         var middleOfTheNightDateTime = new DateTime(2000, 1, 1, 0, 30, 0);
         

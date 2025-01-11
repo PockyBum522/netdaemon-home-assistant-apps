@@ -6,8 +6,8 @@ public class CameraImageNotifier
     private readonly IHaContext _haContext;
 
     
-    string MediaPath => SECRETS.CameraImageNotificationCachePath;
-    string LocalPath => SECRETS.CameraImageNotificationLocalUrl;
+    string _mediaPath => SECRETS.CameraImageNotificationCachePath;
+    string _localPath => SECRETS.CameraImageNotificationLocalUrl;
     
     public CameraImageNotifier(IHaContext haContext)
     {
@@ -30,14 +30,14 @@ public class CameraImageNotifier
         _haContext.CallService("notify", "persistent_notification", data: new
         {
             title = notifyTitle,
-            message = $"![front door motion]({Path.Join(LocalPath, imageFileName)})"
+            message = $"![front door motion]({Path.Join(_localPath, imageFileName)})"
         }); 
     }
     
     public void NotifyDavid(string notifyTitle, string notifyBody, string imageFileName)
     {
-        var localFullPath = Path.Join(LocalPath, imageFileName);
-        var mediaFullPath = Path.Join(MediaPath, imageFileName);
+        var localFullPath = Path.Join(_localPath, imageFileName);
+        var mediaFullPath = Path.Join(_mediaPath, imageFileName);
 
         mediaFullPath = mediaFullPath.Replace("/media/", "/");
 
@@ -71,8 +71,8 @@ public class CameraImageNotifier
     
     public void NotifyAlyssa(string notifyTitle, string notifyBody, string imageFileName)
     {
-        var localFullPath = Path.Join(LocalPath, imageFileName);
-        var mediaFullPath = Path.Join(MediaPath, imageFileName);
+        var localFullPath = Path.Join(_localPath, imageFileName);
+        var mediaFullPath = Path.Join(_mediaPath, imageFileName);
 
         mediaFullPath = mediaFullPath.Replace("/media/", "/");
 
