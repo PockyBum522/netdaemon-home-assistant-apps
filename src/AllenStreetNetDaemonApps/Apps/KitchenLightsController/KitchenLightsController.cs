@@ -8,7 +8,7 @@ public class KitchenLightsController
     private readonly Entities _entities;
 
     private readonly Entity[] _kitchenCeilingLightsEntities;
-    
+
     public KitchenLightsController(IHaContext ha, INetDaemonScheduler scheduler, ILogger logger)
     {
         _entities = new Entities(ha);
@@ -25,10 +25,8 @@ public class KitchenLightsController
         _logger.Information("Initialized {NamespaceLastPart} v0.01", namespaceLastPart);
         
         ha.Events.Where(e => e.EventType == "zwave_js_value_notification").Subscribe(async (e) => await HandleKitchenSwitchButtons(e));
-
+        
         _kitchenCeilingLightsEntities = GroupUtilities.GetEntitiesFromGroup(ha, _entities.Light.KitchenCeilingLights);
-
-        //scheduler.RunIn(TimeSpan.FromSeconds(0.5), async () => await SetKitchenLightsDimmer());
     }
 
     private async Task HandleKitchenSwitchButtons(Event eventToCheck)

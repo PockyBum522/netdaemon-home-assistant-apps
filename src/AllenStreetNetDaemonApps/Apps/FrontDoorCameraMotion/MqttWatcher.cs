@@ -4,9 +4,6 @@ using MQTTnet;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using MQTTnet.Extensions.TopicTemplate;
-using MQTTnet.Packets;
-using MQTTnet.Protocol;
 
 namespace AllenStreetNetDaemonApps.Apps.FrontDoorCameraMotion;
 
