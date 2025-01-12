@@ -1,23 +1,22 @@
 using System.Diagnostics;
-using AllenStreetNetDaemonApps.Internal;
-using AllenStreetNetDaemonApps.Internal.Interfaces;
+using AllenStreetNetDaemonApps.EntityWrappers.Interfaces;
 using Newtonsoft.Json;
 
-namespace AllenStreetNetDaemonApps.Apps.MotionLights;
+namespace AllenStreetNetDaemonApps.Apps.LightControllers;
 
 [NetDaemonApp]
 public class KitchenLightsMotionController
 {
-    private readonly IKitchenLightsControl _kitchenLightsControl;
+    private readonly IKitchenLightsWrapper _kitchenLightsWrapper;
     private readonly ILogger _logger;
     
     private readonly Entities _entities;
 
     private readonly Entity[] _kitchenCeilingLightsEntities;
 
-    public KitchenLightsMotionController(IHaContext ha, INetDaemonScheduler scheduler, ILogger logger, IKitchenLightsControl kitchenLightsControl)
+    public KitchenLightsMotionController(IHaContext ha, INetDaemonScheduler scheduler, ILogger logger, IKitchenLightsWrapper kitchenLightsWrapper)
     {
-        _kitchenLightsControl = kitchenLightsControl;
+        _kitchenLightsWrapper = kitchenLightsWrapper;
         _entities = new Entities(ha);
 
         var namespaceLastPart = GetType().Namespace?.Split('.').Last();
@@ -65,7 +64,7 @@ public class KitchenLightsMotionController
         
         _logger.Debug("Full parse of motion event handled in {ElapsedMilliseconds}ms", sw.ElapsedMilliseconds);
         
-        _kitchenLightsControl.TurnOnKitchenLightsFromMotion();
+        _kitchenLightsWrapper.TurnOnKitchenLightsFromMotion();
     }
 
     private void checkIfMotionTimerExpired()
@@ -86,6 +85,6 @@ public class KitchenLightsMotionController
         if (SharedState.MotionSensors.LastMotionInKitchenAt < longTimeAgo) return;
 
         // Otherwise
-        _kitchenLightsControl.TurnOffKitchenLightsFromMotion();
+        _kitchenLightsWrapper.TurnOffKitchenLightsFromMotion();
     }
 }

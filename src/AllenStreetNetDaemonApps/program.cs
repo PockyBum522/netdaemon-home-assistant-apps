@@ -1,7 +1,6 @@
 using System.Reflection;
-using AllenStreetNetDaemonApps.Apps.KitchenLightsController;
-using AllenStreetNetDaemonApps.Internal;
-using AllenStreetNetDaemonApps.Internal.Interfaces;
+using AllenStreetNetDaemonApps.EntityWrappers;
+using AllenStreetNetDaemonApps.EntityWrappers.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NetDaemon.Extensions.Logging;
@@ -21,8 +20,9 @@ try
         .UseNetDaemonTextToSpeech()
         .ConfigureServices((_, services) =>
             services
-                .AddSingleton<IKitchenLightsControl, KitchenLightsControl>()
-                .AddSingleton<IFrontRoomLightsControl, FrontRoomLightsControl>()
+                .AddSingleton<IKitchenLightsWrapper, KitchenLightsWrapper>()
+                .AddSingleton<IFrontRoomLightsWrapper, FrontRoomLightsWrapper>()
+                .AddSingleton<IGuestBathLightsWrapper, GuestBathLightsWrapper>()
                 .AddAppsFromAssembly(Assembly.GetExecutingAssembly())
                 .AddNetDaemonStateManager()
                 .AddNetDaemonScheduler()

@@ -1,8 +1,9 @@
-using AllenStreetNetDaemonApps.Internal.Interfaces;
+using AllenStreetNetDaemonApps.Apps;
+using AllenStreetNetDaemonApps.EntityWrappers.Interfaces;
 
-namespace AllenStreetNetDaemonApps.Internal;
+namespace AllenStreetNetDaemonApps.EntityWrappers;
 
-public class KitchenLightsControl : IKitchenLightsControl
+public class KitchenLightsWrapper : IKitchenLightsWrapper
 {
     private readonly ILogger _logger;
     
@@ -10,7 +11,7 @@ public class KitchenLightsControl : IKitchenLightsControl
 
     private readonly Entity[] _kitchenCeilingLightsEntities;
 
-    public KitchenLightsControl(IHaContext ha, INetDaemonScheduler scheduler, ILogger logger)
+    public KitchenLightsWrapper(IHaContext ha, INetDaemonScheduler scheduler, ILogger logger)
     {
         _entities = new Entities(ha);
 

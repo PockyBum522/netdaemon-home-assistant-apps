@@ -1,16 +1,13 @@
 ﻿using System.Buffers;
 using AllenStreetNetDaemonApps.Apps.DoorsLockAfterTimePeriod;
-using AllenStreetNetDaemonApps.Apps.KitchenLightsController;
-using AllenStreetNetDaemonApps.Internal.Interfaces;
+using AllenStreetNetDaemonApps.Apps.FrontDoorCameraMotion;
+using AllenStreetNetDaemonApps.EntityWrappers.Interfaces;
 using MQTTnet;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
 
-namespace AllenStreetNetDaemonApps.Apps.FrontDoorCameraMotion;
+namespace AllenStreetNetDaemonApps.Apps;
 
 [NetDaemonApp]
-public class MqttWatcher 
+public class MqttClientWrapper 
 {
     private readonly IHaContext _ha;
     private readonly Entities _entities;
@@ -28,12 +25,12 @@ public class MqttWatcher
     private SwitchEntity? _deadboltLatch;
     private SwitchEntity? _doorknobLatch;
     private LockEntity? _frontDoorLock;
-    private readonly LockController _lockController;
+    private readonly DoorLocksController _doorLocksController;
     private readonly string _clientIdString;
     
     public const int MqttSetupDelaySeconds = 30;
 
-    public MqttWatcher(IHaContext ha, INetDaemonScheduler scheduler, IKitchenLightsControl kitchenLightsControl, IFrontRoomLightsControl frontRoomLightsControl)
+    public MqttClientWrapper(IHaContext ha, INetDaemonScheduler scheduler, IKitchenLightsWrapper kitchenLightsWrapper, IFrontRoomLightsWrapper frontRoomLightsWrapper)
     {
         _ha = ha;
         _entities = new Entities(ha);
@@ -47,7 +44,7 @@ public class MqttWatcher
             .WriteTo.File($"logs/{namespaceLastPart}/{GetType().Name}_.log", rollingInterval: RollingInterval.Day)
             .CreateLogger();
 
-        _lockController = new LockController(ha, scheduler, kitchenLightsControl, frontRoomLightsControl);
+        _doorLocksController = new DoorLocksController(ha, scheduler, kitchenLightsWrapper, frontRoomLightsWrapper);
         
         _lastLockWakeAtTime = DateTimeOffset.Now - TimeSpan.FromMinutes(5);
         _lastFrontDoorImageNotifyTime = DateTimeOffset.Now - TimeSpan.FromMinutes(5);
@@ -171,9 +168,9 @@ public class MqttWatcher
 
                 _logger.Debug("Front door latches open!");
                     
-                _lockController.FrontDoorLock.AddAutoLockTime();
+                _doorLocksController.FrontDoorLock.AddAutoLockTime();
 
-                await _lockController.FrontDoorLock.Unlock();
+                await _doorLocksController.FrontDoorLock.Unlock();
                 
                 foundAuthorizedTag = true;
 

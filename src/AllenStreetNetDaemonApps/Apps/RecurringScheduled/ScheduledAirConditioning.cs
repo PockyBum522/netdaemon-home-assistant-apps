@@ -1,7 +1,6 @@
-﻿using AllenStreetNetDaemonApps.Apps.FrontDoorCameraMotion;
-using CoordinateSharp;
+﻿using CoordinateSharp;
 
-namespace AllenStreetNetDaemonApps.Apps.Scheduled;
+namespace AllenStreetNetDaemonApps.Apps.RecurringScheduled;
 
 [NetDaemonApp]
 public class ScheduledAirConditioning
@@ -27,7 +26,7 @@ public class ScheduledAirConditioning
             .WriteTo.File($"logs/{namespaceLastPart}/{GetType().Name}_.log", rollingInterval: RollingInterval.Day)
             .CreateLogger();
 
-        var runFirstAfter = MqttWatcher.MqttSetupDelaySeconds + 10;
+        var runFirstAfter = MqttClientWrapper.MqttSetupDelaySeconds + 10;
         
         // Make sure this runs before the next line after
         scheduler.RunIn(TimeSpan.FromSeconds(runFirstAfter - 5), InitializeThermostatOnceMqttUp);

@@ -1,4 +1,4 @@
-﻿namespace AllenStreetNetDaemonApps.Apps.Scheduled;
+﻿namespace AllenStreetNetDaemonApps.Apps.RecurringScheduled;
 
 [NetDaemonApp]
 public class HomeAssistantDashboardSwitchResetter

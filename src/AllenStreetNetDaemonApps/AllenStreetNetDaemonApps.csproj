@@ -44,8 +44,4 @@
         <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.4" />
         <PackageReference Include="SSH.NET" Version="2024.2.0" />
     </ItemGroup>
-        
-    <ItemGroup>
-      <Folder Include="Apps\Interfaces\" />
-    </ItemGroup>
 </Project>

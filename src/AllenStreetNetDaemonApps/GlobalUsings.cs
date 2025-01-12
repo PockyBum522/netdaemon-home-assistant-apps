@@ -14,6 +14,5 @@ global using AllenStreetNetDaemonApps.Models;
 global using AllenStreetNetDaemonApps.Utilities;
 global using System.Text.Json;
 global using System.Threading;
-global using AllenStreetNetDaemonApps.Apps.FrontDoorNfcReader.Models;
 global using NetDaemon.HassModel.Entities;
 global using ILogger = Serilog.ILogger;

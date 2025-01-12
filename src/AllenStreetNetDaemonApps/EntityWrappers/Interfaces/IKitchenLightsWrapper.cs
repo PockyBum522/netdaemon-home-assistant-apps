@@ -1,6 +1,6 @@
-namespace AllenStreetNetDaemonApps.Internal.Interfaces;
+namespace AllenStreetNetDaemonApps.EntityWrappers.Interfaces;
 
-public interface IKitchenLightsControl
+public interface IKitchenLightsWrapper
 {
     void TurnOnKitchenLightsFromMotion();
     void TurnOffKitchenLightsFromMotion();

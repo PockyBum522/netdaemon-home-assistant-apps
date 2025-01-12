@@ -1,19 +1,16 @@
-using System.Diagnostics;
-using AllenStreetNetDaemonApps.Internal;
-using AllenStreetNetDaemonApps.Internal.Interfaces;
-using Newtonsoft.Json;
+using AllenStreetNetDaemonApps.EntityWrappers.Interfaces;
 
-namespace AllenStreetNetDaemonApps.Apps.MotionLights;
+namespace AllenStreetNetDaemonApps.Apps.LightControllers;
 
 [NetDaemonApp]
-public class FrontRoomLightsMotionController
+public class FrontRoomLightsController
 {
-    private readonly IFrontRoomLightsControl _frontRoomLightsControl;
+    private readonly IFrontRoomLightsWrapper _frontRoomLightsWrapper;
     private readonly ILogger _logger;
     
-    public FrontRoomLightsMotionController(IHaContext ha, INetDaemonScheduler scheduler, ILogger logger, IFrontRoomLightsControl FrontRoomLightsControl)
+    public FrontRoomLightsController(IHaContext ha, INetDaemonScheduler scheduler, ILogger logger, IFrontRoomLightsWrapper frontRoomLightsWrapper)
     {
-        _frontRoomLightsControl = FrontRoomLightsControl;
+        _frontRoomLightsWrapper = frontRoomLightsWrapper;
 
         var namespaceLastPart = GetType().Namespace?.Split('.').Last();
         
@@ -47,6 +44,6 @@ public class FrontRoomLightsMotionController
         if (SharedState.MotionSensors.LastMotionInFrontRoomAt < longTimeAgo) return;
 
         // Otherwise
-        _frontRoomLightsControl.TurnOffFrontRoomLightsFromMotion();
+        _frontRoomLightsWrapper.TurnOffFrontRoomLightsFromMotion();
     }
 }

@@ -1,20 +1,20 @@
-using AllenStreetNetDaemonApps.Internal.Interfaces;
+using AllenStreetNetDaemonApps.EntityWrappers.Interfaces;
 
-namespace AllenStreetNetDaemonApps.Apps.KitchenLightsController;
+namespace AllenStreetNetDaemonApps.Apps.WallSwitchControllers;
 
 [NetDaemonApp]
-public class KitchenLightSwitchesController
+public class KitchenWallSwitchesController
 {
-    private readonly IKitchenLightsControl _kitchenLightsControl;
+    private readonly IKitchenLightsWrapper _kitchenLightsWrapper;
     private readonly ILogger _logger;
     
     private readonly Entities _entities;
 
     private readonly Entity[] _kitchenCeilingLightsEntities;
 
-    public KitchenLightSwitchesController(IHaContext ha, INetDaemonScheduler scheduler, ILogger logger, IKitchenLightsControl kitchenLightsControl)
+    public KitchenWallSwitchesController(IHaContext ha, INetDaemonScheduler scheduler, ILogger logger, IKitchenLightsWrapper kitchenLightsWrapper)
     {
-        _kitchenLightsControl = kitchenLightsControl;
+        _kitchenLightsWrapper = kitchenLightsWrapper;
         _entities = new Entities(ha);
 
         var namespaceLastPart = GetType().Namespace?.Split('.').Last();
@@ -63,7 +63,7 @@ public class KitchenLightSwitchesController
         if (zWaveEvent.Domain != "zwave_js") 
             passingFilters = false;
         
-        if (zWaveEvent.DeviceId != SECRETS.KitchenMainSwitchZWaveDeviceId)              // Kitchen switch ID is b63490e5f9fb0cbd32588f893de0bdca
+        if (zWaveEvent.DeviceId != "b63490e5f9fb0cbd32588f893de0bdca")              // Kitchen main switch ID is b63490e5f9fb0cbd32588f893de0bdca
             passingFilters = false;
         
         if (zWaveEvent.Value != "KeyPressed")
@@ -79,16 +79,16 @@ public class KitchenLightSwitchesController
         _logger.Verbose("Detected as incoming central scene change");
         
         if (zWaveEvent.Label == "Scene 001") 
-            await _kitchenLightsControl.SetKitchenLightsBrighter();
+            await _kitchenLightsWrapper.SetKitchenLightsBrighter();
         
         if (zWaveEvent.Label == "Scene 002") 
-            await _kitchenLightsControl.SetKitchenLightsToPurpleScene();
+            await _kitchenLightsWrapper.SetKitchenLightsToPurpleScene();
         
         if (zWaveEvent.Label == "Scene 003") 
-            await _kitchenLightsControl.SetKitchenLightsDimmer();
+            await _kitchenLightsWrapper.SetKitchenLightsDimmer();
         
         if (zWaveEvent.Label == "Scene 004") 
-            await _kitchenLightsControl.SetKitchenLightsToEspressoMachineScene();
+            await _kitchenLightsWrapper.SetKitchenLightsToEspressoMachineScene();
         
         // Event for main button BUT this fires when main button is turning lights off AND when main button turning lights on
         // if (zWaveEvent.CommandClassName == "Scene 005")

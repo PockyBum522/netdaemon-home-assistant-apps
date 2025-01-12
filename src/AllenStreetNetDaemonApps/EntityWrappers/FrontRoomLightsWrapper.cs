@@ -1,14 +1,15 @@
-using AllenStreetNetDaemonApps.Internal.Interfaces;
+using AllenStreetNetDaemonApps.Apps;
+using AllenStreetNetDaemonApps.EntityWrappers.Interfaces;
 
-namespace AllenStreetNetDaemonApps.Internal;
+namespace AllenStreetNetDaemonApps.EntityWrappers;
 
-public class FrontRoomLightsControl : IFrontRoomLightsControl
+public class FrontRoomLightsWrapper : IFrontRoomLightsWrapper
 {
     private readonly ILogger _logger;
     
     private readonly Entities _entities;
 
-    public FrontRoomLightsControl(IHaContext ha, INetDaemonScheduler scheduler, ILogger logger)
+    public FrontRoomLightsWrapper(IHaContext ha, INetDaemonScheduler scheduler, ILogger logger)
     {
         _entities = new Entities(ha);
 

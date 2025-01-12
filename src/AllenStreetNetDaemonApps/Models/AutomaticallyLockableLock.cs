@@ -1,4 +1,4 @@
-﻿namespace AllenStreetNetDaemonApps.Apps.DoorsLockAfterTimePeriod.Models;
+﻿namespace AllenStreetNetDaemonApps.Models;
 
 public class AutomaticallyLockableLock(ILogger logger, TimeSpan autoLockDuration, LockEntity homeAssistantLockEntity)
 {

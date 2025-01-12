@@ -1,16 +1,14 @@
-﻿using AllenStreetNetDaemonApps.Apps.DoorsLockAfterTimePeriod.Models;
-using AllenStreetNetDaemonApps.Apps.KitchenLightsController;
-using AllenStreetNetDaemonApps.Internal.Interfaces;
+﻿using AllenStreetNetDaemonApps.EntityWrappers.Interfaces;
 
 namespace AllenStreetNetDaemonApps.Apps.DoorsLockAfterTimePeriod;
 
 /// <summary>
 /// This gets set up in MqttWatcher.cs
 /// </summary>
-public class LockController
+public class DoorLocksController
 {
-    private readonly IKitchenLightsControl _kitchenLightsControl;
-    private readonly IFrontRoomLightsControl _frontRoomLightsControl;
+    private readonly IKitchenLightsWrapper _kitchenLightsWrapper;
+    private readonly IFrontRoomLightsWrapper _frontRoomLightsWrapper;
     internal AutomaticallyLockableLock FrontDoorLock { get; }
     internal AutomaticallyLockableLock BackDoorLock { get; }
     
@@ -20,10 +18,10 @@ public class LockController
     private readonly ILogger _logger;
     private readonly Entities _entities;
 
-    public LockController(IHaContext ha, INetDaemonScheduler scheduler, IKitchenLightsControl kitchenLightsControl, IFrontRoomLightsControl frontRoomLightsControl)
+    public DoorLocksController(IHaContext ha, INetDaemonScheduler scheduler, IKitchenLightsWrapper kitchenLightsWrapper, IFrontRoomLightsWrapper frontRoomLightsWrapper)
     {
-        _kitchenLightsControl = kitchenLightsControl;
-        _frontRoomLightsControl = frontRoomLightsControl;
+        _kitchenLightsWrapper = kitchenLightsWrapper;
+        _frontRoomLightsWrapper = frontRoomLightsWrapper;
         _entities = new Entities(ha);
 
         var namespaceLastPart = GetType().Namespace?.Split('.').Last();
@@ -73,8 +71,8 @@ public class LockController
 
             _logger.Information("Front door opened as detected in {ThisName}, adding time, door will now lock at: {NewTime}", nameof(CheckFrontDoor), FrontDoorLock.LockAtTime.GetTimeOnly());
             
-            _kitchenLightsControl.TurnOnKitchenLightsFromMotion();
-            _frontRoomLightsControl.TurnOnFrontRoomLightsFromMotion();
+            _kitchenLightsWrapper.TurnOnKitchenLightsFromMotion();
+            _frontRoomLightsWrapper.TurnOnFrontRoomLightsFromMotion();
             
             // Not sure if this will keep the scheduled task from relaunching before this is done, but that's the intent
             await Task.Delay(TimeSpan.FromSeconds(10));
@@ -90,7 +88,7 @@ public class LockController
             
             _logger.Information("Back door opened as detected in {ThisName}, adding time, door will now lock at: {NewTime}", nameof(CheckBackDoor), BackDoorLock.LockAtTime.GetTimeOnly());
 
-            _kitchenLightsControl.TurnOnKitchenLightsFromMotion();
+            _kitchenLightsWrapper.TurnOnKitchenLightsFromMotion();
             
             // Not sure if this will keep the scheduled task from relaunching before this is done, but that's the intent
             await Task.Delay(TimeSpan.FromSeconds(10));
