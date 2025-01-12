@@ -12,5 +12,6 @@ public interface IKitchenLightsWrapper
 
     public Task ModifyCeilingLightsBrightnessBy(int brightnessModifier);
 
+    public Task SetKitchenLightsToWarmWhite();
     public Task SetKitchenLightsToEspressoMachineScene();
 }

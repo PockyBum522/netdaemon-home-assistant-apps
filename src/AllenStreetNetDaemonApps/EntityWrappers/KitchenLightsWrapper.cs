@@ -72,18 +72,12 @@ public class KitchenLightsWrapper : IKitchenLightsWrapper
     {
         if (_entities.Switch.KitchenMainLightswitch.IsOn())
             await ModifyCeilingLightsBrightnessBy(20);
-        
-        if (_entities.Switch.KitchenMainLightswitch.IsOff())
-            await TurnMainRelayOn(CustomColors.WarmWhite());
     }
 
     public async Task SetKitchenLightsDimmer()
     {
         if (_entities.Switch.KitchenMainLightswitch.IsOn())
             await ModifyCeilingLightsBrightnessBy(-20);
-        
-        if (_entities.Switch.KitchenMainLightswitch.IsOff())
-            await TurnMainRelayOn(CustomColors.WarmWhite(20));
     }
 
     public async Task SetKitchenLightsToPurpleScene()
@@ -92,13 +86,16 @@ public class KitchenLightsWrapper : IKitchenLightsWrapper
 
         // Handle when kitchen main relay was off, turning on and try to not blind people with defaults
         if (_entities.Switch.KitchenMainLightswitch.IsOff())
+        {
             await TurnMainRelayOn(CustomColors.AlyssaPurple());
+            return;
+        }
 
         // Then set the right colors, whether main relay was on or not
         _kitchenCeilingLightsEntities.CallService("turn_on", CustomColors.AlyssaPurple() );
     }
 
-    public Task ModifyCeilingLightsBrightnessBy(int brightnessModifier)
+    public async Task ModifyCeilingLightsBrightnessBy(int brightnessModifier)
     {
         foreach (var ceilingLight in _kitchenCeilingLightsEntities)
         {
@@ -123,20 +120,38 @@ public class KitchenLightsWrapper : IKitchenLightsWrapper
             
             ceilingLight.CallService("turn_on", new { brightness_pct = newLightBrightness } );
 
-            // await Task.Delay(100);
+            await Task.Delay(100);
         }
-
-        return Task.CompletedTask;
     }
 
     public async Task SetKitchenLightsToEspressoMachineScene()
     {
         // Handle when kitchen main relay was off, turning on and try to not blind people with defaults
         if (_entities.Switch.KitchenMainLightswitch.IsOff())
-            await TurnMainRelayOn(CustomColors.WarmWhite(20));
+        {
+            await TurnMainRelayOn(CustomColors.WarmWhite(10));
+        }
         
+        await Task.Delay(750);
+
+        for (int i = 0; i < 3; i++)
+        {
+            _entities.Light.BulbKitchenCeilingCornerNeLight5.CallService("turn_on", new { brightness_pct = 100 });
+            await Task.Delay(1000);
+        }
+    }
+    
+    public async Task SetKitchenLightsToWarmWhite()
+    {
+        // Handle when kitchen main relay was off, turning on and try to not blind people with defaults
+        if (_entities.Switch.KitchenMainLightswitch.IsOff())
+        {
+            await TurnMainRelayOn(CustomColors.WarmWhite());
+            return;
+        }
+          
         // Then set the right colors, whether main relay was on or not
-        await TurnMainRelayOn(CustomColors.WarmWhite(20));
+        await TurnMainRelayOn(CustomColors.WarmWhite());
     }
     
     private void allKitchenLightsOnWithBrightness(int brightPercent)
@@ -148,15 +163,26 @@ public class KitchenLightsWrapper : IKitchenLightsWrapper
     
         _logger.Debug("Mapped bright for MotionNightlightKitchenBySinkTowardsFrontroomLight: {Bright}", brightnessMapped);
     }
+    
     private async Task TurnMainRelayOn(object turnOnStateData)
     {
         _entities.Switch.KitchenMainLightswitch.TurnOn();
+        
+        await Task.Delay(600);
 
-        for (var i = 0; i < 5; i++)
+        for (var i = 0; i < 2; i++)
         {
             _kitchenCeilingLightsEntities.CallService("turn_on", turnOnStateData );
-
-            await Task.Delay(500);
+            await Task.Delay(300);
+        }
+        
+        // Make sure it got set
+        await Task.Delay(1000);
+        
+        for (var i = 0; i < 2; i++)
+        {
+            _kitchenCeilingLightsEntities.CallService("turn_on", turnOnStateData );
+            await Task.Delay(750);
         }
     }
 }

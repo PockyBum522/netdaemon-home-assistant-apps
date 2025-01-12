@@ -4,7 +4,7 @@ using AllenStreetNetDaemonApps.EntityWrappers.Interfaces;
 namespace AllenStreetNetDaemonApps.Apps.WallSwitchControllers;
 
 [NetDaemonApp]
-public class GuestBathWallSwitchesController
+public class GuestBathMainSceneController
 {
     private readonly IHaContext _ha;
     private readonly IGuestBathLightsWrapper _guestBathLightsWrapper;
@@ -12,7 +12,7 @@ public class GuestBathWallSwitchesController
     
     private readonly Entities _entities;
 
-    public GuestBathWallSwitchesController(IHaContext ha, INetDaemonScheduler scheduler, ILogger logger, IGuestBathLightsWrapper guestBathLightsWrapper)
+    public GuestBathMainSceneController(IHaContext ha, INetDaemonScheduler scheduler, ILogger logger, IGuestBathLightsWrapper guestBathLightsWrapper)
     {
         _ha = ha;
         _guestBathLightsWrapper = guestBathLightsWrapper;
@@ -32,8 +32,8 @@ public class GuestBathWallSwitchesController
         ha.Events.Where(e => e.EventType == "zwave_js_value_notification").Subscribe(async (e) => await HandleGuestBathSwitchButtons(e));
 
         // Make the four buttons have the correct colors, resends every once in a blue moon just in case something interrupted power
-        scheduler.RunIn(TimeSpan.FromSeconds(5), InitializeSceneControllerSwitchFourButtonLights);
-        //scheduler.RunEvery(TimeSpan.FromMinutes(120), InitializeSceneControllerSwitchFourButtonLights);
+        scheduler.RunIn(TimeSpan.FromSeconds(20), InitializeSceneControllerSwitchFourButtonLights);
+        scheduler.RunEvery(TimeSpan.FromMinutes(120), InitializeSceneControllerSwitchFourButtonLights);
     }
 
     private void InitializeSceneControllerSwitchFourButtonLights()
@@ -114,8 +114,6 @@ public class GuestBathWallSwitchesController
 
         if (zWaveEvent.Domain != "zwave_js") 
             passingFilters = false;
-        
-        _logger.Information("zWaveEvent.DeviceId: {ZWaveEventDeviceId}", zWaveEvent.DeviceId);
         
         if (zWaveEvent.DeviceId != "92921047c95e1cdd1f804dd324163dc6")              // GuestBath scene controller switch ID is 92921047c95e1cdd1f804dd324163dc6
             passingFilters = false;
