@@ -57,11 +57,10 @@ public class GuestBathExhaustFanController
         } 
         
         // Now LastTurnedOnAt will always be when the fan was first turned on
-        var fiveMinutesAgo = DateTimeOffset.Now.AddMinutes(-5);
+        var fifteenMinutesAgo = DateTimeOffset.Now.AddMinutes(-15);
+        var aLittleLonger = fifteenMinutesAgo.AddMinutes(-2);
         
-        var aLittleLonger = fiveMinutesAgo.AddMinutes(-2);
-        
-        if (SharedState.Timeouts.ExhaustFanInGuestBathTurnedOnAt > fiveMinutesAgo) return;
+        if (SharedState.Timeouts.ExhaustFanInGuestBathTurnedOnAt > fifteenMinutesAgo) return;
         
         // If it's had a chance to handle the off events, and now it's tried a few times, let's stop trying so needless events don't keep firing 
         if (SharedState.MotionSensors.LastMotionInKitchenAt < aLittleLonger) return;
