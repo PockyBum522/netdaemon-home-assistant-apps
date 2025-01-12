@@ -9,6 +9,8 @@ public static class Extensions
     
     public static int Map(this int value, int fromSource, int toSource, int fromTarget, int toTarget)
     {
-        return (value - fromSource) / (toSource - fromSource) * (toTarget - fromTarget) + fromTarget;
+        var convertedValue = ((decimal)value).Map(fromSource, toSource, fromTarget, toTarget);
+
+        return (int)Math.Round(convertedValue);
     }
 }

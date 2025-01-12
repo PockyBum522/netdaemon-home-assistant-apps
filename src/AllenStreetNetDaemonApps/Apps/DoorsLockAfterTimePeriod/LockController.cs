@@ -1,4 +1,6 @@
 ﻿using AllenStreetNetDaemonApps.Apps.DoorsLockAfterTimePeriod.Models;
+using AllenStreetNetDaemonApps.Apps.KitchenLightsController;
+using AllenStreetNetDaemonApps.Internal.Interfaces;
 
 namespace AllenStreetNetDaemonApps.Apps.DoorsLockAfterTimePeriod;
 
@@ -7,6 +9,8 @@ namespace AllenStreetNetDaemonApps.Apps.DoorsLockAfterTimePeriod;
 /// </summary>
 public class LockController
 {
+    private readonly IKitchenLightsControl _kitchenLightsControl;
+    private readonly IFrontRoomLightsControl _frontRoomLightsControl;
     internal AutomaticallyLockableLock FrontDoorLock { get; }
     internal AutomaticallyLockableLock BackDoorLock { get; }
     
@@ -16,8 +20,10 @@ public class LockController
     private readonly ILogger _logger;
     private readonly Entities _entities;
 
-    public LockController(IHaContext ha, INetDaemonScheduler scheduler)
+    public LockController(IHaContext ha, INetDaemonScheduler scheduler, IKitchenLightsControl kitchenLightsControl, IFrontRoomLightsControl frontRoomLightsControl)
     {
+        _kitchenLightsControl = kitchenLightsControl;
+        _frontRoomLightsControl = frontRoomLightsControl;
         _entities = new Entities(ha);
 
         var namespaceLastPart = GetType().Namespace?.Split('.').Last();
@@ -67,6 +73,9 @@ public class LockController
 
             _logger.Information("Front door opened as detected in {ThisName}, adding time, door will now lock at: {NewTime}", nameof(CheckFrontDoor), FrontDoorLock.LockAtTime.GetTimeOnly());
             
+            _kitchenLightsControl.TurnOnKitchenLightsFromMotion();
+            _frontRoomLightsControl.TurnOnFrontRoomLightsFromMotion();
+            
             // Not sure if this will keep the scheduled task from relaunching before this is done, but that's the intent
             await Task.Delay(TimeSpan.FromSeconds(10));
         }
@@ -81,6 +90,8 @@ public class LockController
             
             _logger.Information("Back door opened as detected in {ThisName}, adding time, door will now lock at: {NewTime}", nameof(CheckBackDoor), BackDoorLock.LockAtTime.GetTimeOnly());
 
+            _kitchenLightsControl.TurnOnKitchenLightsFromMotion();
+            
             // Not sure if this will keep the scheduled task from relaunching before this is done, but that's the intent
             await Task.Delay(TimeSpan.FromSeconds(10));
         }

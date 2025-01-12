@@ -1,7 +1,8 @@
-namespace AllenStreetNetDaemonApps.Apps.KitchenLightsController;
+using AllenStreetNetDaemonApps.Internal.Interfaces;
 
-[NetDaemonApp]
-public class KitchenLightsController
+namespace AllenStreetNetDaemonApps.Internal;
+
+public class KitchenLightsControl : IKitchenLightsControl
 {
     private readonly ILogger _logger;
     
@@ -9,7 +10,7 @@ public class KitchenLightsController
 
     private readonly Entity[] _kitchenCeilingLightsEntities;
 
-    public KitchenLightsController(IHaContext ha, INetDaemonScheduler scheduler, ILogger logger)
+    public KitchenLightsControl(IHaContext ha, INetDaemonScheduler scheduler, ILogger logger)
     {
         _entities = new Entities(ha);
 
@@ -22,75 +23,51 @@ public class KitchenLightsController
             .WriteTo.File($"logs/{namespaceLastPart}/{GetType().Name}_.log", rollingInterval: RollingInterval.Day)
             .CreateLogger();
         
-        _logger.Information("Initialized {NamespaceLastPart} v0.01", namespaceLastPart);
-        
-        ha.Events.Where(e => e.EventType == "zwave_js_value_notification").Subscribe(async (e) => await HandleKitchenSwitchButtons(e));
-        
+        _logger.Debug("Initialized {NamespaceLastPart} v0.01", namespaceLastPart);
+
         _kitchenCeilingLightsEntities = GroupUtilities.GetEntitiesFromGroup(ha, _entities.Light.KitchenCeilingLights);
     }
-
-    private async Task HandleKitchenSwitchButtons(Event eventToCheck)
+    
+    public void TurnOnKitchenLightsFromMotion()
     {
-        var dataElement = eventToCheck.DataElement;
+        _logger.Debug("Running {NameOfThis}", nameof(TurnOnKitchenLightsFromMotion));
 
-        if (dataElement is null) return;
+        SharedState.MotionSensors.LastMotionInKitchenAt = DateTimeOffset.Now;
         
-        _logger.Debug("Raw JSON: {EventData}", dataElement.Value.ToString());
-
-        var zWaveEvent = dataElement.Value.Deserialize<ZWaveDataElementValue>();
-
-        if (zWaveEvent is null) return;
-
-        if (!EventWasFromKitchenMainSwitch(zWaveEvent)) return;
+        if (TimeRangeHelpers.IsNightTime())
+        {
+            // At night
+            allKitchenLightsOnWithBrightness(50);
+            return;
+        }
         
-        _logger.Verbose("Passed filters for coming from main kitchen switch");
-        
-        // If it passes filters
-        await SetKitchenLightsFrom(zWaveEvent);
+        // Daytime!
+        allKitchenLightsOnWithBrightness(100);
     }
-
-    private bool EventWasFromKitchenMainSwitch(ZWaveDataElementValue zWaveEvent)
+    
+    public void TurnOffKitchenLightsFromMotion()
     {
-        // Some filtering for making sure it's from the kitchen switch and the right event type
-
-        // ReSharper disable once ReplaceWithSingleAssignment.True cause this is easier to read imho
-        var passingFilters = true;
-
-        if (zWaveEvent.Domain != "zwave_js") 
-            passingFilters = false;
+        _logger.Debug("Running {NameOfThis}", nameof(TurnOffKitchenLightsFromMotion));
         
-        if (zWaveEvent.DeviceId != SECRETS.KitchenMainSwitchZWaveDeviceId)              // Kitchen switch ID is b63490e5f9fb0cbd32588f893de0bdca
-            passingFilters = false;
+        var anyLightsAreOn = _kitchenCeilingLightsEntities.Any(l => l.State == "on") ||
+                                  _entities.Light.MotionNightlightKitchenBySinkTowardsFrontroomLight.State == "on" ||
+                                  _entities.Light.KitchenUndercabinetLights.State == "on";
         
-        if (zWaveEvent.Value != "KeyPressed")
-            passingFilters = false;
+        if (!anyLightsAreOn) return;
+        
+        _logger.Debug("Turning off kitchen lights because there was no motion and at least one light state was on");
+        
+        foreach (var ceilingLight in _kitchenCeilingLightsEntities)
+            ceilingLight.CallService("light.turn_off");
 
-        return passingFilters;
+        // Now turn off the native group
+        _entities.Light.KitchenCeilingLights.TurnOff();
+        
+        _entities.Light.KitchenUndercabinetLights.TurnOff();
+        _entities.Light.MotionNightlightKitchenBySinkTowardsFrontroomLight.TurnOff();
     }
-
-    private async Task SetKitchenLightsFrom(ZWaveDataElementValue zWaveEvent)
-    {
-        if (zWaveEvent.CommandClassName != "Central Scene") return;
-        
-        _logger.Verbose("Detected as incoming central scene change");
-        
-        if (zWaveEvent.Label == "Scene 001") 
-            await SetKitchenLightsBrighter();
-        
-        if (zWaveEvent.Label == "Scene 002") 
-            await SetKitchenLightsToPurpleScene();
-        
-        if (zWaveEvent.Label == "Scene 003") 
-            await SetKitchenLightsDimmer();
-        
-        if (zWaveEvent.Label == "Scene 004") 
-            await SetKitchenLightsToEspressoMachineScene();
-        
-        // Event for main button BUT this fires when main button is turning lights off AND when main button turning lights on
-        // if (zWaveEvent.CommandClassName == "Scene 005")
-    }
-
-    private async Task SetKitchenLightsBrighter()
+    
+    public async Task SetKitchenLightsBrighter()
     {
         if (_entities.Switch.KitchenMainLightswitch.IsOn())
             await ModifyCeilingLightsBrightnessBy(20);
@@ -99,7 +76,7 @@ public class KitchenLightsController
             await TurnMainRelayOn(CustomColors.WarmWhite());
     }
 
-    private async Task SetKitchenLightsDimmer()
+    public async Task SetKitchenLightsDimmer()
     {
         if (_entities.Switch.KitchenMainLightswitch.IsOn())
             await ModifyCeilingLightsBrightnessBy(-20);
@@ -108,7 +85,7 @@ public class KitchenLightsController
             await TurnMainRelayOn(CustomColors.WarmWhite(20));
     }
 
-    private async Task SetKitchenLightsToPurpleScene()
+    public async Task SetKitchenLightsToPurpleScene()
     {
         _logger.Debug("Setting purple scene");
 
@@ -120,7 +97,7 @@ public class KitchenLightsController
         _kitchenCeilingLightsEntities.CallService("turn_on", CustomColors.AlyssaPurple() );
     }
 
-    private Task ModifyCeilingLightsBrightnessBy(int brightnessModifier)
+    public Task ModifyCeilingLightsBrightnessBy(int brightnessModifier)
     {
         foreach (var ceilingLight in _kitchenCeilingLightsEntities)
         {
@@ -151,7 +128,7 @@ public class KitchenLightsController
         return Task.CompletedTask;
     }
 
-    private async Task SetKitchenLightsToEspressoMachineScene()
+    public async Task SetKitchenLightsToEspressoMachineScene()
     {
         // Handle when kitchen main relay was off, turning on and try to not blind people with defaults
         if (_entities.Switch.KitchenMainLightswitch.IsOff())
@@ -160,8 +137,16 @@ public class KitchenLightsController
         // Then set the right colors, whether main relay was on or not
         await TurnMainRelayOn(CustomColors.WarmWhite(20));
     }
+    
+    private void allKitchenLightsOnWithBrightness(int brightPercent)
+    {
+        _entities.Light.KitchenUndercabinetLights.CallService("turn_on", new { brightness_pct = brightPercent } );
 
-
+        var brightnessMapped = brightPercent.Map(0, 100, 0, 254);
+        _entities.Light.MotionNightlightKitchenBySinkTowardsFrontroomLight.CallService("turn_on", new { brightness = brightnessMapped } );
+    
+        _logger.Debug("Mapped bright for MotionNightlightKitchenBySinkTowardsFrontroomLight: {Bright}", brightnessMapped);
+    }
     private async Task TurnMainRelayOn(object turnOnStateData)
     {
         _entities.Switch.KitchenMainLightswitch.TurnOn();

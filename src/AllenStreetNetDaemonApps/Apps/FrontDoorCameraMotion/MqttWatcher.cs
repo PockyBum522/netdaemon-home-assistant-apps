@@ -1,5 +1,7 @@
 ﻿using System.Buffers;
 using AllenStreetNetDaemonApps.Apps.DoorsLockAfterTimePeriod;
+using AllenStreetNetDaemonApps.Apps.KitchenLightsController;
+using AllenStreetNetDaemonApps.Internal.Interfaces;
 using MQTTnet;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
@@ -31,7 +33,7 @@ public class MqttWatcher
     
     public const int MqttSetupDelaySeconds = 30;
 
-    public MqttWatcher(IHaContext ha, INetDaemonScheduler scheduler)
+    public MqttWatcher(IHaContext ha, INetDaemonScheduler scheduler, IKitchenLightsControl kitchenLightsControl, IFrontRoomLightsControl frontRoomLightsControl)
     {
         _ha = ha;
         _entities = new Entities(ha);
@@ -45,7 +47,7 @@ public class MqttWatcher
             .WriteTo.File($"logs/{namespaceLastPart}/{GetType().Name}_.log", rollingInterval: RollingInterval.Day)
             .CreateLogger();
 
-        _lockController = new LockController(ha, scheduler);
+        _lockController = new LockController(ha, scheduler, kitchenLightsControl, frontRoomLightsControl);
         
         _lastLockWakeAtTime = DateTimeOffset.Now - TimeSpan.FromMinutes(5);
         _lastFrontDoorImageNotifyTime = DateTimeOffset.Now - TimeSpan.FromMinutes(5);
