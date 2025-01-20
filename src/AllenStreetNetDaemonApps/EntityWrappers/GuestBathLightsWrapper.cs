@@ -59,13 +59,13 @@ public class GuestBathLightsWrapper : IGuestBathLightsWrapper
     
     public async Task SetGuestBathLightsBrighter()
     {
-        if (_entities.Switch.GuestBathroomSceneControllerLightSwitchForLightsAboveMirror.IsOn())
+        if (_entities.Switch.GuestBathMainLightswitchSceneController.IsOn())
             await ModifyCeilingLightsBrightnessBy(20);
     }
 
     public async Task SetGuestBathLightsDimmer()
     {
-        if (_entities.Switch.GuestBathroomSceneControllerLightSwitchForLightsAboveMirror.IsOn())
+        if (_entities.Switch.GuestBathMainLightswitchSceneController.IsOn())
             await ModifyCeilingLightsBrightnessBy(-20);
     }
 
@@ -73,7 +73,7 @@ public class GuestBathLightsWrapper : IGuestBathLightsWrapper
     {
         _logger.Debug("Setting warm white scene");
         
-        if (_entities.Switch.GuestBathroomSceneControllerLightSwitchForLightsAboveMirror.IsOff())
+        if (_entities.Switch.GuestBathMainLightswitchSceneController.IsOff())
         {
             await TurnMainRelayOn(CustomColors.WarmWhite());
             return;
@@ -86,7 +86,7 @@ public class GuestBathLightsWrapper : IGuestBathLightsWrapper
     {
         _logger.Debug("Setting dime red scene");
 
-        if (_entities.Switch.GuestBathroomSceneControllerLightSwitchForLightsAboveMirror.IsOff())
+        if (_entities.Switch.GuestBathMainLightswitchSceneController.IsOff())
         {
             await TurnMainRelayOn(CustomColors.RedDim());
             return;
@@ -136,7 +136,7 @@ public class GuestBathLightsWrapper : IGuestBathLightsWrapper
     
     private async Task TurnMainRelayOn(object turnOnStateData)
     {
-        _entities.Switch.GuestBathroomSceneControllerLightSwitchForLightsAboveMirror.TurnOn();
+        _entities.Switch.GuestBathMainLightswitchSceneController.TurnOn();
         
         await Task.Delay(300);
 

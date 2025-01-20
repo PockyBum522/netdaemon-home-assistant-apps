@@ -37,8 +37,8 @@ public class DoorLocksController
 
         var textNotifier = new TextNotifier(_logger, ha);
 
-        FrontDoorLock = new AutomaticallyLockableLock(_logger, TimeSpan.FromMinutes(3), _entities.Lock.BluetoothFrontDoorLock2);
-        BackDoorLock = new AutomaticallyLockableLock(_logger, TimeSpan.FromMinutes(6), _entities.Lock.BluetoothBackDoorLock2);
+        FrontDoorLock = new AutomaticallyLockableLock(_logger, TimeSpan.FromMinutes(3), _entities.Lock.BluetoothFrontDoorLock);
+        BackDoorLock = new AutomaticallyLockableLock(_logger, TimeSpan.FromMinutes(6), _entities.Lock.BluetoothBackDoorLock);
         
         scheduler.RunIn(TimeSpan.FromSeconds(1), InitializeLockDisableForHours);
 

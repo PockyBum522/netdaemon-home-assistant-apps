@@ -70,13 +70,13 @@ public class KitchenLightsWrapper : IKitchenLightsWrapper
     
     public async Task SetKitchenLightsBrighter()
     {
-        if (_entities.Switch.KitchenMainLightswitch.IsOn())
+        if (_entities.Switch.KitchenMainRightLightswitchSceneController.IsOn())
             await ModifyCeilingLightsBrightnessBy(20);
     }
 
     public async Task SetKitchenLightsDimmer()
     {
-        if (_entities.Switch.KitchenMainLightswitch.IsOn())
+        if (_entities.Switch.KitchenMainRightLightswitchSceneController.IsOn())
             await ModifyCeilingLightsBrightnessBy(-20);
     }
 
@@ -85,7 +85,7 @@ public class KitchenLightsWrapper : IKitchenLightsWrapper
         _logger.Debug("Setting purple scene");
 
         // Handle when kitchen main relay was off, turning on and try to not blind people with defaults
-        if (_entities.Switch.KitchenMainLightswitch.IsOff())
+        if (_entities.Switch.KitchenMainRightLightswitchSceneController.IsOff())
         {
             await TurnMainRelayOn(CustomColors.AlyssaPurple());
             return;
@@ -127,7 +127,7 @@ public class KitchenLightsWrapper : IKitchenLightsWrapper
     public async Task SetKitchenLightsToEspressoMachineScene()
     {
         // Handle when kitchen main relay was off, turning on and try to not blind people with defaults
-        if (_entities.Switch.KitchenMainLightswitch.IsOff())
+        if (_entities.Switch.KitchenMainRightLightswitchSceneController.IsOff())
         {
             await TurnMainRelayOn(CustomColors.WarmWhite(10));
         }
@@ -144,7 +144,7 @@ public class KitchenLightsWrapper : IKitchenLightsWrapper
     public async Task SetKitchenLightsToWarmWhite()
     {
         // Handle when kitchen main relay was off, turning on and try to not blind people with defaults
-        if (_entities.Switch.KitchenMainLightswitch.IsOff())
+        if (_entities.Switch.KitchenMainRightLightswitchSceneController.IsOff())
         {
             await TurnMainRelayOn(CustomColors.WarmWhite());
             return;
@@ -166,7 +166,7 @@ public class KitchenLightsWrapper : IKitchenLightsWrapper
     
     private async Task TurnMainRelayOn(object turnOnStateData)
     {
-        _entities.Switch.KitchenMainLightswitch.TurnOn();
+        _entities.Switch.KitchenMainRightLightswitchSceneController.TurnOn();
         
         await Task.Delay(600);
 

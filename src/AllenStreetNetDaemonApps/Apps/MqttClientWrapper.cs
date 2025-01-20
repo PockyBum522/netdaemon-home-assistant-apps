@@ -82,7 +82,7 @@ public class MqttClientWrapper
         _deadboltLatch = _entities.Switch.DeadboltDoorframeLatch;
         _doorknobLatch = _entities.Switch.DoorknobDoorframeLatch;
 
-        _frontDoorLock = _entities.Lock.BluetoothFrontDoorLock2;
+        _frontDoorLock = _entities.Lock.BluetoothFrontDoorLock;
         
         var mqttFactory = new MqttClientFactory();
 

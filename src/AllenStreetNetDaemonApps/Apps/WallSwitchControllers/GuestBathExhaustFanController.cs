@@ -37,12 +37,12 @@ public class GuestBathExhaustFanController
 
     private void InitializeFanState()
     {
-        _fanLastState = _entities.Fan.GuestBathExhaustFanAboveToiletSpeedControllerSwitch.IsOn();
+        _fanLastState = _entities.Fan.GuestBathExhaustFanSpeedController.IsOn();
     }
 
     private void CheckExhaustFanTimeout()
     {
-        if (!_entities.Fan.GuestBathExhaustFanAboveToiletSpeedControllerSwitch.IsOn())
+        if (!_entities.Fan.GuestBathExhaustFanSpeedController.IsOn())
         {
             resetState();
             return;
@@ -66,7 +66,7 @@ public class GuestBathExhaustFanController
         if (SharedState.MotionSensors.LastMotionInKitchenAt < aLittleLonger) return;
 
         // Otherwise
-        _entities.Fan.GuestBathExhaustFanAboveToiletSpeedControllerSwitch.TurnOff();
+        _entities.Fan.GuestBathExhaustFanSpeedController.TurnOff();
         
         resetState();
     }

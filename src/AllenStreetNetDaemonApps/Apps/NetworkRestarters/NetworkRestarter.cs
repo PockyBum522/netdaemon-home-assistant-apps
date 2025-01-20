@@ -152,7 +152,7 @@ public class NetworkRestarter
 
     private async Task TurnOffShopNetworkEquipment()
     {
-        var entityToWork = _entities.Switch.NetworkPowerShop;
+        var entityToWork = _entities.Switch.NetworkPowerShopEquipmentPlugInShopWindow;
             
         _logger.Information("_entities.Switch.NetworkPowerShop State: {State}", entityToWork.State);
 
@@ -167,7 +167,7 @@ public class NetworkRestarter
     
     private async Task TurnOnShopNetworkEquipment()
     {
-        var entityToWork = _entities.Switch.NetworkPowerShop;
+        var entityToWork = _entities.Switch.NetworkPowerShopEquipmentPlugInShopWindow;
             
         _logger.Information("_entities.Switch.NetworkPowerShop State: {State}", entityToWork.State);
 
@@ -182,7 +182,7 @@ public class NetworkRestarter
     
     private async Task TurnOffMasterBathroomCabinetNetworkEquipment()
     {
-        var entityToWork = _entities.Light.NetworkPowerMasterBathCabinetEquipment;
+        var entityToWork = _entities.Light.NetworkPowerMasterBedroomClosetEquipment;
             
         _logger.Information("_entities.Light.NetworkPowerMasterBathCabinetEquipment State: {State}", entityToWork.State);
 
@@ -197,7 +197,7 @@ public class NetworkRestarter
     
     private async Task TurnOnMasterBathroomCabinetNetworkEquipment()
     {
-        var entityToWork = _entities.Light.NetworkPowerMasterBathCabinetEquipment;
+        var entityToWork = _entities.Light.NetworkPowerMasterBedroomClosetEquipment;
             
         _logger.Information("_entities.Light.NetworkPowerMasterBathCabinetEquipment State: {State}", entityToWork.State);
 
@@ -270,32 +270,32 @@ public class NetworkRestarter
     
     private async Task TurnOffNetworkClosetEquipment()
     {
-        var entityToWork = _entities.Switch.NetworkPowerAllNetworkClosetEquipment;
+        var entityToWork = _entities.Switch.NetworkPowerMainAllNetworkClosetEquipment;
         
-        _logger.Information("_entities.Switch.NetworkPowerAllNetworkClosetEquipment State: {State}", entityToWork.State);
+        _logger.Information("_entities.Switch.NetworkPowerMainAllNetworkClosetEquipment State: {State}", entityToWork.State);
 
-        _logger.Information("Turning off: _entities.Switch.NetworkPowerAllNetworkClosetEquipment");
+        _logger.Information("Turning off: _entities.Switch.NetworkPowerMainAllNetworkClosetEquipment");
             
         entityToWork.TurnOff();
             
         await Task.Delay(TimeSpan.FromSeconds(10));
             
-        _logger.Information("_entities.Switch.NetworkPowerAllNetworkClosetEquipment State: {State}", entityToWork.State);
+        _logger.Information("_entities.Switch.NetworkPowerMainAllNetworkClosetEquipment State: {State}", entityToWork.State);
     }
     
     private async Task TurnOnNetworkClosetEquipment()
     {
-        var entityToWork = _entities.Switch.NetworkPowerAllNetworkClosetEquipment;
+        var entityToWork = _entities.Switch.NetworkPowerMainAllNetworkClosetEquipment;
         
-        _logger.Information("_entities.Switch.NetworkPowerAllNetworkClosetEquipment State: {State}", entityToWork.State);
+        _logger.Information("{EntityName} State: {State}", nameof(_entities.Switch.NetworkPowerMainAllNetworkClosetEquipment),entityToWork.State);
 
-        _logger.Information("Turning on: _entities.Switch.NetworkPowerAllNetworkClosetEquipment");
+        _logger.Information("Turning on: {EntityName}", nameof(_entities.Switch.NetworkPowerMainAllNetworkClosetEquipment));
             
         entityToWork.TurnOn();
             
         await Task.Delay(TimeSpan.FromSeconds(10));
-            
-        _logger.Information("_entities.Switch.NetworkPowerAllNetworkClosetEquipment State: {State}", entityToWork.State);
+
+        _logger.Information("{EntityName} State: {State}", nameof(_entities.Switch.NetworkPowerMainAllNetworkClosetEquipment),entityToWork.State);
     }
 
     private async Task TurnOnLaundryRoomNetworkEquipment()
@@ -315,7 +315,7 @@ public class NetworkRestarter
     
     private async Task TurnOffNetworkClosetCamsPoeSwitch()
     {
-        var entityToWork = _entities.Switch.NetworkPowerNetworkClosetPoeCameras4PortSwitch;
+        var entityToWork = _entities.Switch.NetworkPowerNetworkClosetPoeCameras4portUnmanagedPoeSwitch;
         
         _logger.Information("_entities.Switch.NetworkPowerNetworkClosetPoeCameras4PortSwitch2 State: {State}", entityToWork.State);
 
@@ -330,7 +330,7 @@ public class NetworkRestarter
     
     private async Task TurnOnNetworkClosetCamsPoeSwitch()
     {
-        var entityToWork = _entities.Switch.NetworkPowerNetworkClosetPoeCameras4PortSwitch;
+        var entityToWork = _entities.Switch.NetworkPowerNetworkClosetPoeCameras4portUnmanagedPoeSwitch;
         
         _logger.Information("_entities.Switch.NetworkPowerNetworkClosetPoeCameras4PortSwitch2 State: {State}", entityToWork.State);
 

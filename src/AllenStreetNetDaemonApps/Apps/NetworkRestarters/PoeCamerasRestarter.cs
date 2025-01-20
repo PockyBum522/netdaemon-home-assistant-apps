@@ -75,7 +75,7 @@ public class PoeCamerasRestarter
     
     private async Task TurnOffShopNetworkEquipment()
     {
-        var entityToWork = _entities.Switch.NetworkPowerShop;
+        var entityToWork = _entities.Switch.NetworkPowerShopEquipmentPlugInShopWindow;
             
         _logger.Information("_entities.Switch.NetworkPowerShop State: {State}", entityToWork.State);
 
@@ -90,7 +90,7 @@ public class PoeCamerasRestarter
     
     private async Task TurnOnShopNetworkEquipment()
     {
-        var entityToWork = _entities.Switch.NetworkPowerShop;
+        var entityToWork = _entities.Switch.NetworkPowerShopEquipmentPlugInShopWindow;
             
         _logger.Information("_entities.Switch.NetworkPowerShop State: {State}", entityToWork.State);
 
@@ -120,7 +120,7 @@ public class PoeCamerasRestarter
     
     private async Task TurnOffNetworkClosetCamsPoeSwitch()
     {
-        var entityToWork = _entities.Switch.NetworkPowerNetworkClosetPoeCameras4PortSwitch;
+        var entityToWork = _entities.Switch.NetworkPowerNetworkClosetPoeCameras4portUnmanagedPoeSwitch;
         
         _logger.Information("_entities.Switch.NetworkPowerNetworkClosetPoeCameras4PortSwitch2 State: {State}", entityToWork.State);
 
@@ -150,7 +150,7 @@ public class PoeCamerasRestarter
     
     private async Task TurnOnNetworkClosetCamsPoeSwitch()
     {
-        var entityToWork = _entities.Switch.NetworkPowerNetworkClosetPoeCameras4PortSwitch;
+        var entityToWork = _entities.Switch.NetworkPowerNetworkClosetPoeCameras4portUnmanagedPoeSwitch;
         
         _logger.Information("_entities.Switch.NetworkPowerNetworkClosetPoeCameras4PortSwitch2 State: {State}", entityToWork.State);
 
