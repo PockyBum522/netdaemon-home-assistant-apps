@@ -1,6 +1,6 @@
 using AllenStreetNetDaemonApps.EntityWrappers.Interfaces;
 
-namespace AllenStreetNetDaemonApps.Apps.WallSwitchControllers;
+namespace AllenStreetNetDaemonApps.Apps.LightControllers;
 
 [NetDaemonApp]
 public class KitchenCeilingLightsWallSwitchController
@@ -10,8 +10,6 @@ public class KitchenCeilingLightsWallSwitchController
     private readonly ILogger _logger;
     
     private readonly Entities _entities;
-
-    private readonly Entity[] _kitchenCeilingLightsEntities;
 
     public KitchenCeilingLightsWallSwitchController(IHaContext ha, INetDaemonScheduler scheduler, ILogger logger, IKitchenLightsWrapper kitchenLightsWrapper)
     {
@@ -23,7 +21,7 @@ public class KitchenCeilingLightsWallSwitchController
         
         _logger = new LoggerConfiguration()
             .Enrich.WithProperty("netDaemonLogging", $"Serilog{GetType().Name}Context")
-            .MinimumLevel.Information()
+            .MinimumLevel.Debug()
             .WriteTo.Console()
             .WriteTo.File($"logs/{namespaceLastPart}/{GetType().Name}_.log", rollingInterval: RollingInterval.Day)
             .CreateLogger();
@@ -31,8 +29,6 @@ public class KitchenCeilingLightsWallSwitchController
         _logger.Information("Initialized {NamespaceLastPart} v0.01", namespaceLastPart);
         
         ha.Events.Where(e => e.EventType == "zwave_js_value_notification").Subscribe(async (e) => await HandleKitchenSwitchButtons(e));
-        
-        _kitchenCeilingLightsEntities = GroupUtilities.GetEntitiesFromGroup(ha, _entities.Light.KitchenCeilingLights);
         
         // Make the four buttons have the correct colors, resends every once in a blue moon just in case something interrupted power
         scheduler.RunIn(TimeSpan.FromSeconds(10), async () => await InitializeSceneControllerSwitchFourButtonLights());
@@ -62,6 +58,20 @@ public class KitchenCeilingLightsWallSwitchController
         // White, Blue, Green, Red, Magenta, Yellow, Cyan
         // Bright (100%), Medium (60%), Low (30%)
 
+        // Disable local relay control on startup
+        _ha.CallService("select", "select_option", data: new { option = "Local control disabled", entity_id = "select.kitchen_main_right_lightswitch_scene_controller_relay_control" });
+        await Task.Delay(TimeSpan.FromSeconds(0.5));
+
+        if (_entities.Switch.KitchenMainRightLightswitchSceneController.IsOff())
+        {
+            _entities.Switch.KitchenMainRightLightswitchSceneController.TurnOn();
+            
+            await Task.Delay(TimeSpan.FromSeconds(3));
+
+            await _kitchenLightsWrapper.SetKitchenCeilingLightsOff();
+            _entities.Switch.KitchenMainRightLightswitchSceneController0x43Button1IndicationBinary.TurnOn();
+        }
+        
         // Set button 1 color and brightness
         _ha.CallService("select", "select_option", data: new { option = "Yellow", entity_id = buttonOneColor });
         await Task.Delay(TimeSpan.FromSeconds(0.5));
@@ -108,6 +118,8 @@ public class KitchenCeilingLightsWallSwitchController
         
         // Actually button 4 of the bottom 4
         _entities.Switch.KitchenMainRightLightswitchSceneController0x47Button5IndicationBinary.TurnOn();
+        
+        _logger.Debug("Kitchen Ceiling Lights Wall Switch Controller Initialized");
     }
 
     private async Task HandleKitchenSwitchButtons(Event eventToCheck)
@@ -154,12 +166,25 @@ public class KitchenCeilingLightsWallSwitchController
 
     private async Task SetKitchenLightsFrom(ZWaveDataElementValue zWaveEvent)
     {
+        _logger.Information("Detected: {ZLabel}", zWaveEvent.Label);
+
         if (zWaveEvent.CommandClassName != "Central Scene") return;
-        
-        _logger.Verbose("Detected as incoming central scene change");
 
         switch (zWaveEvent.Label)
         {
+            // Main relay
+            case "Scene 005":
+                if (_kitchenLightsWrapper.AreAnyCeilingLightsOn())
+                {
+                    await _kitchenLightsWrapper.SetKitchenCeilingLightsOff();
+                    _entities.Switch.KitchenMainRightLightswitchSceneController0x43Button1IndicationBinary.TurnOn();
+                }
+                else
+                {
+                    await _kitchenLightsWrapper.SetKitchenLightsToWarmWhite();
+                }
+                break;
+            
             case "Scene 001":
                 await _kitchenLightsWrapper.SetKitchenLightsToWarmWhite();
                 break;

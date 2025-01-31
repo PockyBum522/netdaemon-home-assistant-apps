@@ -1,7 +1,6 @@
-using AllenStreetNetDaemonApps.EntityWrappers;
 using AllenStreetNetDaemonApps.EntityWrappers.Interfaces;
 
-namespace AllenStreetNetDaemonApps.Apps.WallSwitchControllers;
+namespace AllenStreetNetDaemonApps.Apps.GuestBathFanController;
 
 [NetDaemonApp]
 public class GuestBathExhaustFanController
@@ -32,7 +31,7 @@ public class GuestBathExhaustFanController
         _logger.Information("Initialized {NamespaceLastPart} v0.01", namespaceLastPart);
         
         scheduler.RunIn(TimeSpan.FromSeconds(10), InitializeFanState);
-        scheduler.RunEvery(TimeSpan.FromSeconds(40), CheckExhaustFanTimeout);
+        scheduler.RunEvery(TimeSpan.FromSeconds(1), CheckExhaustFanTimeout);
     }
 
     private void InitializeFanState()
@@ -42,11 +41,15 @@ public class GuestBathExhaustFanController
 
     private void CheckExhaustFanTimeout()
     {
-        if (!_entities.Fan.GuestBathExhaustFanSpeedController.IsOn())
+        var fifteenMinutesAgo = DateTimeOffset.Now.AddMinutes(-15);
+        
+        if (_entities.Fan.GuestBathExhaustFanSpeedController.IsOff())
         {
             resetState();
             return;
         }
+
+        updateCountdownUntilOffText(fifteenMinutesAgo);
         
         // The above if checks if the fan is on, so now all we have to check is "was last state off"
         if (!_fanLastState)
@@ -57,7 +60,6 @@ public class GuestBathExhaustFanController
         } 
         
         // Now LastTurnedOnAt will always be when the fan was first turned on
-        var fifteenMinutesAgo = DateTimeOffset.Now.AddMinutes(-15);
         var aLittleLonger = fifteenMinutesAgo.AddMinutes(-2);
         
         if (SharedState.Timeouts.ExhaustFanInGuestBathTurnedOnAt > fifteenMinutesAgo) return;
@@ -71,9 +73,35 @@ public class GuestBathExhaustFanController
         resetState();
     }
 
-    private static void resetState()
+    private void updateCountdownUntilOffText(DateTimeOffset fifteenMinutesAgo)
+    {
+        if (_entities.Fan.GuestBathExhaustFanSpeedController.IsOff())
+        {
+            resetState();
+            return;
+        }
+        
+        var timeUntilOff = SharedState.Timeouts.ExhaustFanInGuestBathTurnedOnAt - fifteenMinutesAgo;
+
+        if (timeUntilOff.Minutes is < 0 or > 15)
+        {
+            _entities.InputText.GuestBathFanCountdown.SetValue("Unknown");
+            return;
+        }
+        
+        _entities.InputBoolean.IsVisibleGuestBathFanCountdownBadge.TurnOn();
+        
+        var countdownMessage = $"{timeUntilOff.Minutes:d2}:{timeUntilOff.Seconds:d2}";
+            
+        _entities.InputText.GuestBathFanCountdown.SetValue(countdownMessage);
+    }
+
+    private void resetState()
     {
         _fanLastState = false;
         SharedState.Timeouts.ExhaustFanInGuestBathTurnedOnAt = DateTimeOffset.MinValue;
+        
+        _entities.InputText.GuestBathFanCountdown.SetValue("Off");
+        _entities.InputBoolean.IsVisibleGuestBathFanCountdownBadge.TurnOff();
     }
 }

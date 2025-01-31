@@ -29,6 +29,21 @@ public class GuestBathLightsWrapper : IGuestBathLightsWrapper
         _guestBathCeilingLightsEntities = GroupUtilities.GetEntitiesFromGroup(ha, _entities.Light.GuestBathLights);
     }
     
+    public bool AreAnyAboveMirrorLightsOn()
+    {
+        var foundOneOn = false;
+        
+        foreach (var light in _guestBathCeilingLightsEntities)
+        {
+            _logger.Debug("Walking all above mirror lights: {Name}.State: {State}", light.EntityId, light.State);
+            
+            if (light.State == "on")
+                foundOneOn = true;
+        }
+
+        return foundOneOn;
+    }
+    
     public async Task TurnOffGuestBathLights()
     {
         _logger.Debug("Running {NameOfThis}", nameof(TurnOffGuestBathLights));
@@ -71,6 +86,8 @@ public class GuestBathLightsWrapper : IGuestBathLightsWrapper
 
     public async Task SetGuestBathLightsToWarmWhiteScene()
     {
+        _entities.Switch.GuestBathMainLightswitchSceneController0x43Button1IndicationBinary.TurnOff();
+        
         _logger.Debug("Setting warm white scene");
         
         if (_entities.Switch.GuestBathMainLightswitchSceneController.IsOff())

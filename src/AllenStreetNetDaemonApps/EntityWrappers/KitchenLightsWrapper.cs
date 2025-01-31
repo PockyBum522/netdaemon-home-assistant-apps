@@ -19,7 +19,7 @@ public class KitchenLightsWrapper : IKitchenLightsWrapper
         
         _logger = new LoggerConfiguration()
             .Enrich.WithProperty("netDaemonLogging", $"Serilog{GetType().Name}Context")
-            .MinimumLevel.Information()
+            .MinimumLevel.Debug()
             .WriteTo.Console()
             .WriteTo.File($"logs/{namespaceLastPart}/{GetType().Name}_.log", rollingInterval: RollingInterval.Day)
             .CreateLogger();
@@ -27,6 +27,21 @@ public class KitchenLightsWrapper : IKitchenLightsWrapper
         _logger.Debug("Initialized {NamespaceLastPart} v0.01", namespaceLastPart);
 
         _kitchenCeilingLightsEntities = GroupUtilities.GetEntitiesFromGroup(ha, _entities.Light.KitchenCeilingLights);
+    }
+
+    public bool AreAnyCeilingLightsOn()
+    {
+        var foundOneOn = false;
+        
+        foreach (var ceilingLight in _kitchenCeilingLightsEntities)
+        {
+            _logger.Debug("Walking all ceiling lights: {Name}.State: {State}", ceilingLight.EntityId, ceilingLight.State);
+            
+            if (ceilingLight.State == "on")
+                foundOneOn = true;
+        }
+
+        return foundOneOn;
     }
     
     public void TurnOnKitchenLightsFromMotion()
@@ -79,6 +94,11 @@ public class KitchenLightsWrapper : IKitchenLightsWrapper
         if (_entities.Switch.KitchenMainRightLightswitchSceneController.IsOn())
             await ModifyCeilingLightsBrightnessBy(-20);
     }
+    
+    public async Task SetKitchenCeilingLightsOff()
+    {
+        await ModifyCeilingLightsBrightnessBy(-100);
+    }
 
     public async Task SetKitchenLightsToPurpleScene()
     {
@@ -99,14 +119,43 @@ public class KitchenLightsWrapper : IKitchenLightsWrapper
     {
         foreach (var ceilingLight in _kitchenCeilingLightsEntities)
         {
+            _logger.Debug("About to modify brightness of ceiling light: {Name}", ceilingLight.EntityId);
+            
+            //_logger.Debug("Deconstructed: {@Light}", ceilingLight);
+
+            if (ceilingLight.Attributes is null)
+            {
+                _logger.Debug("Attributes is null for {Name}", ceilingLight.EntityId);
+                continue;
+            }
+                
+            //_logger.Debug("Attributes: {@LightAttributes}", ceilingLight.Attributes);
+            
             var lightAttributesDict = (Dictionary<string,object>?)ceilingLight.Attributes;
+
+            //_logger.Debug("lightAttributesDict: {@LightAttributesDict}", lightAttributesDict);
             
             if (lightAttributesDict is null)
-                throw new Exception("lightAttributesDict is null");
+            {
+                _logger.Debug("lightAttributesDict is null for {Name}", ceilingLight.EntityId);
+                continue;
+            }
+
+            _logger.Debug("About to parse decimal");
+
+            if (lightAttributesDict["brightness"] is null)
+            {
+                _logger.Debug("brightness is null for {Name}", ceilingLight.EntityId);
+                continue;
+            }
 
             var currentLightBrightness = decimal.Parse(lightAttributesDict["brightness"].ToString() ?? "0");
-
+            
+            _logger.Debug("About to map");
+            
             var currentLightBrightnessPercent = currentLightBrightness.Map(0, 255, 0, 100); 
+            
+            _logger.Debug("About to add mod");
             
             var newLightBrightness = (int)currentLightBrightnessPercent + brightnessModifier;
 
@@ -120,7 +169,7 @@ public class KitchenLightsWrapper : IKitchenLightsWrapper
             
             ceilingLight.CallService("turn_on", new { brightness_pct = newLightBrightness } );
 
-            await Task.Delay(100);
+            await Task.Delay(400);
         }
     }
 
@@ -143,6 +192,8 @@ public class KitchenLightsWrapper : IKitchenLightsWrapper
     
     public async Task SetKitchenLightsToWarmWhite()
     {
+        _entities.Switch.KitchenMainRightLightswitchSceneController0x43Button1IndicationBinary.TurnOff();
+        
         // Handle when kitchen main relay was off, turning on and try to not blind people with defaults
         if (_entities.Switch.KitchenMainRightLightswitchSceneController.IsOff())
         {
