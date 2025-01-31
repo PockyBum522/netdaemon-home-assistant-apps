@@ -15,10 +15,10 @@ public class WasherDryerNotifier
     private int _washerErrorCount = 0; 
     
     
-    private int _washerStopWattThreshold = 25; 
-    
-    private int _washerStopCountdownCount = 20; 
-    private int _washerStopCountdown;
+    private int _washerStopWattThreshold = 20;
+
+    private int _historyCount = 20;
+    private List<double> _washerPowerUsageHistory = new();
 
     public enum WasherMode
     {
@@ -50,8 +50,6 @@ public class WasherDryerNotifier
         scheduler.RunEvery(TimeSpan.FromSeconds(30), async () => await checkCurrentWasherPowerUsage()); 
         
         _logger.Information("Initialized {NamespaceLastPart} v0.01", namespaceLastPart);
-
-        _washerStopCountdown = _washerStopCountdownCount;
     }
     
     private async Task checkCurrentWasherPowerUsage()
@@ -64,32 +62,46 @@ public class WasherDryerNotifier
         var washerWatts = (double)washerCurrentWattsRaw;
         _logger.Debug("Current washer power usage is: {CurrentWatts}w", washerWatts);
         
-        checkForWasherStart(washerWatts);
+        updateRunningHistory(washerWatts);
+        var averagedValue = _washerPowerUsageHistory.AsQueryable().Average();
+        
+        checkForWasherStart(averagedValue);
 
         if (!_washerRunning) return;
         
         _logger.Debug("Washer has been running for: {ElapsedTime}", DateTimeOffset.Now - _washerStartedAt);
         
-        checkForWasherStop(washerWatts);
+        checkForWasherStop(averagedValue);
+    }
+
+    private void updateRunningHistory(double washerWatts)
+    {
+        _washerPowerUsageHistory.Add(washerWatts);
+
+        if (_washerPowerUsageHistory.Count > _historyCount)
+        {
+            _washerPowerUsageHistory.RemoveAt(0);
+        }
+
+        _logger.Debug("Washer power usage history count: {HistoryCount}", _washerPowerUsageHistory.Count);
+
+        _logger.Debug("Washer power usage history: {@WasherPowerUsageHistory}", _washerPowerUsageHistory);
+
+        var averagedValue = _washerPowerUsageHistory.AsQueryable().Average();
+        
+        _logger.Debug("Washer power usage history AVERAGE: {Average}", averagedValue);
+        _logger.Debug("");
     }
 
     private void checkForWasherStop(double washerWatts)
     {
         if (washerWatts > _washerStopWattThreshold)
         {
-            _washerStopCountdown = _washerStopCountdownCount;
             return;
         }
         
         // Otherwise:
-        _washerStopCountdown--;
-        _logger.Debug("Washer stop detected, countdown at: {Countdown}", _washerStopCountdown);
-
-        if (_washerStopCountdown >= 1) return;
-        
-        // Otherwise:
         _washerRunning = false;
-        _washerStopCountdown = _washerStopCountdownCount;
         _logger.Debug("Washer stop detected, setting _washerRunning to false");
 
         if (DateTimeOffset.Now - _washerStartedAt > TimeSpan.FromHours(3))
