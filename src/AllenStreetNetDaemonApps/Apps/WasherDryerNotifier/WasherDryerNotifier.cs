@@ -15,9 +15,9 @@ public class WasherDryerNotifier
     private int _washerErrorCount = 0; 
     
     
-    private int _washerStopWattThreshold = 10; 
+    private int _washerStopWattThreshold = 25; 
     
-    private int _washerStopCountdownCount = 10; 
+    private int _washerStopCountdownCount = 20; 
     private int _washerStopCountdown;
 
     public enum WasherMode
