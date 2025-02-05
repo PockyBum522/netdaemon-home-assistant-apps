@@ -81,7 +81,7 @@ public class WasherDryerNotifier
 
         var averagedValue = _washerPowerUsageHistory.AsQueryable().Average();
         
-        _logger.Debug("Washer power usage history AVERAGE: {Average}", averagedValue);
+        _logger.Debug("Washer power usage history AVERAGE: {Average} out of {Count} values", averagedValue.ToString("F2"), _washerPowerUsageHistory.Count);
     }
 
     // ReSharper disable once CognitiveComplexity because it's a state machine. It's simple, the linter just is dumb.
@@ -95,6 +95,7 @@ public class WasherDryerNotifier
                 if (_washerPowerUsageHistory.Count < _historyMaximum) return;
                 
                 // Triggers:
+                
                 //      Uninitialized => Off = Washer average <= 3w
                 if (washerWatts <= _washerOffWattThreshold) stateChangeTo(WasherState.Off);
                 
@@ -128,7 +129,6 @@ public class WasherDryerNotifier
             
             case WasherState.Off:
                 
-                // Triggers:
                 //      Off => Washing = Washer average > 3w
                 if (washerWatts > _washerOffWattThreshold)
                 {
@@ -144,6 +144,7 @@ public class WasherDryerNotifier
                 _logger.Debug("Washer has been running for: {ElapsedTime}", DateTimeOffset.Now - _washerStartedAt);
                 
                 // Triggers:
+                
                 //      Washing => Drying = Washer average >= 500w
                 if (washerWatts >= _washerDryingWattThreshold) stateChangeTo(WasherState.Drying);
                 
@@ -157,6 +158,7 @@ public class WasherDryerNotifier
                 _logger.Debug("Washer has been running for: {ElapsedTime}", DateTimeOffset.Now - _washerStartedAt);
 
                 // Triggers:
+                
                 //      Drying => StayFresh = Washer average < 20w
                 if (washerWatts < _washerStayFreshWattThreshold) stateChangeTo(WasherState.StayFresh);
                 
@@ -167,6 +169,7 @@ public class WasherDryerNotifier
                 _logger.Debug("LOAD IS FINISHED, PLEASE UNLOAD WASHER!");
                 
                 // Triggers:
+                
                 //      StayFresh => Off = Washer average < 3w
                 if (washerWatts < _washerOffWattThreshold)
                 {
@@ -182,6 +185,7 @@ public class WasherDryerNotifier
                 _logger.Debug("WASHER HAS A PROBLEM HALLLLLLLLP");
                 
                 // Triggers:
+                
                 //      Problem => Washing = Washer average > 3w
                 if (washerWatts > _washerOffWattThreshold) stateChangeTo(WasherState.Washing);
                 
