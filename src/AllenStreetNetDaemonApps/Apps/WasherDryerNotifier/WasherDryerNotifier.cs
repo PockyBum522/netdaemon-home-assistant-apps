@@ -1,30 +1,32 @@
-using CoordinateSharp;
+using System.ComponentModel;
 
 namespace AllenStreetNetDaemonApps.Apps.WasherDryerNotifier;
 
 [NetDaemonApp]
 public class WasherDryerNotifier
 {
-    private readonly IHaContext _ha;
-    private readonly ILogger _logger;
+    private readonly Serilog.Core.Logger _logger;
     private readonly Entities _entities;
 
-    private bool _washerRunning;
-    private DateTimeOffset _washerStartedAt = DateTimeOffset.MinValue;
+    private DateTimeOffset _washerStartedAt = DateTimeOffset.MaxValue;
 
-    private int _washerErrorCount = 0; 
+    private int _washerErrorCount; 
     
+    private WasherState _washerState;
     
-    private int _washerStopWattThreshold = 20;
+    // Transition thresholds
+    private const int _washerOffWattThreshold = 3;
+    private const int _washerDryingWattThreshold = 500;
+    private const int _washerStayFreshWattThreshold = 20;
 
-    private int _historyCount = 20;
-    private List<double> _washerPowerUsageHistory = new();
+    private const int _historyMaximum = 10;
+    private readonly List<double> _washerPowerUsageHistory = [];
 
-    public enum WasherMode
+    private enum WasherState
     {
         Uninitialized,
         Off,
-        Running,
+        Washing,
         Drying,
         StayFresh,
         Problem
@@ -32,9 +34,7 @@ public class WasherDryerNotifier
     
     public WasherDryerNotifier(IHaContext ha, INetDaemonScheduler scheduler)
     {
-        _ha = ha;
-
-        _entities = new Entities(_ha);
+        _entities = new Entities(ha);
 
         var namespaceLastPart = GetType().Namespace?.Split('.').Last();
 
@@ -45,14 +45,12 @@ public class WasherDryerNotifier
             .WriteTo.File($"logs/{namespaceLastPart}/{GetType().Name}_.log", rollingInterval: RollingInterval.Day)
             .CreateLogger();
         
-        //scheduler.RunIn(TimeSpan.FromSeconds(5), async () => await CheckCurrentWasherPowerUsage());
-        
-        scheduler.RunEvery(TimeSpan.FromSeconds(30), async () => await checkCurrentWasherPowerUsage()); 
+        scheduler.RunEvery(TimeSpan.FromSeconds(30), checkCurrentWasherPowerUsage); 
         
         _logger.Information("Initialized {NamespaceLastPart} v0.01", namespaceLastPart);
     }
-    
-    private async Task checkCurrentWasherPowerUsage()
+
+    private void checkCurrentWasherPowerUsage()
     {
         var washerCurrentWattsRaw = _entities.Sensor.WasherDryerComboMainPowerElectricConsumptionW.State;
         
@@ -60,70 +58,157 @@ public class WasherDryerNotifier
         
         if (washerCurrentWattsRaw is null) return;
         var washerWatts = (double)washerCurrentWattsRaw;
-        _logger.Debug("Current washer power usage is: {CurrentWatts}w", washerWatts);
         
-        updateRunningHistory(washerWatts);
+        updateHistory(washerWatts);
+        
         var averagedValue = _washerPowerUsageHistory.AsQueryable().Average();
-        
-        checkForWasherStart(averagedValue);
 
-        if (!_washerRunning) return;
-        
-        _logger.Debug("Washer has been running for: {ElapsedTime}", DateTimeOffset.Now - _washerStartedAt);
-        
-        checkForWasherStop(averagedValue);
+        handleWasherStateUpdate(averagedValue);
     }
 
-    private void updateRunningHistory(double washerWatts)
+    private void updateHistory(double washerWatts)
     {
         _washerPowerUsageHistory.Add(washerWatts);
 
-        if (_washerPowerUsageHistory.Count > _historyCount)
+        if (_washerPowerUsageHistory.Count > _historyMaximum)
         {
             _washerPowerUsageHistory.RemoveAt(0);
         }
 
-        _logger.Debug("Washer power usage history count: {HistoryCount}", _washerPowerUsageHistory.Count);
+        _logger.Verbose("Washer power usage history count: {HistoryCount}", _washerPowerUsageHistory.Count);
 
-        _logger.Debug("Washer power usage history: {@WasherPowerUsageHistory}", _washerPowerUsageHistory);
+        _logger.Verbose("Washer power usage history: {@WasherPowerUsageHistory}", _washerPowerUsageHistory);
 
         var averagedValue = _washerPowerUsageHistory.AsQueryable().Average();
         
         _logger.Debug("Washer power usage history AVERAGE: {Average}", averagedValue);
-        _logger.Debug("");
     }
 
-    private void checkForWasherStop(double washerWatts)
+    // ReSharper disable once CognitiveComplexity because it's a state machine. It's simple, the linter just is dumb.
+    private void handleWasherStateUpdate(double washerWatts)
     {
-        if (washerWatts > _washerStopWattThreshold)
+        switch (_washerState)
         {
-            return;
-        }
-        
-        // Otherwise:
-        _washerRunning = false;
-        _logger.Debug("Washer stop detected, setting _washerRunning to false");
-
-        if (DateTimeOffset.Now - _washerStartedAt > TimeSpan.FromHours(3))
-        {
-            _logger.Information("Washer ran for more than 3 hours, should be fine! Time to unload washer!");    
-            return;
-        }
-        
-        // Below here washer ran for sub 3 hours
-        _logger.Error("Washer ran for less than 3 hours, was either a short load or there is an issue, please check washer");
-    }
-
-    private void checkForWasherStart(double washerWatts)
-    {
-        if (_washerRunning) return;
-        if (washerWatts < _washerStopWattThreshold) return;
+            case WasherState.Uninitialized:
                 
-        // Otherwise:
-        _washerRunning = true;
-        _logger.Debug("Washer start detected");
+                // Wait for 20 reads when Uninitialized before handling state so we have an accurate idea of what's going on:
+                if (_washerPowerUsageHistory.Count < _historyMaximum) return;
+                
+                // Triggers:
+                //      Uninitialized => Off = Washer average <= 3w
+                if (washerWatts <= _washerOffWattThreshold) stateChangeTo(WasherState.Off);
+                
+                //      Uninitialized => StayFresh = Washer average > 3w && <= 20w
+                if (washerWatts is > _washerOffWattThreshold and
+                                   <= _washerStayFreshWattThreshold)
+                {
+                    _washerStartedAt = DateTimeOffset.Now;
+                    
+                    stateChangeTo(WasherState.StayFresh);
+                }  
+                
+                //      Uninitialized => Washing = Washer average > 20w && <= 500w
+                if (washerWatts is > _washerStayFreshWattThreshold and 
+                                   <= _washerDryingWattThreshold)
+                {
+                    _washerStartedAt = DateTimeOffset.Now;
+                    
+                    stateChangeTo(WasherState.Washing);
+                }  
+                
+                //      Uninitialized => Drying = Washer average > 500w
+                if (washerWatts > _washerDryingWattThreshold)
+                {
+                    _washerStartedAt = DateTimeOffset.Now;
+                    
+                    stateChangeTo(WasherState.Drying);
+                }
+                
+                break;
+            
+            case WasherState.Off:
+                
+                // Triggers:
+                //      Off => Washing = Washer average > 3w
+                if (washerWatts > _washerOffWattThreshold)
+                {
+                    _washerStartedAt = DateTimeOffset.Now;
+                    
+                    stateChangeTo(WasherState.Washing);
+                }
+                
+                break;
+            
+            case WasherState.Washing:
+                
+                _logger.Debug("Washer has been running for: {ElapsedTime}", DateTimeOffset.Now - _washerStartedAt);
+                
+                // Triggers:
+                //      Washing => Drying = Washer average >= 500w
+                if (washerWatts >= _washerDryingWattThreshold) stateChangeTo(WasherState.Drying);
+                
+                //      Washing => Problem = Washer average < 3w
+                if (washerWatts < _washerOffWattThreshold) stateChangeTo(WasherState.Problem);
+                
+                break;
+            
+            case WasherState.Drying:
+
+                _logger.Debug("Washer has been running for: {ElapsedTime}", DateTimeOffset.Now - _washerStartedAt);
+
+                // Triggers:
+                //      Drying => StayFresh = Washer average < 20w
+                if (washerWatts < _washerStayFreshWattThreshold) stateChangeTo(WasherState.StayFresh);
+                
+                break;
+            
+            case WasherState.StayFresh:
+                
+                _logger.Debug("LOAD IS FINISHED, PLEASE UNLOAD WASHER!");
+                
+                // Triggers:
+                //      StayFresh => Off = Washer average < 3w
+                if (washerWatts < _washerOffWattThreshold)
+                {
+                    _washerStartedAt = DateTimeOffset.MaxValue;
+                    
+                    stateChangeTo(WasherState.Off);
+                }
+                
+                break;
+            
+            case WasherState.Problem:
+                
+                _logger.Debug("WASHER HAS A PROBLEM HALLLLLLLLP");
+                
+                // Triggers:
+                //      Problem => Washing = Washer average > 3w
+                if (washerWatts > _washerOffWattThreshold) stateChangeTo(WasherState.Washing);
+                
+                //      Problem => Off = 24h Timeout
+                if (_washerStartedAt < DateTimeOffset.Now - TimeSpan.FromHours(24))
+                {
+                    _logger.Warning("Washer was in WasherState.Problem, but load started more than 24h ago so timing out and moving to WasherState.Off");
+                    
+                    stateChangeTo(WasherState.Off);
+                }
+                
+                break;
+            
+            default:
+                throw new InvalidEnumArgumentException(
+                    $"{nameof(_washerState)} in {nameof(handleWasherStateUpdate)} was not a handled state (Did you add something to the enum recently?)");
+        }
+    }
+
+    private void stateChangeTo(WasherState newState)
+    {
+        var oldStateName = Enum.GetName(_washerState.GetType(), _washerState);
+        var newStateName = Enum.GetName(newState.GetType(), newState);
         
-        _washerStartedAt = DateTimeOffset.Now;
+        _logger.Debug("STATE: {OldStateName} => {NewStateName}", oldStateName, newStateName);
+        
+        _washerState = newState;
     }
 
     private bool washerValueInvalid(double? washerCurrentWattsRaw)
