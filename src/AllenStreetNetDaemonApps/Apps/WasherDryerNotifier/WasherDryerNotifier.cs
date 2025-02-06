@@ -97,7 +97,7 @@ public class WasherDryerNotifier
                 // Triggers:
                 
                 //      Uninitialized => Off = Washer average <= 3w
-                if (washerWatts <= _washerOffWattThreshold) stateChangeTo(WasherState.Off);
+                if (washerWatts <= _washerOffWattThreshold) changeStateTo(WasherState.Off);
                 
                 //      Uninitialized => StayFresh = Washer average > 3w && <= 20w
                 if (washerWatts is > _washerOffWattThreshold and
@@ -105,7 +105,7 @@ public class WasherDryerNotifier
                 {
                     _washerStartedAt = DateTimeOffset.Now;
                     
-                    stateChangeTo(WasherState.StayFresh);
+                    changeStateTo(WasherState.StayFresh);
                 }  
                 
                 //      Uninitialized => Washing = Washer average > 20w && <= 500w
@@ -114,7 +114,7 @@ public class WasherDryerNotifier
                 {
                     _washerStartedAt = DateTimeOffset.Now;
                     
-                    stateChangeTo(WasherState.Washing);
+                    changeStateTo(WasherState.Washing);
                 }  
                 
                 //      Uninitialized => Drying = Washer average > 500w
@@ -122,7 +122,7 @@ public class WasherDryerNotifier
                 {
                     _washerStartedAt = DateTimeOffset.Now;
                     
-                    stateChangeTo(WasherState.Drying);
+                    changeStateTo(WasherState.Drying);
                 }
                 
                 break;
@@ -134,7 +134,7 @@ public class WasherDryerNotifier
                 {
                     _washerStartedAt = DateTimeOffset.Now;
                     
-                    stateChangeTo(WasherState.Washing);
+                    changeStateTo(WasherState.Washing);
                 }
                 
                 break;
@@ -146,10 +146,10 @@ public class WasherDryerNotifier
                 // Triggers:
                 
                 //      Washing => Drying = Washer average >= 500w
-                if (washerWatts >= _washerDryingWattThreshold) stateChangeTo(WasherState.Drying);
+                if (washerWatts >= _washerDryingWattThreshold) changeStateTo(WasherState.Drying);
                 
                 //      Washing => Problem = Washer average < 3w
-                if (washerWatts < _washerOffWattThreshold) stateChangeTo(WasherState.Problem);
+                if (washerWatts < _washerOffWattThreshold) changeStateTo(WasherState.Problem);
                 
                 break;
             
@@ -160,7 +160,7 @@ public class WasherDryerNotifier
                 // Triggers:
                 
                 //      Drying => StayFresh = Washer average < 20w
-                if (washerWatts < _washerStayFreshWattThreshold) stateChangeTo(WasherState.StayFresh);
+                if (washerWatts < _washerStayFreshWattThreshold) changeStateTo(WasherState.StayFresh);
                 
                 break;
             
@@ -175,7 +175,7 @@ public class WasherDryerNotifier
                 {
                     _washerStartedAt = DateTimeOffset.MaxValue;
                     
-                    stateChangeTo(WasherState.Off);
+                    changeStateTo(WasherState.Off);
                 }
                 
                 break;
@@ -187,14 +187,14 @@ public class WasherDryerNotifier
                 // Triggers:
                 
                 //      Problem => Washing = Washer average > 3w
-                if (washerWatts > _washerOffWattThreshold) stateChangeTo(WasherState.Washing);
+                if (washerWatts > _washerOffWattThreshold) changeStateTo(WasherState.Washing);
                 
                 //      Problem => Off = 24h Timeout
                 if (_washerStartedAt < DateTimeOffset.Now - TimeSpan.FromHours(24))
                 {
                     _logger.Warning("Washer was in WasherState.Problem, but load started more than 24h ago so timing out and moving to WasherState.Off");
                     
-                    stateChangeTo(WasherState.Off);
+                    changeStateTo(WasherState.Off);
                 }
                 
                 break;
@@ -205,7 +205,7 @@ public class WasherDryerNotifier
         }
     }
 
-    private void stateChangeTo(WasherState newState)
+    private void changeStateTo(WasherState newState)
     {
         var oldStateName = Enum.GetName(_washerState.GetType(), _washerState);
         var newStateName = Enum.GetName(newState.GetType(), newState);
