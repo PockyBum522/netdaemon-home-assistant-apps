@@ -80,7 +80,7 @@ public class GuestBathLightsWrapper : IGuestBathLightsWrapper
 
     public async Task SetGuestBathLightsDimmer()
     {
-        if (_entities.Switch.GuestBathMainLightswitchSceneController.IsOn())
+        if (AreAnyAboveMirrorLightsOn())
         {
             await ModifyCeilingLightsBrightnessBy(-20);   
         }

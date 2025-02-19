@@ -91,8 +91,10 @@ public class KitchenLightsWrapper : IKitchenLightsWrapper
 
     public async Task SetKitchenLightsDimmer()
     {
-        if (_entities.Switch.KitchenMainRightLightswitchSceneController.IsOn())
-            await ModifyCeilingLightsBrightnessBy(-20);
+        if (AreAnyCeilingLightsOn())
+        {
+            await ModifyCeilingLightsBrightnessBy(-20);   
+        }
         else
         {
             await TurnMainRelayOn(CustomColors.WarmWhite(20));
