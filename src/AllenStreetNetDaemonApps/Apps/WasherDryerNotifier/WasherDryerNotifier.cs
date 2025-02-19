@@ -7,7 +7,8 @@ public class WasherDryerNotifier
 {
     private readonly Serilog.Core.Logger _logger;
     private readonly Entities _entities;
-
+    private readonly TextNotifier _textNotifier;
+    
     private DateTimeOffset _washerStartedAt = DateTimeOffset.MaxValue;
 
     private int _washerErrorCount; 
@@ -16,7 +17,7 @@ public class WasherDryerNotifier
     
     // Transition thresholds
     private const int _washerOffWattThreshold = 3;
-    private const int _washerDryingWattThreshold = 500;
+    private const int _washerDryingWattThreshold = 1100;
     private const int _washerStayFreshWattThreshold = 20;
 
     private const int _historyMaximum = 10;
@@ -45,9 +46,85 @@ public class WasherDryerNotifier
             .WriteTo.File($"logs/{namespaceLastPart}/{GetType().Name}_.log", rollingInterval: RollingInterval.Day)
             .CreateLogger();
         
+        _textNotifier = new TextNotifier(_logger, ha);
+        
         scheduler.RunEvery(TimeSpan.FromSeconds(30), checkCurrentWasherPowerUsage); 
         
+        scheduler.RunEvery(TimeSpan.FromSeconds(1), updateWasherCountdown); 
+        
         _logger.Information("Initialized {NamespaceLastPart} v0.01", namespaceLastPart);
+    }
+
+    private void updateWasherCountdown()
+    {
+        var unknownMessage = "unknown";
+        var problemMessage = "PROBLEM - Check Laundry!!";
+        var finishedMessage = "Finished!";
+        
+        var timeUntilOff = TimeSpan.FromMinutes(-1201);
+        
+        if (_washerStartedAt != DateTimeOffset.MaxValue)
+        {
+            timeUntilOff = (_washerStartedAt + TimeSpan.FromHours(5) + TimeSpan.FromMinutes(30)) - DateTimeOffset.Now;    
+        }
+        
+        var countdownMessage = $"{timeUntilOff.Hours:d1}h {timeUntilOff.Minutes:d2}m {timeUntilOff.Seconds:d2}s";
+        
+        _logger.Information("Time until off: {TimeUntilOff}, Minutes only: {TimeUntilMinutes} | countdownMessage: {CountdownMessage}", 
+            timeUntilOff, timeUntilOff.TotalMinutes, countdownMessage);
+        
+        if (timeUntilOff.TotalMinutes is < -1200 or > 1200 ||
+            _washerState == WasherState.Uninitialized)
+        {
+            //_logger.Information("_entities.InputText.LaundryCountdown.State {WasherString}", _entities.InputText.LaundryCountdown.State);
+            
+            if (_entities.InputText.LaundryCountdown.State != unknownMessage)
+                _entities.InputText.LaundryCountdown.SetValue(unknownMessage);
+            
+            return;
+        }
+
+        switch (_washerState)
+        {
+            case WasherState.Problem:
+                
+                if (_entities.InputText.LaundryCountdown.State != problemMessage)
+                    _entities.InputText.LaundryCountdown.SetValue(problemMessage);
+                
+                break;
+            
+            case WasherState.StayFresh:
+                if (_entities.InputText.LaundryCountdown.State != finishedMessage)
+                    _entities.InputText.LaundryCountdown.SetValue(finishedMessage);
+                
+                break;
+            
+            case WasherState.Off:
+                if (timeUntilOff.TotalMinutes < -1200)
+                {
+                    if (_entities.InputText.LaundryCountdown.State != unknownMessage)
+                        _entities.InputText.LaundryCountdown.SetValue(unknownMessage);
+                    
+                    break;
+                }
+                
+                if (_entities.InputText.LaundryCountdown.State != finishedMessage)
+                    _entities.InputText.LaundryCountdown.SetValue(finishedMessage);
+                
+                break;
+            
+            case WasherState.Washing:
+                _entities.InputText.LaundryCountdown.SetValue($"Washing: {countdownMessage}");
+                break;
+            
+            case WasherState.Drying:
+                _entities.InputText.LaundryCountdown.SetValue($"Drying: {countdownMessage}");
+                break;
+            
+            default:
+                _entities.InputText.LaundryCountdown.SetValue("Switch Error");
+                break;
+        }
     }
 
     private void checkCurrentWasherPowerUsage()
@@ -93,6 +170,10 @@ public class WasherDryerNotifier
                 
                 // Wait for 20 reads when Uninitialized before handling state so we have an accurate idea of what's going on:
                 if (_washerPowerUsageHistory.Count < _historyMaximum) return;
+                
+                // Make sure first value isn't 0, otherwise we might have not enough data to be accurate on uninitialized
+                if (_washerPowerUsageHistory.FirstOrDefault() > -1 &&
+                    _washerPowerUsageHistory.FirstOrDefault() < 1) return;
                 
                 // Triggers:
                 
@@ -167,6 +248,8 @@ public class WasherDryerNotifier
             case WasherState.StayFresh:
                 
                 _logger.Debug("LOAD IS FINISHED, PLEASE UNLOAD WASHER!");
+
+                _textNotifier.NotifyAll("Laundry Finished", "Laundry load is now dry. Please unload the washer!");
                 
                 // Triggers:
                 
@@ -174,8 +257,10 @@ public class WasherDryerNotifier
                 if (washerWatts < _washerOffWattThreshold)
                 {
                     _washerStartedAt = DateTimeOffset.MaxValue;
-                    
+
                     changeStateTo(WasherState.Off);
+                    
+                    _textNotifier.NotifyAll("Laundry Finished", "Laundry load is now dry. Please unload the washer!");
                 }
                 
                 break;
@@ -183,7 +268,9 @@ public class WasherDryerNotifier
             case WasherState.Problem:
                 
                 _logger.Debug("WASHER HAS A PROBLEM HALLLLLLLLP");
-                
+
+                _textNotifier.NotifyAll("PROBLEM - Laundry Issue", "Laundry load seems like it didn't drain properly. Please check and fix.");
+
                 // Triggers:
                 
                 //      Problem => Washing = Washer average > 3w
@@ -193,6 +280,8 @@ public class WasherDryerNotifier
                 if (_washerStartedAt < DateTimeOffset.Now - TimeSpan.FromHours(24))
                 {
                     _logger.Warning("Washer was in WasherState.Problem, but load started more than 24h ago so timing out and moving to WasherState.Off");
+                    
+                    _textNotifier.NotifyAll("PROBLEM - Laundry Issue", "Laundry load seems like it didn't drain properly. Please check and fix.");
                     
                     changeStateTo(WasherState.Off);
                 }
