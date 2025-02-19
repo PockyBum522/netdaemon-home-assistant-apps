@@ -17,7 +17,7 @@ public class WasherDryerNotifier
     
     // Transition thresholds
     private const int _washerOffWattThreshold = 3;
-    private const int _washerDryingWattThreshold = 1100;
+    private const int _washerDryingWattThreshold = 1200;
     private const int _washerStayFreshWattThreshold = 20;
 
     private const int _historyMaximum = 10;
