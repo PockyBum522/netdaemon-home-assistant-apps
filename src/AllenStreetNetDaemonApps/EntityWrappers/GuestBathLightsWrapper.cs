@@ -81,7 +81,15 @@ public class GuestBathLightsWrapper : IGuestBathLightsWrapper
     public async Task SetGuestBathLightsDimmer()
     {
         if (_entities.Switch.GuestBathMainLightswitchSceneController.IsOn())
-            await ModifyCeilingLightsBrightnessBy(-20);
+        {
+            await ModifyCeilingLightsBrightnessBy(-20);   
+        }
+        else
+        {
+            await TurnMainRelayOn(CustomColors.WarmWhite(20));
+            
+            _guestBathCeilingLightsEntities.CallService("turn_on", CustomColors.WarmWhite(20) );
+        }
     }
 
     public async Task SetGuestBathLightsToWarmWhiteScene()
