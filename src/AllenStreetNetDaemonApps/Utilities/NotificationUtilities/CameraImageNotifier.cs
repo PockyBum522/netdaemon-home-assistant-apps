@@ -58,7 +58,7 @@ public class CameraImageNotifier
         //     }
         // });
         
-        // _haContext.CallService("notify", "mobile_app_pixel_fold", data: new
+        // _haContext.CallService("notify", "mobile_app_pixelfoldapril24", data: new
         // {
         //     title = notifyTitle,
         //     message = notifyBody,
