@@ -19,7 +19,7 @@ public class KitchenLightsWrapper : IKitchenLightsWrapper
         
         _logger = new LoggerConfiguration()
             .Enrich.WithProperty("netDaemonLogging", $"Serilog{GetType().Name}Context")
-            .MinimumLevel.Debug()
+            .MinimumLevel.Information()
             .WriteTo.Console()
             .WriteTo.File($"logs/{namespaceLastPart}/{GetType().Name}_.log", rollingInterval: RollingInterval.Day)
             .CreateLogger();
@@ -46,7 +46,7 @@ public class KitchenLightsWrapper : IKitchenLightsWrapper
     
     public void TurnOnKitchenLightsFromMotion()
     {
-        _logger.Debug("Running {NameOfThis}", nameof(TurnOnKitchenLightsFromMotion));
+        //_logger.Debug("Running {NameOfThis}", nameof(TurnOnKitchenLightsFromMotion));
 
         SharedState.MotionSensors.LastMotionInKitchenAt = DateTimeOffset.Now;
         
@@ -63,7 +63,7 @@ public class KitchenLightsWrapper : IKitchenLightsWrapper
     
     public void TurnOffKitchenLightsFromMotion()
     {
-        _logger.Debug("Running {NameOfThis}", nameof(TurnOffKitchenLightsFromMotion));
+        //_logger.Debug("Running {NameOfThis}", nameof(TurnOffKitchenLightsFromMotion));
         
         var anyLightsAreOn = _kitchenCeilingLightsEntities.Any(l => l.State == "on") ||
                                   _entities.Light.MotionNightlightKitchenBySinkTowardsFrontroomLight.State == "on" ||

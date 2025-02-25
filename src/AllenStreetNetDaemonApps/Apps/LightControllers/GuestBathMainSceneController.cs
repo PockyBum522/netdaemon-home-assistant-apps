@@ -125,7 +125,7 @@ public class GuestBathMainSceneController
 
         if (dataElement is null) return;
         
-        _logger.Debug("Raw JSON: {EventData}", dataElement.Value.ToString());
+        //_logger.Debug("Raw JSON: {EventData}", dataElement.Value.ToString());
 
         var zWaveEvent = dataElement.Value.Deserialize<ZWaveDataElementValue>();
 

@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace AllenStreetNetDaemonApps.Apps.WasherDryerNotifier;
 
@@ -14,6 +15,9 @@ public class WasherDryerNotifier
     private int _washerErrorCount; 
     
     private WasherState _washerState;
+
+    private Stopwatch _loadStopwatch = new();
+    private bool _hadProblem;
     
     // Transition thresholds
     private const int _washerOffWattThreshold = 3;
@@ -41,7 +45,7 @@ public class WasherDryerNotifier
 
         _logger = new LoggerConfiguration()
             .Enrich.WithProperty("netDaemonLogging", $"Serilog{GetType().Name}Context")
-            .MinimumLevel.Debug()
+            .MinimumLevel.Information()
             .WriteTo.Console()
             .WriteTo.File($"logs/{namespaceLastPart}/{GetType().Name}_.log", rollingInterval: RollingInterval.Day)
             .CreateLogger();
@@ -63,15 +67,16 @@ public class WasherDryerNotifier
         
         var timeUntilOff = TimeSpan.FromMinutes(-1201);
         
-        if (_washerStartedAt != DateTimeOffset.MaxValue)
+        if (_washerState == WasherState.Washing &&
+            _washerStartedAt != DateTimeOffset.MaxValue)
         {
             timeUntilOff = (_washerStartedAt + TimeSpan.FromHours(5) + TimeSpan.FromMinutes(30)) - DateTimeOffset.Now;    
         }
         
         var countdownMessage = $"{timeUntilOff.Hours:d1}h {timeUntilOff.Minutes:d2}m {timeUntilOff.Seconds:d2}s";
         
-        _logger.Information("Time until off: {TimeUntilOff}, Minutes only: {TimeUntilMinutes} | countdownMessage: {CountdownMessage}", 
-            timeUntilOff, timeUntilOff.TotalMinutes, countdownMessage);
+        // _logger.Debug("Time until off: {TimeUntilOff}, Minutes only: {TimeUntilMinutes} | countdownMessage: {CountdownMessage}", 
+        //     timeUntilOff, timeUntilOff.TotalMinutes, countdownMessage);
         
         if (timeUntilOff.TotalMinutes is < -1200 or > 1200 ||
             _washerState == WasherState.Uninitialized)
@@ -87,6 +92,8 @@ public class WasherDryerNotifier
         switch (_washerState)
         {
             case WasherState.Problem:
+                
+                _hadProblem = true;
                 
                 if (_entities.InputText.LaundryCountdown.State != problemMessage)
                     _entities.InputText.LaundryCountdown.SetValue(problemMessage);
@@ -193,7 +200,7 @@ public class WasherDryerNotifier
                 if (washerWatts is > _washerStayFreshWattThreshold and 
                                    <= _washerDryingWattThreshold)
                 {
-                    _washerStartedAt = DateTimeOffset.Now;
+                    startLoadWork();
                     
                     changeStateTo(WasherState.Washing);
                 }  
@@ -248,7 +255,7 @@ public class WasherDryerNotifier
             case WasherState.StayFresh:
                 
                 _logger.Debug("LOAD IS FINISHED, PLEASE UNLOAD WASHER!");
-
+               
                 _textNotifier.NotifyAll("Laundry Finished", "Laundry load is now dry. Please unload the washer!");
                 
                 // Triggers:
@@ -259,8 +266,6 @@ public class WasherDryerNotifier
                     _washerStartedAt = DateTimeOffset.MaxValue;
 
                     changeStateTo(WasherState.Off);
-                    
-                    _textNotifier.NotifyAll("Laundry Finished", "Laundry load is now dry. Please unload the washer!");
                 }
                 
                 break;
@@ -292,6 +297,15 @@ public class WasherDryerNotifier
                 throw new InvalidEnumArgumentException(
                     $"{nameof(_washerState)} in {nameof(handleWasherStateUpdate)} was not a handled state (Did you add something to the enum recently?)");
         }
+    }
+
+    private void startLoadWork()
+    {
+        _hadProblem = false;
+        
+        _loadStopwatch.Restart();
+                        
+        _washerStartedAt = DateTimeOffset.Now;
     }
 
     private void changeStateTo(WasherState newState)

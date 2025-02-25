@@ -28,7 +28,7 @@ public class TextNotifier
         
         _haContext.CallService("notify", "html5", data: new
         {
-            target = "2025-02_DAVID-DESKTOP_Firefox",
+            target = "html5_2025_02_david_desktop_firefox",
             title = notifyTitle,
             message = notifyBody
         });
@@ -44,7 +44,7 @@ public class TextNotifier
     {
         _logger.Information("Notifying [ALYSSA]: {Title} | {Body}", notifyTitle, notifyBody);
 
-        _haContext.CallService("notify", "mobile_app_" + SECRETS.AlyssaiPhoneMobileAppId, data: new
+        _haContext.CallService("notify", "mobile_app_" + SECRETS.AlyssaIPhoneMobileAppId, data: new
         {
             title = notifyTitle,
             message = notifyBody
@@ -52,7 +52,7 @@ public class TextNotifier
         
         _haContext.CallService("notify", "html5", data: new
         {
-            target = "ALYSSA-DESKTOP_Chrome_2025-02",
+            target = "html5_alyssa_desktop_chrome_2025_02",
             title = notifyTitle,
             message = notifyBody
         });

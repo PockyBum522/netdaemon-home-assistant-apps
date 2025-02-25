@@ -11,6 +11,8 @@ public class ScheduledAirConditioning
 
     private bool _middleOfTheNightStuffActivated;
     
+    private TextNotifier _textNotifier;
+    
     public ScheduledAirConditioning(IHaContext ha, INetDaemonScheduler scheduler)
     {
         _ha = ha;
@@ -26,7 +28,12 @@ public class ScheduledAirConditioning
             .WriteTo.File($"logs/{namespaceLastPart}/{GetType().Name}_.log", rollingInterval: RollingInterval.Day)
             .CreateLogger();
 
+        _textNotifier = new TextNotifier(_logger, _ha);
+        
         var runFirstAfter = MqttClientWrapper.MqttSetupDelaySeconds + 10;
+        
+        // Just testing notifications
+        scheduler.RunIn(TimeSpan.FromSeconds(2), TestNotifications);
         
         // Make sure this runs before the next line after
         scheduler.RunIn(TimeSpan.FromSeconds(runFirstAfter - 5), InitializeThermostatOnceMqttUp);
@@ -36,6 +43,12 @@ public class ScheduledAirConditioning
         scheduler.RunEvery(TimeSpan.FromSeconds(runFirstAfter * 2), async () => await CheckAllScheduledTasks()); 
         
         _logger.Information("Initialized {NamespaceLastPart} v0.01", namespaceLastPart);
+    }
+
+    private void TestNotifications()
+    {
+        // _textNotifier.NotifyDavid("Test Title 01", "The washer has finished, please go unload it! This is your test notification!");
+        // _textNotifier.NotifyAlyssa("Test Title 01", "This is your test notification! Actionable item! Possibilities!");
     }
 
     private void InitializeThermostatOnceMqttUp()

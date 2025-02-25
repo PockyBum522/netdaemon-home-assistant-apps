@@ -21,7 +21,7 @@ public class KitchenCeilingLightsWallSwitchController
         
         _logger = new LoggerConfiguration()
             .Enrich.WithProperty("netDaemonLogging", $"Serilog{GetType().Name}Context")
-            .MinimumLevel.Debug()
+            .MinimumLevel.Information()
             .WriteTo.Console()
             .WriteTo.File($"logs/{namespaceLastPart}/{GetType().Name}_.log", rollingInterval: RollingInterval.Day)
             .CreateLogger();
@@ -38,7 +38,7 @@ public class KitchenCeilingLightsWallSwitchController
     private async Task InitializeSceneControllerSwitchFourButtonLights()
     {
         // Delay so all scene controller inits aren't sending tons of z-wave messages at the same time
-        await Task.Delay(TimeSpan.FromSeconds(30));
+        await Task.Delay(TimeSpan.FromMinutes(57));
         
         var buttonOneColor = "select.kitchen_main_right_lightswitch_scene_controller_led_indicator_color_button_1";
         var buttonTwoColor = "select.kitchen_main_right_lightswitch_scene_controller_led_indicator_color_button_2";
