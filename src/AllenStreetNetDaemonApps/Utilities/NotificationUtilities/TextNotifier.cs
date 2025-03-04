@@ -24,38 +24,23 @@ public class TextNotifier
     
     public void NotifyDavid(string notifyTitle, string notifyBody, string? notificationId = null)
     {
-        _logger.Information("Notifying [DAVID]: {Title} | {Body}", notifyTitle, notifyBody);
+        // Mobile app names should be what is in Dev Tools > Actions > Type notify and see what autocompletes 
+        attemptToNotifyMobileAppInHa("mobile_app_pixelfoldapril24", notifyTitle, notifyBody);
         
-        _haContext.CallService("notify", "html5", data: new
-        {
-            target = "html5_2025_02_david_desktop_firefox",
-            title = notifyTitle,
-            message = notifyBody
-        });
-        
-        _haContext.CallService("notify", "mobile_app_pixelfoldapril24", data: new
-        {
-            title = notifyTitle,
-            message = notifyBody
-        });
+        // GET HTML5 DEVICE NAMES OUT OF html5_push_registrations.conf AND NOT THE HA ENTITY NAME
+        attemptToNotifyHtml5InHa("2025-02_DAVID-DESKTOP_Firefox", notifyTitle, notifyBody);
+        attemptToNotifyHtml5InHa("DAVID-LAPTOP_2025-02", notifyTitle, notifyBody);
     }
     
     public void NotifyAlyssa(string notifyTitle, string notifyBody, string? notificationId = null)
     {
-        _logger.Information("Notifying [ALYSSA]: {Title} | {Body}", notifyTitle, notifyBody);
-
-        _haContext.CallService("notify", "mobile_app_" + SECRETS.AlyssaIPhoneMobileAppId, data: new
-        {
-            title = notifyTitle,
-            message = notifyBody
-        });
+        // Redo this from scratch because a lot of stuff is extremely confusing.
         
-        _haContext.CallService("notify", "html5", data: new
-        {
-            target = "html5_alyssa_desktop_chrome_2025_02",
-            title = notifyTitle,
-            message = notifyBody
-        });
+        // Test everything thoroughly for Alyssa notifications one at a time as you go
+        
+        // Look at working examples in NotifyDavid
+
+        throw new NotImplementedException();
     }
 
     public void NotifyAll(string notifyTitle, string notifyBody)
@@ -71,7 +56,7 @@ public class TextNotifier
         
         if (!usersToExclude.Contains(WhoToNotify.David)) NotifyDavid(notifyTitle, notifyBody);
         
-        if (!usersToExclude.Contains(WhoToNotify.Alyssa)) NotifyAlyssa(notifyTitle, notifyBody);
+        //if (!usersToExclude.Contains(WhoToNotify.Alyssa)) NotifyAlyssa(notifyTitle, notifyBody);
     }
     
     public void NotifyUsersInHa(string notifyTitle, string notifyBody, List<WhoToNotify> usersToNotify)
@@ -80,6 +65,48 @@ public class TextNotifier
         
         if (usersToNotify.Contains(WhoToNotify.David)) NotifyDavid(notifyTitle, notifyBody);
         
-        if (usersToNotify.Contains(WhoToNotify.Alyssa)) NotifyAlyssa(notifyTitle, notifyBody);
+        //if (usersToNotify.Contains(WhoToNotify.Alyssa)) NotifyAlyssa(notifyTitle, notifyBody);
+    }
+    
+    
+    private void attemptToNotifyMobileAppInHa(string deviceName, string notifyTitle, string notifyBody)
+    {
+        _logger.Information("About to send HA notification: {Title} | {Body} | To HA device: {DeviceName}", notifyTitle, notifyBody, deviceName);
+        
+        try
+        {
+            var dataPacket = new
+            {
+                title = notifyTitle,
+                message = notifyBody
+            };
+            
+            _haContext.CallService("notify", deviceName, data: dataPacket);
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "Exception: {ExMessage} (while notifying HA entity: {NotifyDeviceName}", ex.Message, deviceName);
+        }
+    }
+
+    private void attemptToNotifyHtml5InHa(string haNotifyEntityName, string notifyTitle, string notifyBody)
+    {
+        _logger.Information("About to send HA notification: {Title} | {Body} | To HA device: {DeviceName}", notifyTitle, notifyBody, haNotifyEntityName);
+        
+        try
+        {
+            var dataPacket = new
+            {
+                target = haNotifyEntityName,
+                title = notifyTitle,
+                message = notifyBody
+            };
+            
+            _haContext.CallService("notify", "html5", data: dataPacket);
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "Exception: {ExMessage} (while notifying HA entity: {NotifyDeviceName}", ex.Message, haNotifyEntityName);
+        }
     }
 }

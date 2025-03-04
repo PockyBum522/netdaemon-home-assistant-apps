@@ -45,7 +45,7 @@ public class WasherDryerNotifier
 
         _logger = new LoggerConfiguration()
             .Enrich.WithProperty("netDaemonLogging", $"Serilog{GetType().Name}Context")
-            .MinimumLevel.Information()
+            .MinimumLevel.Debug()
             .WriteTo.Console()
             .WriteTo.File($"logs/{namespaceLastPart}/{GetType().Name}_.log", rollingInterval: RollingInterval.Day)
             .CreateLogger();
@@ -231,6 +231,14 @@ public class WasherDryerNotifier
                 
                 _logger.Debug("Washer has been running for: {ElapsedTime}", DateTimeOffset.Now - _washerStartedAt);
                 
+                // Filter. Wait for 4 minutes after start before allowing transitions to other states
+                // This is so it can't switch to washing then immediately to off just in case there is a low power usage briefly
+                if (_washerStartedAt + TimeSpan.FromMinutes(4) < DateTimeOffset.Now)
+                {
+                    _logger.Information("Washer started less than 4 minutes ago, preventing transition to other states until then");
+                    break;
+                }
+                
                 // Triggers:
                 
                 //      Washing => Drying = Washer average >= 500w
@@ -255,8 +263,6 @@ public class WasherDryerNotifier
             case WasherState.StayFresh:
                 
                 _logger.Debug("LOAD IS FINISHED, PLEASE UNLOAD WASHER!");
-               
-                _textNotifier.NotifyAll("Laundry Finished", "Laundry load is now dry. Please unload the washer!");
                 
                 // Triggers:
                 
@@ -274,8 +280,6 @@ public class WasherDryerNotifier
                 
                 _logger.Debug("WASHER HAS A PROBLEM HALLLLLLLLP");
 
-                _textNotifier.NotifyAll("PROBLEM - Laundry Issue", "Laundry load seems like it didn't drain properly. Please check and fix.");
-
                 // Triggers:
                 
                 //      Problem => Washing = Washer average > 3w
@@ -285,9 +289,7 @@ public class WasherDryerNotifier
                 if (_washerStartedAt < DateTimeOffset.Now - TimeSpan.FromHours(24))
                 {
                     _logger.Warning("Washer was in WasherState.Problem, but load started more than 24h ago so timing out and moving to WasherState.Off");
-                    
-                    _textNotifier.NotifyAll("PROBLEM - Laundry Issue", "Laundry load seems like it didn't drain properly. Please check and fix.");
-                    
+                 
                     changeStateTo(WasherState.Off);
                 }
                 
@@ -314,8 +316,51 @@ public class WasherDryerNotifier
         var newStateName = Enum.GetName(newState.GetType(), newState);
         
         _logger.Debug("STATE: {OldStateName} => {NewStateName}", oldStateName, newStateName);
+
+        var lastState = _washerState;
         
         _washerState = newState;
+
+        // Handle notification actions on transition to new state
+        switch (_washerState)
+        {
+            case WasherState.Off:
+                
+                // Notification if last state was drying
+                if (lastState == WasherState.Drying)
+                {
+                    //_textNotifier.NotifyAll("Laundry Finished", "Laundry load is now dry. Please unload the washer!");
+                    _textNotifier.NotifyDavid("Laundry Finished", "Laundry load is now dry. Please unload the washer!");    
+                }
+                
+                // Notification if last state was problem
+                if (lastState == WasherState.Problem)
+                {
+                    //_textNotifier.NotifyAll("PROBLEM - Laundry Issue", "Laundry load seems like it didn't drain properly. Please check and fix.");
+                    _textNotifier.NotifyDavid("PROBLEM - Laundry Issue", "Laundry load turned off after having a problem. Please check and fix.");
+                }
+
+                break;
+            
+            case WasherState.StayFresh:
+                
+                // Filter so we only send notification if last state was drying
+                if (lastState != WasherState.Drying) break;
+                
+                //_textNotifier.NotifyAll("Laundry Finished", "Laundry load is now dry. Please unload the washer!");
+                _textNotifier.NotifyDavid("Laundry Finished", "Laundry load is now dry. Please unload the washer!");  
+                break;
+            
+            case WasherState.Problem:
+                
+                //_textNotifier.NotifyAll("PROBLEM - Laundry Issue", "Laundry load seems like it didn't drain properly. Please check and fix.");
+                _textNotifier.NotifyDavid("PROBLEM - Laundry Issue", "Laundry load seems like it didn't drain properly. Please check and fix.");
+
+                break;
+            
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
     }
 
     private bool washerValueInvalid(double? washerCurrentWattsRaw)
