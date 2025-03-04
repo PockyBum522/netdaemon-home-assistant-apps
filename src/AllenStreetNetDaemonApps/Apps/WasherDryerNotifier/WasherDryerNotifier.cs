@@ -127,10 +127,6 @@ public class WasherDryerNotifier
             case WasherState.Drying:
                 _entities.InputText.LaundryCountdown.SetValue($"Drying: {countdownMessage}");
                 break;
-            
-            default:
-                _entities.InputText.LaundryCountdown.SetValue("Switch Error");
-                break;
         }
     }
 
@@ -233,7 +229,7 @@ public class WasherDryerNotifier
                 
                 // Filter. Wait for 4 minutes after start before allowing transitions to other states
                 // This is so it can't switch to washing then immediately to off just in case there is a low power usage briefly
-                if (_washerStartedAt + TimeSpan.FromMinutes(4) < DateTimeOffset.Now)
+                if (DateTimeOffset.Now - _washerStartedAt < TimeSpan.FromMinutes(4))
                 {
                     _logger.Information("Washer started less than 4 minutes ago, preventing transition to other states until then");
                     break;
@@ -357,9 +353,6 @@ public class WasherDryerNotifier
                 _textNotifier.NotifyDavid("PROBLEM - Laundry Issue", "Laundry load seems like it didn't drain properly. Please check and fix.");
 
                 break;
-            
-            default:
-                throw new ArgumentOutOfRangeException();
         }
     }
 
