@@ -1,15 +1,15 @@
 # Project template for binary deploy
 This is the project template for binary deploy. This allows you to build a binary package and deploy it to NetDaemon.
 
-This is generated using NetDaemon runtime version 3.1 and .NET 7.
+This is generated using NetDaemon runtime version 5 and .NET 9.
 
 ## Getting started
-Please see [netdaemon.xyz](https://netdaemon.xyz/docs/v3) for more information about getting starting developing apps for Home Assistant using NetDaemon.
+Please see [netdaemon.xyz](https://netdaemon.xyz/docs) more information about getting starting developing apps for Home Assistant using NetDaemon.
 
 Please add code generation features in `program.cs` when using code generation features by removing comments!
 
 ## Use the code generator
-See https://netdaemon.xyz/docs/v3/hass_model/hass_model_codegen
+See https://netdaemon.xyz/docs/hass_model/hass_model_codegen
 
 ## Issues
 

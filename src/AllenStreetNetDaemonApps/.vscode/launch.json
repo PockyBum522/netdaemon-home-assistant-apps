@@ -6,7 +6,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/bin/Debug/net6.0/AllenStreetNetDaemonApps.dll",
+            "program": "${workspaceFolder}/bin/Debug/net9.0/src.dll",
             "args": [],
             "cwd": "${workspaceFolder}",
             "env": {
