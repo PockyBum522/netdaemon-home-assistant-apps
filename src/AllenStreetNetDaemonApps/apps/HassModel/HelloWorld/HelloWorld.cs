@@ -1,7 +1,7 @@
 // Use unique namespaces for your apps if you going to share with others to avoid
 // conflicting names
 
-namespace AllenStreetNetDaemonApps.apps.HassModel.HelloWorld;
+namespace HassModel;
 
 /// <summary>
 ///     Hello world showcase using the new HassModel API

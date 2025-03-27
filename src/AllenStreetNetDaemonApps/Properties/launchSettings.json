@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "src": {
+    "AllenStreetNetDaemonApps": {
       "commandName": "Project",
       "workingDirectory": "$(ProjectDir)",
       "environmentVariables": {

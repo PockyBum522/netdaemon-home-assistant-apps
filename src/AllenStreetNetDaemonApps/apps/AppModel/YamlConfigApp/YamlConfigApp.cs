@@ -1,4 +1,4 @@
-namespace AllenStreetNetDaemonApps.apps.AppModel.YamlConfigApp;
+namespace AppModel;
 
 /// <summary>
 ///     Showcases how to instance apps with yaml and use automatic configuration population

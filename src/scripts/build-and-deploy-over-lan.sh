@@ -1,3 +1,5 @@
+#!/usr/bin/bash
+
 # Script to build a .NET project, clean a directory, and move build output
 
 # WARNING, MUCH IN THIS FILE WILL NEED TO BE CONFIGURED FOR YOUR PATHS, SETTINGS, ETC...
@@ -82,7 +84,7 @@ echo ""
 
 # if ($key.Character -eq 'y')
 # {	
-# 	explorer "\\192.168.1.25\config\netdaemon4\logs"
+# 	explorer "\\192.168.1.25\config\netdaemon5\logs"
 # }
 
 cd "$solution_path/../scripts"
