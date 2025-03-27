@@ -147,8 +147,8 @@ public class KitchenTrackLightingWallSwitchController
         if (zWaveEvent.Domain != "zwave_js") 
             passingFilters = false;
         
-        // Kitchen track lighting (Left) switch ID is 9020618a0e003b1271f9949d91919564
-        if (zWaveEvent.DeviceId != "9020618a0e003b1271f9949d91919564")              
+        // Kitchen track lighting (Left) switch ID is 719a5cd56d1175f5e4570c984fe74e3f
+        if (zWaveEvent.DeviceId != "719a5cd56d1175f5e4570c984fe74e3f")              
             passingFilters = false;
         
         if (zWaveEvent.Value != "KeyPressed")

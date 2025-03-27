@@ -162,8 +162,8 @@ public class KitchenCeilingLightsWallSwitchController
         
         _logger.Information("zWaveEvent.DeviceId: {ZWaveEventDeviceId}", zWaveEvent.DeviceId);
         
-        // Kitchen main (Right) switch ID is 6d54e396f5dc7cff27f74c5db8d95e99
-        if (zWaveEvent.DeviceId != "6d54e396f5dc7cff27f74c5db8d95e99")              
+        // Kitchen main (Right) switch ID is 603ec0312373d3b6a3100f33e72b23bd
+        if (zWaveEvent.DeviceId != "603ec0312373d3b6a3100f33e72b23bd")              
             passingFilters = false;
         
         if (zWaveEvent.Value != "KeyPressed")

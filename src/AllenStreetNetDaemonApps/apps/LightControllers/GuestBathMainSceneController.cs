@@ -157,7 +157,7 @@ public class GuestBathMainSceneController
         if (zWaveEvent.Domain != "zwave_js") 
             passingFilters = false;
         
-        if (zWaveEvent.DeviceId != "0d8c0bc6038c01dce96f29eeb434b57f")              // GuestBath scene controller switch ID is 0d8c0bc6038c01dce96f29eeb434b57f
+        if (zWaveEvent.DeviceId != "372b93b10e93ac6b91b297ee09918cb9")              // GuestBath scene controller switch ID is 372b93b10e93ac6b91b297ee09918cb9
             passingFilters = false;
         
         if (zWaveEvent.Value != "KeyPressed")
