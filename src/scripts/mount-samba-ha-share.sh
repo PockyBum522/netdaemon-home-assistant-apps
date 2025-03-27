@@ -7,13 +7,13 @@
 # Local paths on your computer:
 solution_path="/media/secondary/repos/netdaemon-home-assistant-apps/src/AllenStreetNetDaemonApps"
 solution_filename="AllenStreetNetDaemonApps.csproj"
-build_path_local="$solution_path/bin/Debug/net8.0"
+build_path_local="$solution_path/bin/Debug/net9.0"
 
 # Samba temp mount point
 mount_point="/tmp/ha_smb"
 
 # ND folder after SSH commands below SSH into the server
-build_path_remote="/root/config/netdaemon4"
+build_path_remote="/root/config"
 
 
 # Import our secrets
@@ -24,7 +24,7 @@ mkdir -p "${mount_point}"
 sudo chown david "${mount_point}"
 
 # Note: You may need 'sudo' here if mounting requires root access
-sudo mount -t cifs "//192.168.1.25/config/netdaemon4" /tmp/ha_smb -o username="${SAMBA_USER}",password="${SAMBA_PASS}",rw
+sudo mount -t cifs "//192.168.1.25/config/netdaemon5" /tmp/ha_smb -o username="${SAMBA_USER}",password="${SAMBA_PASS}",rw
   
 echo "Script execution completed."
 echo ""
