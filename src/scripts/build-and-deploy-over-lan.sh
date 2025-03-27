@@ -15,8 +15,8 @@ build_path_local="$solution_path/bin/Debug/net9.0"
 mount_point="/tmp/ha_smb"
 
 # ND folder after SSH commands below SSH into the server
-nd_folder="/config/netdaemon5"
-build_path_remote="/root$nd_folder"
+nd_folder="config/netdaemon5"
+build_path_remote="/root/$nd_folder"
 
 
 # Step 1: Run dotnet build

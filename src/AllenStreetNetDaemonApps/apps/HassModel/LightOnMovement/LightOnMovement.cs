@@ -1,6 +1,6 @@
 // Use unique namespaces for your apps if you going to share with others to avoid
 // conflicting names
-namespace HassModel;
+namespace AllenStreetNetDaemonApps.apps.HassModel.LightOnMovement;
 
 /// <summary>
 ///     Showcase using the new HassModel API and turn on light on movement
