@@ -41,18 +41,21 @@ public class CatLastPilledTracker
     private async Task HandleCatPilledButtonPress(Event e)
     {
         if (e.DataElement is null) return;
-        
+     
         var stringedEventValue = e.DataElement.ToString();
         
         if (stringedEventValue is null) return;
         
         // Make sure it's from the cat pilled button
-        if (!stringedEventValue.Contains("\"device_id\":\"bb7fdad3cfb9bdad3e9e519df2ae0c20\"")) return;
-        
-        // Debug
-        // _logger.Debug("");
-        // _logger.Debug("e.DataElement.Value.ToString() {ValueRaw}", e.DataElement.Value.ToString());
-        // _logger.Debug("");
+        if (!stringedEventValue.Contains("\"device_id\":\"abc2c8873488ee4b4a61d3fe8da83566\""))
+        {
+            // Debug
+            _logger.Warning("");
+            _logger.Warning("Unknown ID in e.DataElement.Value.ToString(): {ValueRaw}", e.DataElement.Value.ToString());
+            _logger.Warning("");
+            
+            return;
+        }
 
         // Handle single tap (quick press)
         if (stringedEventValue.Contains("\"command\":\"single\""))

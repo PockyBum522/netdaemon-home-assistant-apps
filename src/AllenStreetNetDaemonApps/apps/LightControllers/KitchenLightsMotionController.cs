@@ -51,13 +51,20 @@ public class KitchenLightsMotionController
         
         if (e.DataElement is null) return;
 
-        var commonPrefix = "\"new_state\":{\"entity_id\":\"binary_sensor.motion";
+        var commonPrefix = "\"new_state\":{\"entity_id\":\"binary_sensor.bulb_in_kitchen_by_sink_nightlight_motion";
 
         var stringedEventValue = e.DataElement.Value.ToString();
         
         if (!stringedEventValue.Contains(commonPrefix)) return;
+        
         if (!stringedEventValue.Contains("kitchen")) return;
         // There will only be kitchen motion events now
+        
+        
+        // Debug
+        // _logger.Warning("");
+        // _logger.Warning("e.DataElement.Value: {@ValueRaw}", e.DataElement.Value.ToString());
+        // _logger.Warning("");
         
         var nativeEventValue = JsonConvert.DeserializeObject<MotionEventValue>(stringedEventValue);
 

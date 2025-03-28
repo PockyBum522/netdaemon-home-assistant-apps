@@ -54,7 +54,7 @@ public class KitchenLightsWrapper : IKitchenLightsWrapper
     
     public void TurnOnKitchenLightsFromMotion()
     {
-        //_logger.Debug("Running {NameOfThis}", nameof(TurnOnKitchenLightsFromMotion));
+        _logger.Debug("Running {NameOfThis}", nameof(TurnOnKitchenLightsFromMotion));
 
         SharedState.MotionSensors.LastMotionInKitchenAt = DateTimeOffset.Now;
         
@@ -71,7 +71,7 @@ public class KitchenLightsWrapper : IKitchenLightsWrapper
     
     public void TurnOffKitchenLightsFromMotion()
     {
-        //_logger.Debug("Running {NameOfThis}", nameof(TurnOffKitchenLightsFromMotion));
+        _logger.Debug("Running {NameOfThis}", nameof(TurnOffKitchenLightsFromMotion));
         
         var anyLightsAreOn = _kitchenCeilingLightsEntities.Any(l => l.State == "on") ||
                                   _entities.Light.BulbInKitchenBySinkNightlight.State == "on" ||
