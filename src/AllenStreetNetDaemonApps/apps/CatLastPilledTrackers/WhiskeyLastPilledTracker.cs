@@ -1,22 +1,22 @@
 ﻿using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using AllenStreetNetDaemonApps.EntityWrappers.Interfaces;
+using AllenStreetNetDaemonApps.EntityWrappers.Lights.Interfaces;
 using HomeAssistantGenerated;
 using NetDaemon.Extensions.Scheduler;
 using Newtonsoft.Json;
 
-namespace AllenStreetNetDaemonApps.CatLastPilledTracker;
+namespace AllenStreetNetDaemonApps.CatLastPilledTrackers;
 
 [NetDaemonApp]
-public class CatLastPilledTracker
+public class WhiskeyLastPilledTracker
 {
-    private readonly CatPilledAtState _catPilledState = new();
+    private readonly WhiskeyPilledAtState _catPilledState = new();
 
     private readonly ILogger _logger;
     private readonly Entities _entities;
 
-    public CatLastPilledTracker(ILogger logger, IHaContext ha, INetDaemonScheduler scheduler, IKitchenLightsWrapper kitchenLightsWrapper, IFrontRoomLightsWrapper frontRoomLightsWrapper)
+    public WhiskeyLastPilledTracker(ILogger logger, IHaContext ha, INetDaemonScheduler scheduler, IKitchenLightsWrapper kitchenLightsWrapper, IFrontRoomLightsWrapper frontRoomLightsWrapper)
     {
         _logger = logger;
         _entities = new Entities(ha);
@@ -35,7 +35,7 @@ public class CatLastPilledTracker
         
         ha.Events.Where(e => e.EventType == "zha_event").Subscribe(async e => await HandleCatPilledButtonPress(e));
         
-        scheduler.RunEvery(TimeSpan.FromSeconds(29), UpdateCatLastPilledAtTextbox);
+        scheduler.RunEvery(TimeSpan.FromSeconds(29), UpdateWhiskeyLastPilledAtTextbox);
     }
 
     private async Task HandleCatPilledButtonPress(Event e)
@@ -47,7 +47,7 @@ public class CatLastPilledTracker
         if (stringedEventValue is null) return;
         
         // Make sure it's from the cat pilled button
-        if (!stringedEventValue.Contains("\"device_id\":\"abc2c8873488ee4b4a61d3fe8da83566\""))
+        if (!stringedEventValue.Contains("\"device_id\":\"f897babb174a94585ec0cdcb892e12fd\""))
         {
             // Debug
             _logger.Warning("");
@@ -76,7 +76,8 @@ public class CatLastPilledTracker
 
             savePersistentCatPilledAtState(_catPilledState);
             
-            _entities.Light.BulbInKitchenBySinkNightlight.CallService("turn_on", new { color_temp_kelvin = 2000 } );
+            _entities.Light.NightlightInKitchenBySink.CallService("turn_on", new { color_temp_kelvin = 2000 } );
+            _entities.Light.NightlightInKitchenByStove.CallService("turn_on", new { color_temp_kelvin = 2000 } );
             await blinkLightWithCurrentColor();
             
             _logger.Debug("Long hold event fired");
@@ -88,26 +89,28 @@ public class CatLastPilledTracker
         //     _logger.Debug("Double click event fired");
         // }
         
-        UpdateCatLastPilledAtTextbox();
+        UpdateWhiskeyLastPilledAtTextbox();
     }
 
     private async Task blinkKitchenNightlightBasedOnLastPilledTime()
     {
-        var eightHoursAgo = DateTimeOffset.Now.AddHours(-8);
+        var eightHoursAgo = DateTimeOffset.Now.AddHours(-7);
 
         if (_catPilledState.LastPilledAt > eightHoursAgo)
         {
             // More than 8 hours ago = no pill, Maxx
 
             // Set red
-            _entities.Light.BulbInKitchenBySinkNightlight.CallService("turn_on", new { hs_color = new[] { 2, 100 } } );
+            _entities.Light.NightlightInKitchenBySink.CallService("turn_on", new { hs_color = new[] { 2, 100 } } );
+            _entities.Light.NightlightInKitchenByStove.CallService("turn_on", new { hs_color = new[] { 2, 100 } } );
         }
         else
         {
             // Less than 8 hours ago = You get a pill!
             
             // Set green
-            _entities.Light.BulbInKitchenBySinkNightlight.CallService("turn_on", new { hs_color = new[] { 120, 100 } } );
+            _entities.Light.NightlightInKitchenBySink.CallService("turn_on", new { hs_color = new[] { 120, 100 } } );
+            _entities.Light.NightlightInKitchenByStove.CallService("turn_on", new { hs_color = new[] { 120, 100 } } );
         }
 
         await blinkLightWithCurrentColor();
@@ -115,7 +118,8 @@ public class CatLastPilledTracker
         await Task.Delay(TimeSpan.FromSeconds(2));
         
         // Set back to warm white
-        _entities.Light.BulbInKitchenBySinkNightlight.CallService("turn_on", new { color_temp_kelvin = 2000 } );
+        _entities.Light.NightlightInKitchenBySink.CallService("turn_on", new { color_temp_kelvin = 2000 } );
+        _entities.Light.NightlightInKitchenByStove.CallService("turn_on", new { color_temp_kelvin = 2000 } );
     }
 
     private async Task blinkLightWithCurrentColor()
@@ -125,15 +129,17 @@ public class CatLastPilledTracker
         {
             await Task.Delay(TimeSpan.FromSeconds(0.5));
         
-            _entities.Light.BulbInKitchenBySinkNightlight.CallService("turn_on", new { brightness = 1 } );
+            _entities.Light.NightlightInKitchenBySink.CallService("turn_on", new { brightness = 1 } );
+            _entities.Light.NightlightInKitchenByStove.CallService("turn_on", new { brightness = 1 } );
         
             await Task.Delay(TimeSpan.FromSeconds(0.5));
         
-            _entities.Light.BulbInKitchenBySinkNightlight.CallService("turn_on", new { brightness = 254 } );
+            _entities.Light.NightlightInKitchenBySink.CallService("turn_on", new { brightness = 254 } );
+            _entities.Light.NightlightInKitchenByStove.CallService("turn_on", new { brightness = 254 } );
         }
     }
 
-    private void UpdateCatLastPilledAtTextbox()
+    private void UpdateWhiskeyLastPilledAtTextbox()
     {
         restoreSavedState();
         
@@ -144,34 +150,34 @@ public class CatLastPilledTracker
         message += ", at ";
         message += _catPilledState.LastPilledAt.ToString("hh:mm tt");
         
-        _entities.InputText.CatLastPilledAt.SetValue(message);
+        _entities.InputText.WhiskeyLastPilledAt.SetValue(message);
         
         
         // Handle default value
         if (_catPilledState.LastPilledAt == DateTimeOffset.MinValue) 
-            _entities.InputText.CatLastPilledAt.SetValue("Unknown");
+            _entities.InputText.WhiskeyLastPilledAt.SetValue("Unknown");
     }
     
     private void restoreSavedState()
     {
-        var stateFilePath = Path.Combine(SECRETS.CatPilledAtSavedStateDirectory, "saved-state.json");
+        var stateFilePath = Path.Combine(SECRETS.CatPilledAtSavedStateDirectory, "whiskey-saved-state.json");
         
         if (!File.Exists(stateFilePath)) return;
         
         var jsonString = File.ReadAllText(stateFilePath);
         
-        var fetchedState = JsonConvert.DeserializeObject<CatPilledAtState>(jsonString) ?? new CatPilledAtState();
+        var fetchedState = JsonConvert.DeserializeObject<WhiskeyPilledAtState>(jsonString) ?? new WhiskeyPilledAtState();
         
         _logger.Debug("Restoring CatPilledAt saved state: {LastPilledAt}", fetchedState.LastPilledAt);
         
         _catPilledState.LastPilledAt = fetchedState.LastPilledAt;
     }
     
-    private void savePersistentCatPilledAtState(CatPilledAtState state)
+    private void savePersistentCatPilledAtState(WhiskeyPilledAtState state)
     {
         Directory.CreateDirectory(SECRETS.CatPilledAtSavedStateDirectory);
         
-        var stateFilePath = Path.Combine(SECRETS.CatPilledAtSavedStateDirectory, "saved-state.json");
+        var stateFilePath = Path.Combine(SECRETS.CatPilledAtSavedStateDirectory, "whiskey-saved-state.json");
         
         File.Create(stateFilePath).Close();
         
@@ -183,7 +189,7 @@ public class CatLastPilledTracker
     }
 }
 
-public class CatPilledAtState
+public class WhiskeyPilledAtState
 {
     public DateTimeOffset LastPilledAt { get; set; } = DateTimeOffset.MinValue;
 }

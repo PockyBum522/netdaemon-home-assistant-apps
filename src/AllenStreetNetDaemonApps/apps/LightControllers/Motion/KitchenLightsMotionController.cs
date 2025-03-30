@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using System.Linq;
-using AllenStreetNetDaemonApps.EntityWrappers.Interfaces;
+using AllenStreetNetDaemonApps.EntityWrappers.Lights.Interfaces;
 using AllenStreetNetDaemonApps.Models;
 using AllenStreetNetDaemonApps.Utilities;
 using HomeAssistantGenerated;
@@ -8,7 +8,7 @@ using NetDaemon.Extensions.Scheduler;
 using NetDaemon.HassModel.Entities;
 using Newtonsoft.Json;
 
-namespace AllenStreetNetDaemonApps.LightControllers;
+namespace AllenStreetNetDaemonApps.LightControllers.Motion;
 
 [NetDaemonApp]
 public class KitchenLightsMotionController
@@ -16,16 +16,11 @@ public class KitchenLightsMotionController
     private readonly IKitchenLightsWrapper _kitchenLightsWrapper;
     private readonly ILogger _logger;
     
-    private readonly Entities _entities;
-
-    private readonly Entity[] _kitchenCeilingLightsEntities;
-
     public KitchenLightsMotionController(IHaContext ha, INetDaemonScheduler scheduler, ILogger logger, IKitchenLightsWrapper kitchenLightsWrapper)
     {
         _logger = logger;
         _kitchenLightsWrapper = kitchenLightsWrapper;
-        _entities = new Entities(ha);
-
+        
         var namespaceLastPart = GetType().Namespace?.Split('.').Last();
         
         // _logger = new LoggerConfiguration()
@@ -39,8 +34,6 @@ public class KitchenLightsMotionController
         
         ha.Events.Where(e => e.EventType == "state_changed").Subscribe(HandleKitchenMotion);
 
-        _kitchenCeilingLightsEntities = GroupUtilities.GetEntitiesFromGroup(ha, _entities.Light.KitchenCeilingLightsGroup);
-
         scheduler.RunEvery(TimeSpan.FromSeconds(30), checkIfMotionTimerExpired);
     }
 
@@ -51,15 +44,13 @@ public class KitchenLightsMotionController
         
         if (e.DataElement is null) return;
 
-        var commonPrefix = "\"new_state\":{\"entity_id\":\"binary_sensor.bulb_in_kitchen_by_sink_nightlight_motion";
-
         var stringedEventValue = e.DataElement.Value.ToString();
-        
-        if (!stringedEventValue.Contains(commonPrefix)) return;
-        
-        if (!stringedEventValue.Contains("kitchen")) return;
-        // There will only be kitchen motion events now
-        
+
+        if (!stringedEventValue.Contains("\"new_state\":{\"entity_id\":\"binary_sensor.nightlight_in_kitchen") &&
+            !stringedEventValue.Contains("\"new_state\":{\"entity_id\":\"binary_sensor.nightlight_in_den"))
+        {
+            return;
+        }
         
         // Debug
         // _logger.Warning("");
@@ -72,7 +63,8 @@ public class KitchenLightsMotionController
         if (nativeEventValue.NewState is null) return;
 
         if (nativeEventValue.NewState.State != "on") return;
-        // Only motion on events for kitchen now
+        
+        // Only motion on events for kitchen and den now
         
         sw.Stop();
         

@@ -1,14 +1,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AllenStreetNetDaemonApps.EntityWrappers.Interfaces;
+using AllenStreetNetDaemonApps.EntityWrappers.Lights.Interfaces;
 using AllenStreetNetDaemonApps.Models;
 using AllenStreetNetDaemonApps.Utilities;
 using HomeAssistantGenerated;
 using NetDaemon.Extensions.Scheduler;
 using NetDaemon.HassModel.Entities;
 
-namespace AllenStreetNetDaemonApps.EntityWrappers;
+namespace AllenStreetNetDaemonApps.EntityWrappers.Lights;
 
 public class GuestBathLightsWrapper : IGuestBathLightsWrapper
 {

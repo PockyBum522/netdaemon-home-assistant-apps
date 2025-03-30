@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using AllenStreetNetDaemonApps.EntityWrappers.Interfaces;
+using AllenStreetNetDaemonApps.EntityWrappers.Lights.Interfaces;
 using AllenStreetNetDaemonApps.Models;
 using AllenStreetNetDaemonApps.Utilities;
 using AllenStreetNetDaemonApps.Utilities.NotificationUtilities;

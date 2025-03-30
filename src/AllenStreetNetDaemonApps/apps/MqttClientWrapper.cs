@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AllenStreetNetDaemonApps.DoorsLockAfterTimePeriod;
-using AllenStreetNetDaemonApps.EntityWrappers.Interfaces;
+using AllenStreetNetDaemonApps.EntityWrappers.Lights.Interfaces;
 using AllenStreetNetDaemonApps.FrontDoorCameraMotion;
 using AllenStreetNetDaemonApps.Utilities.NotificationUtilities;
 using HomeAssistantGenerated;

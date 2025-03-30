@@ -1,8 +1,8 @@
 using System.Linq;
-using AllenStreetNetDaemonApps.EntityWrappers.Interfaces;
+using AllenStreetNetDaemonApps.EntityWrappers.Lights.Interfaces;
 using NetDaemon.Extensions.Scheduler;
 
-namespace AllenStreetNetDaemonApps.LightControllers;
+namespace AllenStreetNetDaemonApps.LightControllers.DoorEvents;
 
 [NetDaemonApp]
 public class FrontRoomLightsController

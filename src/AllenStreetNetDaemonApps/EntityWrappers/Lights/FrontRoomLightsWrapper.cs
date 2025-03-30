@@ -1,10 +1,10 @@
 using System.Linq;
-using AllenStreetNetDaemonApps.EntityWrappers.Interfaces;
+using AllenStreetNetDaemonApps.EntityWrappers.Lights.Interfaces;
 using AllenStreetNetDaemonApps.Utilities;
 using HomeAssistantGenerated;
 using NetDaemon.Extensions.Scheduler;
 
-namespace AllenStreetNetDaemonApps.EntityWrappers;
+namespace AllenStreetNetDaemonApps.EntityWrappers.Lights;
 
 public class FrontRoomLightsWrapper : IFrontRoomLightsWrapper
 {

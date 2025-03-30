@@ -130,7 +130,7 @@ public class ScheduledLights
         
         _entities.Switch.BackPorchChristmasLights.TurnOff();
         
-        _entities.Switch.CeilingLedStripInUtilityCloset.TurnOff();
+        _entities.Switch.LaundryRoomLights.TurnOff();
         
         _entities.Switch.PlantGrowLightsInFoyerByMasterBedroom.TurnOn();
         

@@ -1,5 +1,5 @@
 using System.Linq;
-using AllenStreetNetDaemonApps.EntityWrappers.Interfaces;
+using AllenStreetNetDaemonApps.EntityWrappers.Lights.Interfaces;
 using HomeAssistantGenerated;
 using NetDaemon.Extensions.Scheduler;
 using NetDaemon.HassModel.Entities;

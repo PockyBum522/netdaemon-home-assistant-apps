@@ -1,7 +1,8 @@
 using System.Reflection;
 using AllenStreetNetDaemonApps;
 using AllenStreetNetDaemonApps.EntityWrappers;
-using AllenStreetNetDaemonApps.EntityWrappers.Interfaces;
+using AllenStreetNetDaemonApps.EntityWrappers.Lights;
+using AllenStreetNetDaemonApps.EntityWrappers.Lights.Interfaces;
 using HomeAssistantGenerated;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -24,6 +25,7 @@ try
                 .AddSingleton<IKitchenLightsWrapper, KitchenLightsWrapper>()
                 .AddSingleton<IFrontRoomLightsWrapper, FrontRoomLightsWrapper>()
                 .AddSingleton<IGuestBathLightsWrapper, GuestBathLightsWrapper>()
+                .AddSingleton<IMasterBathLightsWrapper, MasterBathLightsWrapper>()
                 .AddAppsFromAssembly(Assembly.GetExecutingAssembly())
                 .AddNetDaemonStateManager()
                 .AddNetDaemonScheduler()

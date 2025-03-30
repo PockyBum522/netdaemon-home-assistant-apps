@@ -1,16 +1,16 @@
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using AllenStreetNetDaemonApps.EntityWrappers.Interfaces;
+using AllenStreetNetDaemonApps.EntityWrappers.Lights.Interfaces;
 using AllenStreetNetDaemonApps.Models;
 using HomeAssistantGenerated;
 using NetDaemon.Extensions.Scheduler;
 using NetDaemon.HassModel.Entities;
 
-namespace AllenStreetNetDaemonApps.LightControllers;
+namespace AllenStreetNetDaemonApps.LightControllers.SceneChanges;
 
 [NetDaemonApp]
-public class GuestBathMainSceneController
+public class GuestBathSceneController
 {
     private readonly IHaContext _ha;
     private readonly IGuestBathLightsWrapper _guestBathLightsWrapper;
@@ -18,7 +18,7 @@ public class GuestBathMainSceneController
     
     private readonly Entities _entities;
 
-    public GuestBathMainSceneController(IHaContext ha, INetDaemonScheduler scheduler, ILogger logger, IGuestBathLightsWrapper guestBathLightsWrapper)
+    public GuestBathSceneController(IHaContext ha, INetDaemonScheduler scheduler, ILogger logger, IGuestBathLightsWrapper guestBathLightsWrapper)
     {
         _ha = ha;
         _logger = logger;

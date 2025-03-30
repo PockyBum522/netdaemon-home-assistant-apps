@@ -1,15 +1,16 @@
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using AllenStreetNetDaemonApps.EntityWrappers.Interfaces;
+using AllenStreetNetDaemonApps.EntityWrappers.Lights.Interfaces;
 using AllenStreetNetDaemonApps.Models;
 using HomeAssistantGenerated;
 using NetDaemon.Extensions.Scheduler;
+using NetDaemon.HassModel.Entities;
 
-namespace AllenStreetNetDaemonApps.LightControllers;
+namespace AllenStreetNetDaemonApps.LightControllers.SceneChanges;
 
 [NetDaemonApp]
-public class KitchenTrackLightingWallSwitchController
+public class KitchenCeilingLightsSceneController
 {
     private readonly IHaContext _ha;
     private readonly IKitchenLightsWrapper _kitchenLightsWrapper;
@@ -17,9 +18,7 @@ public class KitchenTrackLightingWallSwitchController
     
     private readonly Entities _entities;
 
-    // private readonly Entity[] _kitchenCeilingLightsEntities;
-
-    public KitchenTrackLightingWallSwitchController(IHaContext ha, INetDaemonScheduler scheduler, ILogger logger, IKitchenLightsWrapper kitchenLightsWrapper)
+    public KitchenCeilingLightsSceneController(IHaContext ha, INetDaemonScheduler scheduler, ILogger logger, IKitchenLightsWrapper kitchenLightsWrapper)
     {
         _ha = ha;
         _logger = logger;
@@ -39,35 +38,47 @@ public class KitchenTrackLightingWallSwitchController
         
         ha.Events.Where(e => e.EventType == "zwave_js_value_notification").Subscribe(async (e) => await HandleKitchenSwitchButtons(e));
         
-        //_kitchenCeilingLightsEntities = GroupUtilities.GetEntitiesFromGroup(ha, _entities.Light.KitchenCeilingLights);
-        
         // Make the four buttons have the correct colors, resends every once in a blue moon just in case something interrupted power
         scheduler.RunIn(TimeSpan.FromSeconds(10), async () => await InitializeSceneControllerSwitchFourButtonLights());
-        scheduler.RunEvery(TimeSpan.FromMinutes(122),  async () => await InitializeSceneControllerSwitchFourButtonLights());
+        scheduler.RunEvery(TimeSpan.FromMinutes(123),  async () => await InitializeSceneControllerSwitchFourButtonLights());
     }
 
     private async Task InitializeSceneControllerSwitchFourButtonLights()
     {
         // Delay so all scene controller inits aren't sending tons of z-wave messages at the same time
-        await Task.Delay(TimeSpan.FromSeconds(20));
+        await Task.Delay(TimeSpan.FromMinutes(57));
         
-        var buttonOneColor = "select.kitchen_main_left_track_lighting_lightswitch_scene_controller_led_indicator_color_button_1";
-        var buttonTwoColor = "select.kitchen_main_left_track_lighting_lightswitch_scene_controller_led_indicator_color_button_2";
-        var buttonThreeColor = "select.kitchen_main_left_track_lighting_lightswitch_scene_controller_led_indicator_color_button_3";
-        var buttonFourColor = "select.kitchen_main_left_track_lighting_lightswitch_scene_controller_led_indicator_color_button_4";
+        var buttonOneColor = "select.kitchen_main_right_lightswitch_scene_controller_led_indicator_color_button_1";
+        var buttonTwoColor = "select.kitchen_main_right_lightswitch_scene_controller_led_indicator_color_button_2";
+        var buttonThreeColor = "select.kitchen_main_right_lightswitch_scene_controller_led_indicator_color_button_3";
+        var buttonFourColor = "select.kitchen_main_right_lightswitch_scene_controller_led_indicator_color_button_4";
         
-        var buttonOneBrightness = "select.kitchen_main_left_track_lighting_lightswitch_scene_controller_led_indicator_brightness_button_1";
-        var buttonTwoBrightness = "select.kitchen_main_left_track_lighting_lightswitch_scene_controller_led_indicator_brightness_button_2";
-        var buttonThreeBrightness = "select.kitchen_main_left_track_lighting_lightswitch_scene_controller_led_indicator_brightness_button_3";
-        var buttonFourBrightness = "select.kitchen_main_left_track_lighting_lightswitch_scene_controller_led_indicator_brightness_button_4";
-        
-        var buttonOneIndicatorBehavior = "select.kitchen_main_left_track_lighting_lightswitch_scene_controller_led_indicator_button_1";
-        var buttonTwoIndicatorBehavior = "select.kitchen_main_left_track_lighting_lightswitch_scene_controller_led_indicator_button_2";
-        var buttonThreeIndicatorBehavior = "select.kitchen_main_left_track_lighting_lightswitch_scene_controller_led_indicator_button_3";
-        var buttonFourIndicatorBehavior = "select.kitchen_main_left_track_lighting_lightswitch_scene_controller_led_indicator_button_4";
+        var buttonOneBrightness = "select.kitchen_main_right_lightswitch_scene_controller_led_indicator_brightness_button_1";
+        var buttonTwoBrightness = "select.kitchen_main_right_lightswitch_scene_controller_led_indicator_brightness_button_2";
+        var buttonThreeBrightness = "select.kitchen_main_right_lightswitch_scene_controller_led_indicator_brightness_button_3";
+        var buttonFourBrightness = "select.kitchen_main_right_lightswitch_scene_controller_led_indicator_brightness_button_4";
+
+        var buttonOneIndicatorBehavior = "select.kitchen_main_right_lightswitch_scene_controller_led_indicator_button_1";
+        var buttonTwoIndicatorBehavior = "select.kitchen_main_right_lightswitch_scene_controller_led_indicator_button_2";
+        var buttonThreeIndicatorBehavior = "select.kitchen_main_right_lightswitch_scene_controller_led_indicator_button_3";
+        var buttonFourIndicatorBehavior = "select.kitchen_main_right_lightswitch_scene_controller_led_indicator_button_4";
         
         // White, Blue, Green, Red, Magenta, Yellow, Cyan
         // Bright (100%), Medium (60%), Low (30%)
+
+        // Disable local relay control on startup
+        _ha.CallService("select", "select_option", data: new { option = "Local control disabled", entity_id = "select.kitchen_main_right_lightswitch_scene_controller_relay_control" });
+        await Task.Delay(TimeSpan.FromSeconds(0.5));
+
+        if (_entities.Switch.SceneControllerKitchenMainLightswitchRightSide.IsOff())
+        {
+            _entities.Switch.SceneControllerKitchenMainLightswitchRightSide.TurnOn();
+            
+            await Task.Delay(TimeSpan.FromSeconds(3));
+
+            await _kitchenLightsWrapper.SetKitchenCeilingLightsOff();
+            _entities.Switch.SceneControllerKitchenMainLightswitchRightSide0x43Button1IndicationBinary.TurnOn();
+        }
         
         // Set button 1 color and brightness
         _ha.CallService("select", "select_option", data: new { option = "Yellow", entity_id = buttonOneColor });
@@ -86,7 +97,7 @@ public class KitchenTrackLightingWallSwitchController
         await Task.Delay(TimeSpan.FromSeconds(0.5));
 
         // Set button 3 color and brightness
-        _ha.CallService("select", "select_option", data: new { option = "Green", entity_id = buttonThreeColor });
+        _ha.CallService("select", "select_option", data: new { option = "Magenta", entity_id = buttonThreeColor });
         await Task.Delay(TimeSpan.FromSeconds(0.5));
         _ha.CallService("select", "select_option", data: new { option = "Medium (60%)", entity_id = buttonThreeBrightness });
         await Task.Delay(TimeSpan.FromSeconds(0.5));
@@ -102,19 +113,21 @@ public class KitchenTrackLightingWallSwitchController
         await Task.Delay(TimeSpan.FromSeconds(0.5));
         
         // Actually button 1 of the bottom 4
-        _entities.Switch.SceneControllerKitchenMainLightswitchLeftSide0x43Button1IndicationBinary.TurnOn();
+        _entities.Switch.SceneControllerKitchenMainLightswitchRightSide0x44Button2IndicationBinary.TurnOn();
         await Task.Delay(TimeSpan.FromSeconds(0.5));
         
         // Actually button 2 of the bottom 4
-        _entities.Switch.SceneControllerKitchenMainLightswitchLeftSide0x45Button3IndicationBinary.TurnOn();
+        _entities.Switch.SceneControllerKitchenMainLightswitchRightSide0x45Button3IndicationBinary.TurnOn();
         await Task.Delay(TimeSpan.FromSeconds(0.5));
         
         // Actually button 3 of the bottom 4
-        _entities.Switch.SceneControllerKitchenMainLightswitchLeftSide0x46Button4IndicationBinary.TurnOn();
+        _entities.Switch.SceneControllerKitchenMainLightswitchRightSide0x46Button4IndicationBinary.TurnOn();
         await Task.Delay(TimeSpan.FromSeconds(0.5));
         
         // Actually button 4 of the bottom 4
-        _entities.Switch.SceneControllerKitchenMainLightswitchLeftSide0x47Button5IndicationBinary.TurnOn();
+        _entities.Switch.SceneControllerKitchenMainLightswitchRightSide0x47Button5IndicationBinary.TurnOn();
+        
+        _logger.Debug("Kitchen Ceiling Lights Wall Switch Controller Initialized");
     }
 
     private async Task HandleKitchenSwitchButtons(Event eventToCheck)
@@ -147,8 +160,10 @@ public class KitchenTrackLightingWallSwitchController
         if (zWaveEvent.Domain != "zwave_js") 
             passingFilters = false;
         
-        // Kitchen track lighting (Left) switch ID is 719a5cd56d1175f5e4570c984fe74e3f
-        if (zWaveEvent.DeviceId != "719a5cd56d1175f5e4570c984fe74e3f")              
+        _logger.Information("zWaveEvent.DeviceId: {ZWaveEventDeviceId}", zWaveEvent.DeviceId);
+        
+        // Kitchen main (Right) switch ID is 603ec0312373d3b6a3100f33e72b23bd
+        if (zWaveEvent.DeviceId != "603ec0312373d3b6a3100f33e72b23bd")              
             passingFilters = false;
         
         if (zWaveEvent.Value != "KeyPressed")
@@ -159,12 +174,25 @@ public class KitchenTrackLightingWallSwitchController
 
     private async Task SetKitchenLightsFrom(ZWaveDataElementValue zWaveEvent)
     {
+        _logger.Information("Detected: {ZLabel}", zWaveEvent.Label);
+
         if (zWaveEvent.CommandClassName != "Central Scene") return;
-        
-        _logger.Verbose("Detected as incoming central scene change");
 
         switch (zWaveEvent.Label)
         {
+            // Main relay
+            case "Scene 005":
+                if (_kitchenLightsWrapper.AreAnyCeilingLightsOn())
+                {
+                    await _kitchenLightsWrapper.SetKitchenCeilingLightsOff();
+                    _entities.Switch.SceneControllerKitchenMainLightswitchRightSide0x43Button1IndicationBinary.TurnOn();
+                }
+                else
+                {
+                    await _kitchenLightsWrapper.SetKitchenLightsToWarmWhite();
+                }
+                break;
+            
             case "Scene 001":
                 await _kitchenLightsWrapper.SetKitchenLightsToWarmWhite();
                 break;
@@ -174,7 +202,7 @@ public class KitchenTrackLightingWallSwitchController
                 break;
             
             case "Scene 003":
-                await _kitchenLightsWrapper.SetKitchenLightsToEspressoMachineScene();
+                await _kitchenLightsWrapper.SetKitchenLightsToPurpleScene();
                 break;
             
             case "Scene 004":

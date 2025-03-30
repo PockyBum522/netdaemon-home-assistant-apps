@@ -1,14 +1,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AllenStreetNetDaemonApps.EntityWrappers.Interfaces;
+using AllenStreetNetDaemonApps.EntityWrappers.Lights.Interfaces;
 using AllenStreetNetDaemonApps.Models;
 using AllenStreetNetDaemonApps.Utilities;
 using HomeAssistantGenerated;
 using NetDaemon.Extensions.Scheduler;
 using NetDaemon.HassModel.Entities;
 
-namespace AllenStreetNetDaemonApps.EntityWrappers;
+namespace AllenStreetNetDaemonApps.EntityWrappers.Lights;
 
 public class KitchenLightsWrapper : IKitchenLightsWrapper
 {
@@ -74,7 +74,6 @@ public class KitchenLightsWrapper : IKitchenLightsWrapper
         _logger.Debug("Running {NameOfThis}", nameof(TurnOffKitchenLightsFromMotion));
         
         var anyLightsAreOn = _kitchenCeilingLightsEntities.Any(l => l.State == "on") ||
-                                  _entities.Light.BulbInKitchenBySinkNightlight.State == "on" ||
                                   _entities.Light.KitchenUnderCabinetLightsGroup.State == "on";
         
         if (!anyLightsAreOn) return;
@@ -88,7 +87,6 @@ public class KitchenLightsWrapper : IKitchenLightsWrapper
         _entities.Light.KitchenCeilingLightsGroup.TurnOff();
         
         _entities.Light.KitchenUnderCabinetLightsGroup.TurnOff();
-        _entities.Light.BulbInKitchenBySinkNightlight.TurnOff();
     }
     
     public async Task SetKitchenLightsBrighter()
@@ -224,7 +222,8 @@ public class KitchenLightsWrapper : IKitchenLightsWrapper
         _entities.Light.KitchenUnderCabinetLightsGroup.CallService("turn_on", new { brightness_pct = brightPercent } );
 
         var brightnessMapped = brightPercent.Map(0, 100, 0, 254);
-        _entities.Light.BulbInKitchenBySinkNightlight.CallService("turn_on", new { brightness = brightnessMapped } );
+        _entities.Light.NightlightInKitchenBySink.CallService("turn_on", new { brightness = brightnessMapped } );
+        _entities.Light.NightlightInKitchenByStove.CallService("turn_on", new { brightness = brightnessMapped } );
     
         _logger.Debug("Mapped bright for MotionNightlightKitchenBySinkTowardsFrontroomLight: {Bright}", brightnessMapped);
     }

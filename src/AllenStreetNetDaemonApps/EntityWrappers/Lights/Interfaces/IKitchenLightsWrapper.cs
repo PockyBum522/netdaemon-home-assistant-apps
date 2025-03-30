@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace AllenStreetNetDaemonApps.EntityWrappers.Interfaces;
+namespace AllenStreetNetDaemonApps.EntityWrappers.Lights.Interfaces;
 
 public interface IKitchenLightsWrapper
 {
