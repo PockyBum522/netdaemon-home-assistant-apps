@@ -8,6 +8,7 @@ public static class SharedState
         public static DateTimeOffset LastMotionInFrontRoomAt { get; set; } = DateTime.MinValue;
         public static DateTimeOffset LastMotionInGuestBathAt { get; set; } = DateTime.MinValue;
         public static DateTimeOffset LastMotionInMasterBathAt { get; set; } = DateTime.MinValue;
+        public static DateTimeOffset LastMotionAtBackDoorAt { get; set; } = DateTime.MinValue;
     }
 
     public static class Timeouts
