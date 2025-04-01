@@ -45,9 +45,9 @@ public class KitchenLightsMotionController
         if (e.DataElement is null) return;
 
         var stringedEventValue = e.DataElement.Value.ToString();
-
-        if (!stringedEventValue.Contains("\"new_state\":{\"entity_id\":\"binary_sensor.nightlight_in_kitchen") &&
-            !stringedEventValue.Contains("\"new_state\":{\"entity_id\":\"binary_sensor.nightlight_in_den"))
+        
+        //!stringedEventValue.Contains("\"new_state\":{\"entity_id\":\"binary_sensor.nightlight_in_den")
+        if (!stringedEventValue.Contains("\"new_state\":{\"entity_id\":\"binary_sensor.nightlight_in_kitchen"))
         {
             return;
         }
