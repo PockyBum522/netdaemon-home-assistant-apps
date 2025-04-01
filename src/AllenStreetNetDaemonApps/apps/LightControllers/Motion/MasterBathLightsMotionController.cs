@@ -16,6 +16,7 @@ public class MasterBathLightsMotionController
 {
     private readonly IMasterBathLightsWrapper _masterBathLightsWrapper;
     private readonly ILogger _logger;
+    private readonly Entities _entities;
     
     public MasterBathLightsMotionController(IHaContext ha, INetDaemonScheduler scheduler, IMasterBathLightsWrapper masterBathLightsWrapper) //, ILogger logger)
     {
@@ -23,6 +24,8 @@ public class MasterBathLightsMotionController
         _masterBathLightsWrapper = masterBathLightsWrapper;
 
         var namespaceLastPart = GetType().Namespace?.Split('.').Last();
+        
+        _entities = new Entities(ha);
         
         _logger = new LoggerConfiguration()
             .Enrich.WithProperty("netDaemonLogging", $"Serilog{GetType().Name}Context")
@@ -76,19 +79,28 @@ public class MasterBathLightsMotionController
         
         SharedState.MotionSensors.LastMotionInMasterBathAt =  DateTimeOffset.Now;
         
-        if (DateTimeOffset.Now.Hour > 7 &&
-            DateTimeOffset.Now.Hour < 23)
+        if (DateTimeOffset.Now.Hour > 9 &&
+            DateTimeOffset.Now.Hour < 20)
         {
             _logger.Debug("Setting all master bath lights to warm white");
 
-            _masterBathLightsWrapper.SetMasterBathLightsToWarmWhiteScene();    
+            _masterBathLightsWrapper.SetMasterBathLightsToWarmWhiteScene();
+
+            return;
         }
-        else
+        
+        if (_entities.Light.BulbInMasterBedroomCeilingFan01.IsOn())
         {
-            _logger.Debug("Setting all master bath lights to dim red");
-            
-            _masterBathLightsWrapper.SetMasterBathLightsDimRed();
+            _logger.Debug("Setting all master bath lights to warm white because master bedroom fan light was on");
+
+            _masterBathLightsWrapper.SetMasterBathLightsToWarmWhiteScene();
+
+            return;
         }
+        
+        _logger.Debug("Setting all master bath lights to dim red");
+        
+        _masterBathLightsWrapper.SetMasterBathLightsDimRed();
     }
 
     private async Task<Task> checkIfMotionTimerExpired()
