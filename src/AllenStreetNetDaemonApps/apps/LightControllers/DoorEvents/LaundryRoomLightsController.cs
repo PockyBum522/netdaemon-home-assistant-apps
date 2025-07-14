@@ -50,14 +50,14 @@ public class LaundryRoomLightsController
         // Keep this at like -2 so there's a few chances to retry with scheduler.RunEvery(30 in the constructor
         var longTimeAgo = tenMinutesAgo.AddMinutes(-2);
 
-        _logger.Debug("Checking if {MinutesAgoVarName}: {MinutesAgo} is greater than lastFrontRoomMotionSeenAt: {LastFrontRoomMotionSeenAt}",
-            nameof(tenMinutesAgo), tenMinutesAgo, SharedState.MotionSensors.LastMotionInFrontRoomAt);
+        _logger.Information("Checking if {MinutesAgoVarName}: {MinutesAgo} is greater than LastMotionAtBackDoorAt: {LastMotionAtBackDoor}",
+            nameof(tenMinutesAgo), tenMinutesAgo, SharedState.MotionSensors.LastMotionAtBackDoorAt);
         
         // If it's been less than timeout since the last motion event, don't do anything
         if (SharedState.MotionSensors.LastMotionAtBackDoorAt > tenMinutesAgo) return;
         
-        _logger.Debug("Checking if longTimeAgo: {LongTimeAgo} is less than lastFrontRoomMotionSeenAt: {LastFrontRoomMotionSeenAt}", 
-            longTimeAgo, SharedState.MotionSensors.LastMotionInFrontRoomAt);
+        _logger.Information("Checking if longTimeAgo: {LongTimeAgo} is less than LastMotionAtBackDoorAt: {LastMotionAtBackDoor}", 
+            longTimeAgo, SharedState.MotionSensors.LastMotionAtBackDoorAt);
 
         // If it's had a chance to handle the off events, and now it's tried a few times, let's stop trying so needless events don't keep firing 
         if (SharedState.MotionSensors.LastMotionAtBackDoorAt < longTimeAgo) return;
