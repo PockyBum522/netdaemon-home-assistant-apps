@@ -111,7 +111,7 @@ public class PoeCamerasRestarter
     
     private async Task TurnOffLaundryRoomNetworkEquipment()
     {
-        var entityToWork = _entities.Light.NetworkPowerInUtilityCloset;
+        var entityToWork = _entities.Switch.NetworkPowerForUtilityCloset;
 
         _logger.Information("_entities.Light.NetworkPowerLaundryRoomEquipment State: {State}", entityToWork.State);
 
@@ -141,7 +141,7 @@ public class PoeCamerasRestarter
     
     private async Task TurnOnLaundryRoomNetworkEquipment()
     {
-        var entityToWork = _entities.Light.NetworkPowerInUtilityCloset;
+        var entityToWork = _entities.Switch.NetworkPowerForUtilityCloset;
 
         _logger.Information("_entities.Light.NetworkPowerLaundryRoomEquipment State: {State}", entityToWork.State);
 

@@ -189,7 +189,7 @@ public class NetworkRestarter
     
     private async Task TurnOffMasterBathroomCabinetNetworkEquipment()
     {
-        var entityToWork = _entities.Light.NetworkPowerForMasterBedroomClosetAndMasterBathCabinet;
+        var entityToWork = _entities.Switch.NetworkPowerInMasterBedroomClosetAndMasterBathCabinet;
             
         _logger.Information("_entities.Light.NetworkPowerMasterBathCabinetEquipment State: {State}", entityToWork.State);
 
@@ -204,7 +204,7 @@ public class NetworkRestarter
     
     private async Task TurnOnMasterBathroomCabinetNetworkEquipment()
     {
-        var entityToWork = _entities.Light.NetworkPowerForMasterBedroomClosetAndMasterBathCabinet;
+        var entityToWork = _entities.Switch.NetworkPowerInMasterBedroomClosetAndMasterBathCabinet;
             
         _logger.Information("_entities.Light.NetworkPowerMasterBathCabinetEquipment State: {State}", entityToWork.State);
 
@@ -262,7 +262,7 @@ public class NetworkRestarter
 
     private async Task TurnOffLaundryRoomNetworkEquipment()
     {
-        var entityToWork = _entities.Light.NetworkPowerInUtilityCloset;
+        var entityToWork = _entities.Switch.NetworkPowerForUtilityCloset;
             
         _logger.Information("_entities.Light.NetworkPowerLaundryRoomEquipment State: {State}", entityToWork.State);
 
@@ -307,7 +307,7 @@ public class NetworkRestarter
 
     private async Task TurnOnLaundryRoomNetworkEquipment()
     {
-        var entityToWork = _entities.Light.NetworkPowerInUtilityCloset;
+        var entityToWork = _entities.Switch.NetworkPowerForUtilityCloset;
             
         _logger.Information("_entities.Light.NetworkPowerLaundryRoomEquipment State: {State}", entityToWork.State);
 
