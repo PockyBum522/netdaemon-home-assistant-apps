@@ -195,7 +195,7 @@ public class NetworkRestarter
 
         _logger.Information("Turning off: _entities.Light.NetworkPowerMasterBathCabinetEquipment");
             
-        entityToWork.TurnOff();      // Accidentally got dimmers so it's a light not a switch, still works.
+        entityToWork.TurnOff();    
             
         await Task.Delay(TimeSpan.FromSeconds(10));
             
@@ -210,7 +210,7 @@ public class NetworkRestarter
 
         _logger.Information("Turning on: _entities.Light.NetworkPowerMasterBathCabinetEquipment");
             
-        entityToWork.TurnOn();      // Accidentally got dimmers so it's a light not a switch, still works.
+        entityToWork.TurnOn();     
             
         await Task.Delay(TimeSpan.FromSeconds(10));
             
@@ -268,7 +268,7 @@ public class NetworkRestarter
 
         _logger.Information("Turning off: _entities.Light.NetworkPowerLaundryRoomEquipment");
             
-        entityToWork.TurnOff();      // Accidentally got dimmers so it's a light not a switch, still works.
+        entityToWork.TurnOff();    
             
         await Task.Delay(TimeSpan.FromSeconds(10));
             
@@ -313,7 +313,7 @@ public class NetworkRestarter
 
         _logger.Information("Turning on: _entities.Light.NetworkPowerLaundryRoomEquipment");
             
-        entityToWork.TurnOn();      // Accidentally got dimmers so it's a light not a switch, still works.
+        entityToWork.TurnOn();   
             
         await Task.Delay(TimeSpan.FromSeconds(10));
             
