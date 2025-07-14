@@ -29,7 +29,7 @@ public class MasterBathLightsMotionController
         
         _logger = new LoggerConfiguration()
             .Enrich.WithProperty("netDaemonLogging", $"Serilog{GetType().Name}Context")
-            .MinimumLevel.Debug()
+            .MinimumLevel.Information()
             .WriteTo.Console()
             .WriteTo.Debug()
             .WriteTo.File($"logs/{namespaceLastPart}/{GetType().Name}_.log", rollingInterval: RollingInterval.Day)
