@@ -52,6 +52,21 @@ public class KitchenLightsWrapper : IKitchenLightsWrapper
         return foundOneOn;
     }
     
+    public bool IsEspressoBulbOn()
+    {
+        var foundOneOn = false;
+        
+        foreach (var ceilingLight in _kitchenCeilingLightsEntities)
+        {
+            _logger.Debug("Walking all ceiling lights: {Name}.State: {State}", ceilingLight.EntityId, ceilingLight.State);
+            
+            if (ceilingLight.State == "on")
+                foundOneOn = true;
+        }
+
+        return foundOneOn;
+    }
+    
     public void TurnOnKitchenLightsFromMotion()
     {
         _logger.Debug("Running {NameOfThis}", nameof(TurnOnKitchenLightsFromMotion));
@@ -197,7 +212,18 @@ public class KitchenLightsWrapper : IKitchenLightsWrapper
 
         for (int i = 0; i < 3; i++)
         {
-            _entities.Light.BulbInKitchenCeiling01.CallService("turn_on", new { brightness_pct = 100 });
+            // Handle nighttime/early morning
+            if (DateTimeOffset.Now.Hour < 8 ||
+                DateTimeOffset.Now.Hour > 22)
+            {
+                _entities.Light.BulbInKitchenCeiling01.CallService("turn_on", new { brightness_pct = 25 });    
+            }
+            else
+            {
+                // Daytime!
+                _entities.Light.BulbInKitchenCeiling01.CallService("turn_on", new { brightness_pct = 100 });
+            }
+            
             await Task.Delay(1000);
         }
     }

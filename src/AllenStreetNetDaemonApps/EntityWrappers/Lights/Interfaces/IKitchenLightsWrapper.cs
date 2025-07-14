@@ -5,6 +5,7 @@ namespace AllenStreetNetDaemonApps.EntityWrappers.Lights.Interfaces;
 public interface IKitchenLightsWrapper
 {
     bool AreAnyCeilingLightsOn();
+    bool IsEspressoBulbOn();
     
     void TurnOnKitchenLightsFromMotion();
     void TurnOffKitchenLightsFromMotion();
