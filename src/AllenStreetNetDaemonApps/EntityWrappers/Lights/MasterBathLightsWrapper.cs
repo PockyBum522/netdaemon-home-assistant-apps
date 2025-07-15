@@ -83,30 +83,36 @@ public class MasterBathLightsWrapper : IMasterBathLightsWrapper
     
     public async Task SetMasterBathLightsBrighter()
     {
+        _logger.Debug("Running: {ThisName}", nameof(SetMasterBathLightsBrighter));
+        
         await ModifyCeilingLightsBrightnessBy(20);
     }
 
     public async Task SetMasterBathLightsDimmer()
     {
+        _logger.Debug("Running: {ThisName}", nameof(SetMasterBathLightsDimmer));
+        
         await ModifyCeilingLightsBrightnessBy(-20);   
     }
 
     public void SetMasterBathLightsToWarmWhiteScene()
     {
-        _logger.Debug("Setting warm white scene");
+        _logger.Debug("Running: {ThisName}", nameof(SetMasterBathLightsToWarmWhiteScene));
         
         _masterBathLightsEntities.CallService("turn_on", CustomColors.WarmWhite() );
     }
 
     public void SetMasterBathLightsDimRed()
     {
-        _logger.Debug("Setting dim red scene");
+        _logger.Debug("Running: {ThisName}", nameof(SetMasterBathLightsDimRed));
 
         _masterBathLightsEntities.CallService("turn_on", CustomColors.RedDim() );
     }
     
     public async Task ModifyCeilingLightsBrightnessBy(int brightnessModifier)
     {
+        _logger.Debug("Running: {ThisName} with modifier value: {BrightnessModifier}", nameof(ModifyCeilingLightsBrightnessBy), brightnessModifier);
+        
         foreach (var ceilingLight in _masterBathLightsEntities)
         {
             var lightAttributesDict = (Dictionary<string,object>?)ceilingLight.Attributes;
