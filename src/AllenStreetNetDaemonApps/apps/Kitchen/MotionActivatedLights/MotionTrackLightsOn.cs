@@ -1,11 +1,9 @@
-using System.Diagnostics;
-using System.Linq;
 using AllenStreetNetDaemonApps.Models;
 using HomeAssistantGenerated;
 using NetDaemon.Extensions.Scheduler;
 using Newtonsoft.Json;
 
-namespace AllenStreetNetDaemonApps.MotionActivatedLights.Kitchen;
+namespace AllenStreetNetDaemonApps.Kitchen.MotionActivatedLights;
 
 [NetDaemonApp]
 public class MotionTrackLightsOn

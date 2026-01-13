@@ -1,7 +1,6 @@
 using System.Reflection;
 using AllenStreetNetDaemonApps;
 using Microsoft.Extensions.Hosting;
-using NetDaemon.Extensions.Logging;
 using NetDaemon.Extensions.Scheduler;
 using NetDaemon.Extensions.Tts;
 using NetDaemon.Runtime;

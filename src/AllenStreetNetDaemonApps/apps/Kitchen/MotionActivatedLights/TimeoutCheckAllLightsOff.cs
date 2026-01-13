@@ -1,8 +1,7 @@
-using System.Linq;
 using HomeAssistantGenerated;
 using NetDaemon.Extensions.Scheduler;
 
-namespace AllenStreetNetDaemonApps.MotionActivatedLights.Kitchen;
+namespace AllenStreetNetDaemonApps.Kitchen.MotionActivatedLights;
 
 [NetDaemonApp]
 public class TimeoutCheckAllLightsOff
