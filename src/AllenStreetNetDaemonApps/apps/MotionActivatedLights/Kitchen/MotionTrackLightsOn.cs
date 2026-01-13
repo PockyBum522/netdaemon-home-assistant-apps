@@ -8,17 +8,17 @@ using Newtonsoft.Json;
 namespace AllenStreetNetDaemonApps.MotionActivatedLights.Kitchen;
 
 [NetDaemonApp]
-public class MotionLightsOn
+public class MotionTrackLightsOn
 {
-    private readonly ILogger<MotionLightsOn> _logger;
+    private readonly ILogger<MotionTrackLightsOn> _logger;
     private readonly Entities _entities;
 
-    public MotionLightsOn(IHaContext ha, INetDaemonScheduler scheduler, ILogger<MotionLightsOn> logger)
+    public MotionTrackLightsOn(IHaContext ha, INetDaemonScheduler scheduler, ILogger<MotionTrackLightsOn> logger)
     {
         _logger = logger;
         _entities = new Entities(ha);
 
-        var namespaceBuiltString = Utilities.NameFetcher.GetTrimmedName(this);
+        var namespaceBuiltString = Utilities.TrimmedNamespaceBuilder.GetTrimmedName(this);
         
         if (_logger.IsEnabled(LogLevel.Information))
             _logger.LogInformation("Initializing {NamespaceBuildString} v0.02", namespaceBuiltString);

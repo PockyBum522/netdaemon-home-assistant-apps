@@ -1,6 +1,6 @@
 namespace AllenStreetNetDaemonApps.Utilities;
 
-public static class NameFetcher
+public static class TrimmedNamespaceBuilder
 {
     public static string GetTrimmedName(object classToWork)
     {

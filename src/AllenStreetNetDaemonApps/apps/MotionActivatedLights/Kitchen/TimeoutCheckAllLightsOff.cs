@@ -5,27 +5,24 @@ using NetDaemon.Extensions.Scheduler;
 namespace AllenStreetNetDaemonApps.MotionActivatedLights.Kitchen;
 
 [NetDaemonApp]
-public class TimeoutCheckLightsOff
+public class TimeoutCheckAllLightsOff
 {
-    private readonly ILogger<TimeoutCheckLightsOff> _logger;
+    private readonly ILogger<TimeoutCheckAllLightsOff> _logger;
     private readonly IHaContext _ha;
     private readonly Entities _entities;
 
-    public TimeoutCheckLightsOff(ILogger<TimeoutCheckLightsOff> logger, IHaContext ha, INetDaemonScheduler scheduler)
+    public TimeoutCheckAllLightsOff(ILogger<TimeoutCheckAllLightsOff> logger, IHaContext ha, INetDaemonScheduler scheduler)
     {
         _logger = logger;
         _ha = ha;
         _entities = new Entities(ha);
         
-        scheduler.RunEvery(TimeSpan.FromSeconds(30), checkIfMotionTimerExpired);
+        scheduler.RunEvery(TimeSpan.FromSeconds(34), checkIfMotionTimerExpired);
         
-        var namespaceBuiltString = Utilities.NameFetcher.GetTrimmedName(this);
+        var namespaceBuiltString = Utilities.TrimmedNamespaceBuilder.GetTrimmedName(this);
         
         if (_logger.IsEnabled(LogLevel.Information))
             _logger.LogInformation("Initializing {NamespaceBuildString} v0.02", namespaceBuiltString);
-        
-        if (_logger.IsEnabled(LogLevel.Debug))
-            _logger.LogDebug("DEBGUGSADGGWHEHEA");
     }
     
     private void checkIfMotionTimerExpired()
@@ -52,5 +49,6 @@ public class TimeoutCheckLightsOff
 
         // Otherwise
         _entities.Light.KitchenTrackLightsGroup.TurnOff();
+        _entities.Light.KitchenCeilingLightsGroup.TurnOff();
     }
 }
