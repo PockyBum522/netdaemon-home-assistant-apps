@@ -33,5 +33,6 @@
         <PackageReference Include="NetDaemon.Extensions.Scheduling" Version="25.48.0" />
         <PackageReference Include="NetDaemon.Extensions.Logging" Version="25.48.0" />
         <PackageReference Include="NetDaemon.Extensions.Tts" Version="25.48.0" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     </ItemGroup>
 </Project>
