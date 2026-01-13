@@ -80,9 +80,9 @@ public class MotionTrackLightsOn
     {
         if (!_logger.IsEnabled(LogLevel.Warning)) return;
         
-        _logger.LogWarning("");
-        _logger.LogWarning("DUMP FROM state_changed ALL EVENTS:");
-        _logger.LogWarning("e.DataElement.Value: {@ValueRaw}", e.DataElement.Value.ToString());
-        _logger.LogWarning("");
+        _logger.LogCritical("");
+        _logger.LogCritical("DUMP FROM state_changed ALL EVENTS:");
+        _logger.LogCritical("e.DataElement.Value: {@ValueRaw}", e.DataElement.Value.ToString());
+        _logger.LogCritical("");
     }
 }
