@@ -7,7 +7,7 @@ namespace AllenStreetNetDaemonApps.MotionActivatedLights.Kitchen;
 [NetDaemonApp]
 public class TimeoutCheckLightsOff
 {
-    private readonly ILogger _logger;
+    private readonly ILogger<TimeoutCheckLightsOff> _logger;
     private readonly IHaContext _ha;
     private readonly Entities _entities;
 
@@ -19,10 +19,13 @@ public class TimeoutCheckLightsOff
         
         scheduler.RunEvery(TimeSpan.FromSeconds(30), checkIfMotionTimerExpired);
         
-        var namespaceLastPart = GetType().Namespace?.Split('.').Last();
+        var namespaceBuiltString = Utilities.NameFetcher.GetTrimmedName(this);
+        
+        if (_logger.IsEnabled(LogLevel.Information))
+            _logger.LogInformation("Initializing {NamespaceBuildString} v0.02", namespaceBuiltString);
         
         if (_logger.IsEnabled(LogLevel.Debug))
-            _logger.LogDebug("Initialized {NamespaceLastPart} v0.02", namespaceLastPart);
+            _logger.LogDebug("DEBGUGSADGGWHEHEA");
     }
     
     private void checkIfMotionTimerExpired()

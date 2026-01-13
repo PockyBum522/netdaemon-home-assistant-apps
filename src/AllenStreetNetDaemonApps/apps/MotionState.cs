@@ -4,7 +4,7 @@ public static class SharedState
 {
     public static class MotionTimeouts
     {
-        public const int KitchenLightsTimeoutMinutes = 6;
+        public const int KitchenLightsTimeoutMinutes = 90;
     }
     
     public static class MotionSensors

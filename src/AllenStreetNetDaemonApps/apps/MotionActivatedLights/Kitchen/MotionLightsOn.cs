@@ -10,18 +10,18 @@ namespace AllenStreetNetDaemonApps.MotionActivatedLights.Kitchen;
 [NetDaemonApp]
 public class MotionLightsOn
 {
-    private readonly ILogger _logger;
+    private readonly ILogger<MotionLightsOn> _logger;
     private readonly Entities _entities;
 
     public MotionLightsOn(IHaContext ha, INetDaemonScheduler scheduler, ILogger<MotionLightsOn> logger)
     {
         _logger = logger;
         _entities = new Entities(ha);
+
+        var namespaceBuiltString = Utilities.NameFetcher.GetTrimmedName(this);
         
-        var namespaceLastPart = GetType().Namespace?.Split('.').Last();
-        
-        if (_logger.IsEnabled(LogLevel.Debug))
-            _logger.LogDebug("Initialized {NamespaceLastPart} v0.02", namespaceLastPart);
+        if (_logger.IsEnabled(LogLevel.Information))
+            _logger.LogInformation("Initializing {NamespaceBuildString} v0.02", namespaceBuiltString);
              
         ha.Events.Where(e => e.EventType == "state_changed").Subscribe(HandleKitchenMotion);
     }
