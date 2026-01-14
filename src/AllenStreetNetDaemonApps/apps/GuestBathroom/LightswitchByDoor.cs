@@ -191,7 +191,7 @@ public class LightswitchByDoor
                 break;
 
             case "Scene 002":
-                await _guestBathLightsWrapper.SetGuestBathLightsBrighter(_ha);
+                _guestBathLightsWrapper.SetGuestBathLightsBrighter(_ha);
                 break;
             
             case "Scene 003":

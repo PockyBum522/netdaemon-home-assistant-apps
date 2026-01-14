@@ -33,6 +33,12 @@
         <PackageReference Include="NetDaemon.Extensions.Scheduling" Version="25.48.0" />
         <PackageReference Include="NetDaemon.Extensions.Logging" Version="25.48.0" />
         <PackageReference Include="NetDaemon.Extensions.Tts" Version="25.48.0" />
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.5-beta1" />
+    </ItemGroup>
+        
+    <ItemGroup>
+      <Reference Include="NetDaemon.HassModel">
+        <HintPath>..\..\..\..\..\..\home\david\.nuget\packages\netdaemon.hassmodel\25.48.0\lib\net10.0\NetDaemon.HassModel.dll</HintPath>
+      </Reference>
     </ItemGroup>
 </Project>
