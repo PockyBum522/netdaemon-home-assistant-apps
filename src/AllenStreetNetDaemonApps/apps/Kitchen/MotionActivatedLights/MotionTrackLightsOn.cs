@@ -11,7 +11,7 @@ public class MotionTrackLightsOn
     private readonly ILogger<MotionTrackLightsOn> _logger;
     private readonly Entities _entities;
 
-    public MotionTrackLightsOn(IHaContext ha, INetDaemonScheduler scheduler, ILogger<MotionTrackLightsOn> logger)
+    public MotionTrackLightsOn(IHaContext ha, ILogger<MotionTrackLightsOn> logger)
     {
         _logger = logger;
         _entities = new Entities(ha);
