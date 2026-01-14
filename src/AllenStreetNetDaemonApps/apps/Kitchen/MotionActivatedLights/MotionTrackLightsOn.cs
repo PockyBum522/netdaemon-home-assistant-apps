@@ -82,7 +82,18 @@ public class MotionTrackLightsOn
         
         _logger.LogCritical("");
         _logger.LogCritical("DUMP FROM state_changed ALL EVENTS:");
-        _logger.LogCritical("e.DataElement.Value: {@ValueRaw}", e.DataElement.Value.ToString());
+
+        if (e.DataElement is null)
+        {
+            if (_logger.IsEnabled(LogLevel.Critical))
+                _logger.LogCritical("e.DataElement is null, aborting");
+            
+            return;
+        }
+        
+        if (_logger.IsEnabled(LogLevel.Critical))
+            _logger.LogCritical("e.DataElement.Value: {@ValueRaw}", e.DataElement.Value.ToString());
+        
         _logger.LogCritical("");
     }
 }

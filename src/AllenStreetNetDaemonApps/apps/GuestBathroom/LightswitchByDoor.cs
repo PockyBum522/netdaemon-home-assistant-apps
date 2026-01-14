@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Threading.Tasks;
+using AllenStreetNetDaemonApps.EntityWrappers.Lights;
 using AllenStreetNetDaemonApps.EntityWrappers.Lights.Interfaces;
 using AllenStreetNetDaemonApps.Models;
 using HomeAssistantGenerated;
@@ -13,10 +14,10 @@ public class LightswitchByDoor
 {
     private readonly ILogger<LightswitchByDoor> _logger;
     private readonly IHaContext _ha;
-    private readonly IGuestBathLightsWrapper _guestBathLightsWrapper;
+    private readonly GuestBathLightsWrapper _guestBathLightsWrapper;
     private readonly Entities _entities;
     
-    public LightswitchByDoor(ILogger<LightswitchByDoor> logger, IHaContext ha, INetDaemonScheduler scheduler, IGuestBathLightsWrapper guestBathLightsWrapper)
+    public LightswitchByDoor(ILogger<LightswitchByDoor> logger, IHaContext ha, INetDaemonScheduler scheduler, GuestBathLightsWrapper guestBathLightsWrapper)
     {
         _logger = logger;
         _ha = ha;

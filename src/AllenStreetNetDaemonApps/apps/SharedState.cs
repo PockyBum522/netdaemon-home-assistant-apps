@@ -11,4 +11,12 @@ public static class SharedState
     {
         public static DateTimeOffset KitchenMotionLastSeenAt { get; set; }
     }
+
+    public static class Locks
+    {
+        public static DateTimeOffset FrontDoorToLockAt { get; set; } = DateTimeOffset.MinValue;
+        public static DateTimeOffset BackDoorToLockAt { get; set; } = DateTimeOffset.MinValue;
+        
+        public static DateTimeOffset DoorLastNotifiedOfProblemAt { get; set; } = DateTimeOffset.MinValue;
+    }
 }

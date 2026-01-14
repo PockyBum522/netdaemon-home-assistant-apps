@@ -20,8 +20,7 @@ try
         .UseNetDaemonTextToSpeech()
         .ConfigureServices((_, services) =>
             services
-                    
-                .AddSingleton<IGuestBathLightsWrapper, GuestBathLightsWrapper>()
+                .AddSingleton<GuestBathLightsWrapper>()
                 .AddAppsFromAssembly(Assembly.GetExecutingAssembly())
                 .AddNetDaemonStateManager()
                 .AddNetDaemonScheduler()
