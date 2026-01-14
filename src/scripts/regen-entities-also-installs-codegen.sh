@@ -1,7 +1,7 @@
 # Add check to see if it needs to be installed, here
 
 
-dotnet tool update -g NetDaemon.HassModel.CodeGen
+/home/david/.dotnet/dotnet tool update -g NetDaemon.HassModel.CodeGen
 
 cd ../AllenStreetNetDaemonApps
 
@@ -9,5 +9,5 @@ cd ../AllenStreetNetDaemonApps
 # Add check to see if it needs to be restored, here
 
 
-dotnet tool run nd-codegen
+/home/david/.dotnet/dotnet tool run nd-codegen
 

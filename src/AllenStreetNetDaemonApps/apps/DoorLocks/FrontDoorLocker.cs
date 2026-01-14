@@ -86,6 +86,7 @@ public class FrontDoorLocker
     {
         if (!_logger.IsEnabled(LogLevel.Debug)) return;
         
+        _logger.LogDebug("Deadbolt state is: {LockState}", _entities.Lock.FrontDoorDeadbolt.State);
         _logger.LogDebug("DateTimeOffset.Now is: {DateTimeNow}", DateTimeOffset.Now);
         _logger.LogDebug("SharedState.Locks.FrontDoorToLockAt is: {LastLockedAt}", SharedState.Locks.FrontDoorToLockAt);
         _logger.LogDebug("SharedState.Locks.FrontDoorToLockAt < DateTime.Now: {BoolEval}", (SharedState.Locks.FrontDoorToLockAt < DateTime.Now));
