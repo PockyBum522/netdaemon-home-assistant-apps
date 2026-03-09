@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using HomeAssistantGenerated;
 using NetDaemon.HassModel.Entities;
+using Serilog;
 
 namespace AllenStreetNetDaemonApps.Utilities;
 
@@ -10,13 +11,13 @@ public static class GroupUtilities
     {
         var groupEntities = group.EntityState?.Attributes?.EntityId;
 
-        logger?.LogInformation("Group entities strings: {@Entities}", groupEntities);
+        logger?.Information("Group entities strings: {@Entities}", groupEntities);
         
         var returnEntities = new List<Entity>();
 
         foreach (var entityId in groupEntities ?? new []{ "Error" })
         {
-            logger?.LogInformation("Looking up entity with ID: {EntityId}", entityId);
+            logger?.Information("Looking up entity with ID: {EntityId}", entityId);
             
             var entity  = new Entity(ha, entityId);
 

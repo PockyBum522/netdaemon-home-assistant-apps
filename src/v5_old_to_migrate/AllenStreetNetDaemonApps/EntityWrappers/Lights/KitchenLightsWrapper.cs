@@ -27,12 +27,12 @@ public class KitchenLightsWrapper : IKitchenLightsWrapper
         
         // _logger = new LoggerConfiguration()
         //     .Enrich.WithProperty("netDaemonLogging", $"Serilog{GetType().Name}Context")
-        //     .MinimumLevel.Information()
+        //     .MinimumLevel.LogInformation()
         //     .WriteTo.Console()
         //     .WriteTo.File($"logs/{namespaceLastPart}/{GetType().Name}_.log", rollingInterval: RollingInterval.Day)
         //     .CreateLogger();
         
-        _logger.Debug("Initialized {NamespaceLastPart} v0.01", namespaceLastPart);
+        _logger.LogDebug("Initialized {NamespaceLastPart} v0.01", namespaceLastPart);
 
         _kitchenCeilingLightsEntities = GroupUtilities.GetEntitiesFromGroup(ha, _entities.Light.KitchenCeilingLightsGroup);
     }
@@ -43,7 +43,7 @@ public class KitchenLightsWrapper : IKitchenLightsWrapper
         
         foreach (var ceilingLight in _kitchenCeilingLightsEntities)
         {
-            _logger.Debug("Walking all ceiling lights: {Name}.State: {State}", ceilingLight.EntityId, ceilingLight.State);
+            _logger.LogDebug("Walking all ceiling lights: {Name}.State: {State}", ceilingLight.EntityId, ceilingLight.State);
             
             if (ceilingLight.State == "on")
                 foundOneOn = true;
@@ -58,7 +58,7 @@ public class KitchenLightsWrapper : IKitchenLightsWrapper
         
         foreach (var ceilingLight in _kitchenCeilingLightsEntities)
         {
-            _logger.Debug("Walking all ceiling lights: {Name}.State: {State}", ceilingLight.EntityId, ceilingLight.State);
+            _logger.LogDebug("Walking all ceiling lights: {Name}.State: {State}", ceilingLight.EntityId, ceilingLight.State);
             
             if (ceilingLight.State == "on")
                 foundOneOn = true;
@@ -69,7 +69,7 @@ public class KitchenLightsWrapper : IKitchenLightsWrapper
     
     public void TurnOnKitchenLightsFromMotion()
     {
-        _logger.Debug("Running {NameOfThis}", nameof(TurnOnKitchenLightsFromMotion));
+        _logger.LogDebug("Running {NameOfThis}", nameof(TurnOnKitchenLightsFromMotion));
 
         SharedState.MotionSensors.LastMotionInKitchenAt = DateTimeOffset.Now;
         
@@ -86,14 +86,14 @@ public class KitchenLightsWrapper : IKitchenLightsWrapper
     
     public void TurnOffKitchenLightsFromMotion()
     {
-        _logger.Debug("Running {NameOfThis}", nameof(TurnOffKitchenLightsFromMotion));
+        _logger.LogDebug("Running {NameOfThis}", nameof(TurnOffKitchenLightsFromMotion));
         
         var anyLightsAreOn = _kitchenCeilingLightsEntities.Any(l => l.State == "on") ||
                                   _entities.Light.KitchenUnderCabinetLightsGroup.State == "on";
         
         if (!anyLightsAreOn) return;
         
-        _logger.Debug("Turning off kitchen lights because there was no motion and at least one light state was on");
+        _logger.LogDebug("Turning off kitchen lights because there was no motion and at least one light state was on");
         
         foreach (var ceilingLight in _kitchenCeilingLightsEntities)
             ceilingLight.CallService("light.turn_off");
@@ -129,7 +129,7 @@ public class KitchenLightsWrapper : IKitchenLightsWrapper
 
     public async Task SetKitchenLightsToPurpleScene()
     {
-        _logger.Debug("Setting purple scene");
+        _logger.LogDebug("Setting purple scene");
 
         // Handle when kitchen main relay was off, turning on and try to not blind people with defaults
         if (_entities.Switch.SceneControllerKitchenMainLightswitchRightSide.IsOff())
@@ -146,43 +146,43 @@ public class KitchenLightsWrapper : IKitchenLightsWrapper
     {
         foreach (var ceilingLight in _kitchenCeilingLightsEntities)
         {
-            _logger.Debug("About to modify brightness of ceiling light: {Name}", ceilingLight.EntityId);
+            _logger.LogDebug("About to modify brightness of ceiling light: {Name}", ceilingLight.EntityId);
             
-            //_logger.Debug("Deconstructed: {@Light}", ceilingLight);
+            //_logger.LogDebug("Deconstructed: {@Light}", ceilingLight);
 
             if (ceilingLight.Attributes is null)
             {
-                _logger.Debug("Attributes is null for {Name}", ceilingLight.EntityId);
+                _logger.LogDebug("Attributes is null for {Name}", ceilingLight.EntityId);
                 continue;
             }
                 
-            //_logger.Debug("Attributes: {@LightAttributes}", ceilingLight.Attributes);
+            //_logger.LogDebug("Attributes: {@LightAttributes}", ceilingLight.Attributes);
             
             var lightAttributesDict = (Dictionary<string,object>?)ceilingLight.Attributes;
 
-            //_logger.Debug("lightAttributesDict: {@LightAttributesDict}", lightAttributesDict);
+            //_logger.LogDebug("lightAttributesDict: {@LightAttributesDict}", lightAttributesDict);
             
             if (lightAttributesDict is null)
             {
-                _logger.Debug("lightAttributesDict is null for {Name}", ceilingLight.EntityId);
+                _logger.LogDebug("lightAttributesDict is null for {Name}", ceilingLight.EntityId);
                 continue;
             }
 
-            _logger.Debug("About to parse decimal");
+            _logger.LogDebug("About to parse decimal");
 
             if (lightAttributesDict["brightness"] is null)
             {
-                _logger.Debug("brightness is null for {Name}", ceilingLight.EntityId);
+                _logger.LogDebug("brightness is null for {Name}", ceilingLight.EntityId);
                 continue;
             }
 
             var currentLightBrightness = decimal.Parse(lightAttributesDict["brightness"].ToString() ?? "0");
             
-            _logger.Debug("About to map");
+            _logger.LogDebug("About to map");
             
             var currentLightBrightnessPercent = currentLightBrightness.Map(0, 255, 0, 100); 
             
-            _logger.Debug("About to add mod");
+            _logger.LogDebug("About to add mod");
             
             var newLightBrightness = (int)currentLightBrightnessPercent + brightnessModifier;
 
@@ -192,7 +192,7 @@ public class KitchenLightsWrapper : IKitchenLightsWrapper
             if (newLightBrightness < 0)
                 newLightBrightness = 0;
             
-            _logger.Information("Current brightness: {Bright} and new brightness will be: {NewBright}", currentLightBrightness, newLightBrightness);
+            _logger.LogInformation("Current brightness: {Bright} and new brightness will be: {NewBright}", currentLightBrightness, newLightBrightness);
             
             ceilingLight.CallService("turn_on", new { brightness_pct = newLightBrightness } );
 
@@ -251,7 +251,7 @@ public class KitchenLightsWrapper : IKitchenLightsWrapper
         _entities.Light.NightlightInKitchenBySink.CallService("turn_on", new { brightness = brightnessMapped } );
         _entities.Light.NightlightInKitchenByStove.CallService("turn_on", new { brightness = brightnessMapped } );
     
-        _logger.Debug("Mapped bright for MotionNightlightKitchenBySinkTowardsFrontroomLight: {Bright}", brightnessMapped);
+        _logger.LogDebug("Mapped bright for MotionNightlightKitchenBySinkTowardsFrontroomLight: {Bright}", brightnessMapped);
     }
     
     private async Task TurnMainRelayOn(object turnOnStateData)

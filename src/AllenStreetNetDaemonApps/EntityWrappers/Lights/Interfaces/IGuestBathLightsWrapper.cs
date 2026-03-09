@@ -4,11 +4,12 @@ namespace AllenStreetNetDaemonApps.EntityWrappers.Lights.Interfaces;
 
 public interface IGuestBathLightsWrapper
 {
-    void SetGuestBathLightsBrighter(IHaContext ha);
-    Task SetGuestBathLightsDimmer(IHaContext ha);
-    Task SetGuestBathLightsToWarmWhiteScene(IHaContext ha);
-    void ModifyCeilingLightsBrightnessBy(IHaContext ha, int brightnessModifier);
-    Task SetGuestBathLightsDimRed(IHaContext ha);
+    Task TurnOffGuestBathLights();
+    Task SetGuestBathLightsBrighter();
+    Task SetGuestBathLightsDimmer();
+    Task SetGuestBathLightsToWarmWhiteScene();
+    Task ModifyCeilingLightsBrightnessBy(int brightnessModifier);
+    Task SetGuestBathLightsDimRed();
     
-    bool AreAnyAboveMirrorLightsOn(IHaContext ha);
+    bool AreAnyAboveMirrorLightsOn();
 }

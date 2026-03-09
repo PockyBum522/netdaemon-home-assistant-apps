@@ -26,6 +26,8 @@
     </Target>
         
     <ItemGroup>
+        <PackageReference Include="CoordinateSharp" Version="3.4.1.1" />
+        <PackageReference Include="MQTTnet" Version="5.1.0.1559" />
         <PackageReference Include="NetDaemon.AppModel" Version="25.48.0" />
         <PackageReference Include="NetDaemon.Runtime" Version="25.48.0" />
         <PackageReference Include="NetDaemon.HassModel" Version="25.48.0" />
@@ -40,5 +42,9 @@
       <Reference Include="NetDaemon.HassModel">
         <HintPath>..\..\..\..\..\..\home\david\.nuget\packages\netdaemon.hassmodel\25.48.0\lib\net10.0\NetDaemon.HassModel.dll</HintPath>
       </Reference>
+    </ItemGroup>
+        
+    <ItemGroup>
+      <Folder Include="zArchive (See if should restore)\" />
     </ItemGroup>
 </Project>

@@ -2,21 +2,17 @@ namespace AllenStreetNetDaemonApps;
 
 public static class SharedState
 {
-    public static class MotionTimeouts
-    {
-        public const int KitchenLightsTimeoutMinutes = 90;
-    }
-    
     public static class MotionSensors
     {
-        public static DateTimeOffset KitchenMotionLastSeenAt { get; set; }
+        public static DateTimeOffset LastMotionInKitchenAt { get; set; } = DateTime.MinValue;
+        public static DateTimeOffset LastMotionInFrontRoomAt { get; set; } = DateTime.MinValue;
+        public static DateTimeOffset LastMotionInGuestBathAt { get; set; } = DateTime.MinValue;
+        public static DateTimeOffset LastMotionInMasterBathAt { get; set; } = DateTime.MinValue;
+        public static DateTimeOffset LastMotionAtBackDoorAt { get; set; } = DateTime.MinValue;
     }
 
-    public static class Locks
+    public static class Timeouts
     {
-        public static DateTimeOffset FrontDoorToLockAt { get; set; } = DateTimeOffset.MinValue;
-        public static DateTimeOffset BackDoorToLockAt { get; set; } = DateTimeOffset.MinValue;
-        
-        public static DateTimeOffset DoorLastNotifiedOfProblemAt { get; set; } = DateTimeOffset.MinValue;
+        public static DateTimeOffset ExhaustFanInGuestBathTurnedOnAt { get; set; } = DateTime.MinValue;
     }
 }

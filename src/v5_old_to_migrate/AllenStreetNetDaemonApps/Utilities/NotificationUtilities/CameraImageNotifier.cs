@@ -18,7 +18,7 @@ public class CameraImageNotifier
         
         // _logger = new LoggerConfiguration()
         //     .Enrich.WithProperty("netDaemonLogging", $"Serilog{GetType().Name}Context")
-        //     .MinimumLevel.Information()
+        //     .MinimumLevel.LogInformation()
         //     .WriteTo.Console()
         //     .WriteTo.File($"logs/{namespaceLastPart}/{GetType().Name}_.log", rollingInterval: RollingInterval.Day)
         //     .CreateLogger();
@@ -29,7 +29,7 @@ public class CameraImageNotifier
     
     public void NotifyGeneral(string notifyTitle, string notifyBody, string imageFileName)
     {
-        _logger.Information("Notifying [GENERAL]: {Title} | {Body}", notifyTitle, notifyBody);
+        _logger.LogInformation("Notifying [GENERAL]: {Title} | {Body}", notifyTitle, notifyBody);
         
         _haContext.CallService("notify", "persistent_notification", data: new
         {
@@ -47,9 +47,9 @@ public class CameraImageNotifier
 
         var mediaFullPathWithUrl = SECRETS.NabuUrl + mediaFullPath; 
         
-        _logger.Information("Notifying [DAVID]: {Title} | BODY: {Body}", notifyTitle, notifyBody);
-        _logger.Information("Notifying [DAVID] LOCAL: {LocalPath}", localFullPath);
-        _logger.Information("Notifying [DAVID] MEDIA: {MediaPath}", mediaFullPathWithUrl);
+        _logger.LogInformation("Notifying [DAVID]: {Title} | BODY: {Body}", notifyTitle, notifyBody);
+        _logger.LogInformation("Notifying [DAVID] LOCAL: {LocalPath}", localFullPath);
+        _logger.LogInformation("Notifying [DAVID] MEDIA: {MediaPath}", mediaFullPathWithUrl);
         
         // _haContext.CallService("notify", "david_desktop", data: new
         // {
@@ -82,9 +82,9 @@ public class CameraImageNotifier
 
         var mediaFullPathWithUrl = SECRETS.NabuUrl + mediaFullPath;
         
-        _logger.Information("Notifying [ALYSSA]: {Title} | BODY: {Body}", notifyTitle, notifyBody);
-        _logger.Information("Notifying [ALYSSA] LOCAL: {LocalPath}", localFullPath);
-        _logger.Information("Notifying [ALYSSA] MEDIA: {MediaPath}", mediaFullPathWithUrl);
+        _logger.LogInformation("Notifying [ALYSSA]: {Title} | BODY: {Body}", notifyTitle, notifyBody);
+        _logger.LogInformation("Notifying [ALYSSA] LOCAL: {LocalPath}", localFullPath);
+        _logger.LogInformation("Notifying [ALYSSA] MEDIA: {MediaPath}", mediaFullPathWithUrl);
         
         // This is what was running for a while as working:
         // _haContext.CallService("notify", "mobile_app_" + SECRETS.AlyssaiPhoneMobileAppId, data: new

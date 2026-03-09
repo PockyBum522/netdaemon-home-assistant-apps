@@ -15,7 +15,7 @@ public class TextNotifier
     
     public void NotifyGeneral(string notifyTitle, string notifyBody)
     {
-        _logger.Information("Notifying [GENERAL]: {Title} | {Body}", notifyTitle, notifyBody);
+        _logger.LogInformation("Notifying [GENERAL]: {Title} | {Body}", notifyTitle, notifyBody);
         
         _haContext.CallService("notify", "persistent_notification", data: new
         {
@@ -73,7 +73,7 @@ public class TextNotifier
     
     private void attemptToNotifyMobileAppInHa(string deviceName, string notifyTitle, string notifyBody)
     {
-        _logger.Information("About to send HA notification: {Title} | {Body} | To HA device: {DeviceName}", notifyTitle, notifyBody, deviceName);
+        _logger.LogInformation("About to send HA notification: {Title} | {Body} | To HA device: {DeviceName}", notifyTitle, notifyBody, deviceName);
         
         try
         {
@@ -93,7 +93,7 @@ public class TextNotifier
 
     private void attemptToNotifyHtml5InHa(string haNotifyEntityName, string notifyTitle, string notifyBody)
     {
-        _logger.Information("About to send HA notification: {Title} | {Body} | To HA device: {DeviceName}", notifyTitle, notifyBody, haNotifyEntityName);
+        _logger.LogInformation("About to send HA notification: {Title} | {Body} | To HA device: {DeviceName}", notifyTitle, notifyBody, haNotifyEntityName);
         
         try
         {

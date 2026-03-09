@@ -34,7 +34,7 @@ public class AutomaticallyLockableLock(ILogger logger, TimeSpan autoLockDuration
 
         if (IsManuallyDisabled("Could not attempt to operate, lock manually disabled")) return;
         
-        _logger.Debug("Checking if {Name} should auto-lock: (Now:{Now} > LockAt:{LockAtTime}): {LogicalResult}",
+        _logger.LogDebug("Checking if {Name} should auto-lock: (Now:{Now} > LockAt:{LockAtTime}): {LogicalResult}",
             Name, DateTimeOffset.Now.GetTimeOnly(), LockAtTime.GetTimeOnly(), DateTimeOffset.Now > LockAtTime);
         
         if (LockAtTime < DateTimeOffset.Now)
@@ -56,7 +56,7 @@ public class AutomaticallyLockableLock(ILogger logger, TimeSpan autoLockDuration
 
         if (IsLocked)
         {
-            _logger.Debug("Lock {Name} was locked successfully", Name);
+            _logger.LogDebug("Lock {Name} was locked successfully", Name);
         }
         
         // SetLockAsFailed($"Could not lock {Name} even after retries");
@@ -75,7 +75,7 @@ public class AutomaticallyLockableLock(ILogger logger, TimeSpan autoLockDuration
         
         if (!IsLocked)
         {
-            _logger.Debug("Lock {Name} was unlocked successfully", Name);
+            _logger.LogDebug("Lock {Name} was unlocked successfully", Name);
             
             LastUnlockedAtTime = DateTimeOffset.Now;
         }
@@ -106,7 +106,7 @@ public class AutomaticallyLockableLock(ILogger logger, TimeSpan autoLockDuration
             LockAtTime = DateTimeOffset.Now + maxTimeUntilLocking;
         }
         
-        _logger.Debug("Adding time to auto-lock for {Name}, will now auto-lock at: {NewTime}", Name, LockAtTime.GetTimeOnly());
+        _logger.LogDebug("Adding time to auto-lock for {Name}, will now auto-lock at: {NewTime}", Name, LockAtTime.GetTimeOnly());
     }
 
     /// <summary>
@@ -116,7 +116,7 @@ public class AutomaticallyLockableLock(ILogger logger, TimeSpan autoLockDuration
     {
         AutoLockActive = false;
         
-        _logger.Debug("Disabled auto-lock for {Name}", Name);
+        _logger.LogDebug("Disabled auto-lock for {Name}", Name);
     }
 
     /// <summary>
@@ -133,7 +133,7 @@ public class AutomaticallyLockableLock(ILogger logger, TimeSpan autoLockDuration
     {
         if (!AutoLockActive)
         {
-            _logger.Debug("{Message} {Name}, is manually disabled", message, Name);
+            _logger.LogDebug("{Message} {Name}, is manually disabled", message, Name);
             return true;
         }
 
@@ -146,7 +146,7 @@ public class AutomaticallyLockableLock(ILogger logger, TimeSpan autoLockDuration
 
         Failed = true;
 
-        _logger.Debug("{Name} now set as failed", Name);
+        _logger.LogDebug("{Name} now set as failed", Name);
     }
 
     private bool GetLockedState()

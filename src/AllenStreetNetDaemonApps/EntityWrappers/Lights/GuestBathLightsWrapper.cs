@@ -1,44 +1,50 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AllenStreetNetDaemonApps.EntityWrappers.Lights.Interfaces;
 using AllenStreetNetDaemonApps.Models;
 using AllenStreetNetDaemonApps.Utilities;
 using HomeAssistantGenerated;
+using NetDaemon.Extensions.Scheduler;
 using NetDaemon.HassModel.Entities;
+using Serilog;
 
 namespace AllenStreetNetDaemonApps.EntityWrappers.Lights;
 
 public class GuestBathLightsWrapper : IGuestBathLightsWrapper
 {
-    private readonly ILogger<GuestBathLightsWrapper> _logger;
+    private readonly ILogger _logger;
     
-    private Entities? _entities;
+    private readonly Entities _entities;
 
-    private Entity[]? _guestBathCeilingLightsEntities;
+    private readonly Entity[] _guestBathCeilingLightsEntities;
 
-    public GuestBathLightsWrapper(ILogger<GuestBathLightsWrapper> logger)
+    public GuestBathLightsWrapper(IHaContext ha, INetDaemonScheduler scheduler, ILogger logger)
     {
         _logger = logger;
-        
-        var namespaceBuiltString = TrimmedNamespaceBuilder.GetTrimmedName(this);
-        
-        if (_logger.IsEnabled(LogLevel.Information))
-            _logger.LogInformation("Initializing {NamespaceBuildString} v0.02", namespaceBuiltString);
+        _entities = new Entities(ha);
 
+        var namespaceLastPart = GetType().Namespace?.Split('.').Last();
         
+        _logger = new LoggerConfiguration()
+            .Enrich.WithProperty("netDaemonLogging", $"Serilog{GetType().Name}Context")
+            .MinimumLevel.Information()
+            .WriteTo.Console()
+            .WriteTo.File($"logs/{namespaceLastPart}/{GetType().Name}_.log", rollingInterval: RollingInterval.Day)
+            .CreateLogger();
+        
+        _logger.Debug("Initialized {NamespaceLastPart} v0.01", namespaceLastPart);
+
+        _guestBathCeilingLightsEntities = GroupUtilities.GetEntitiesFromGroup(ha, _entities.Light.GuestBathroomLightsGroup);
     }
     
-    public bool AreAnyAboveMirrorLightsOn(IHaContext ha)
+    public bool AreAnyAboveMirrorLightsOn()
     {
-        _entities ??= new Entities(ha);
-        _guestBathCeilingLightsEntities ??= GroupUtilities.GetEntitiesFromGroup(ha, _entities.Light.GuestBathroomLightsGroup);
-        
         var foundOneOn = false;
         
         foreach (var light in _guestBathCeilingLightsEntities)
         {
-            if (_logger.IsEnabled(LogLevel.Debug))
-                _logger.LogDebug("Walking all above mirror lights: {Name}.State: {State}", light.EntityId, light.State);
+            _logger.Debug("Walking all above mirror lights: {Name}.State: {State}", light.EntityId, light.State);
             
             if (light.State == "on")
                 foundOneOn = true;
@@ -47,81 +53,84 @@ public class GuestBathLightsWrapper : IGuestBathLightsWrapper
         return foundOneOn;
     }
     
-    public void SetGuestBathLightsBrighter(IHaContext ha)
+    public async Task TurnOffGuestBathLights()
     {
-        _entities ??= new Entities(ha);
-        _guestBathCeilingLightsEntities ??= GroupUtilities.GetEntitiesFromGroup(ha, _entities.Light.GuestBathroomLightsGroup);
+        _logger.Debug("Running {NameOfThis}", nameof(TurnOffGuestBathLights));
         
+        var anyLightsAreOn = _guestBathCeilingLightsEntities.Any(l => l.State == "on");
+        
+        if (!anyLightsAreOn) return;
+        
+        _logger.Debug("Turning off GuestBath lights because there was no motion and at least one light state was on");
+        
+        foreach (var ceilingLight in _guestBathCeilingLightsEntities)
+            ceilingLight.CallService("light.turn_off");
+
+        // Now turn off the native group
+        _entities.Light.GuestBathroomLightsGroup.TurnOff();
+
+        await Task.Delay(1000);
+        
+        foreach (var light in _guestBathCeilingLightsEntities)
+        {
+            await Task.Delay(1000);
+            
+            if (!light.IsOn()) continue;
+            
+            light.CallService("light.turn_off");
+        }
+    }
+    
+    public async Task SetGuestBathLightsBrighter()
+    {
         if (_entities.Switch.SceneControllerMainLightswitchInGuestBathroom.IsOn())
-            ModifyCeilingLightsBrightnessBy(ha, 20);
+            await ModifyCeilingLightsBrightnessBy(20);
     }
 
-    public async Task SetGuestBathLightsDimmer(IHaContext ha)
+    public async Task SetGuestBathLightsDimmer()
     {
-        _entities ??= new Entities(ha);
-        _guestBathCeilingLightsEntities ??= GroupUtilities.GetEntitiesFromGroup(ha, _entities.Light.GuestBathroomLightsGroup);
-        
-        if (AreAnyAboveMirrorLightsOn(ha))
+        if (AreAnyAboveMirrorLightsOn())
         {
-            ModifyCeilingLightsBrightnessBy(ha, -20);   
+            await ModifyCeilingLightsBrightnessBy(-20);   
         }
         else
         {
-            var newState = CustomColors.WarmWhite(20);
+            await TurnMainRelayOn(CustomColors.WarmWhite(20));
             
-            await TurnMainRelayOn(ha, newState);
-            
-            _entities.Light.GuestBathroomLightsGroup.TurnOn(
-                colorTempKelvin:newState.Temperature, 
-                brightnessPct:newState.BrightnessPct);
+            _guestBathCeilingLightsEntities.CallService("turn_on", CustomColors.WarmWhite(20) );
         }
     }
 
-    public async Task SetGuestBathLightsToWarmWhiteScene(IHaContext ha)
+    public async Task SetGuestBathLightsToWarmWhiteScene()
     {
-        _entities ??= new Entities(ha);
-        _guestBathCeilingLightsEntities ??= GroupUtilities.GetEntitiesFromGroup(ha, _entities.Light.GuestBathroomLightsGroup);
-        
         _entities.Switch.SceneControllerMainLightswitchInGuestBathroom0x43Button1IndicationBinary.TurnOff();
         
-        _logger.LogDebug("Setting warm white scene");
+        _logger.Debug("Setting warm white scene");
         
         if (_entities.Switch.SceneControllerMainLightswitchInGuestBathroom.IsOff())
         {
-            await TurnMainRelayOn(ha, CustomColors.WarmWhite());
+            await TurnMainRelayOn(CustomColors.WarmWhite());
             return;
         }
-        
-        _entities.Light.GuestBathroomLightsGroup.TurnOn(
-            colorTempKelvin:CustomColors.WarmWhite().Temperature, 
-            brightnessPct:CustomColors.WarmWhite().BrightnessPct);
+
+        _guestBathCeilingLightsEntities.CallService("turn_on", CustomColors.WarmWhite() );
     }
 
-    public async Task SetGuestBathLightsDimRed(IHaContext ha)
+    public async Task SetGuestBathLightsDimRed()
     {
-        _entities ??= new Entities(ha);
-        _guestBathCeilingLightsEntities ??= GroupUtilities.GetEntitiesFromGroup(ha, _entities.Light.GuestBathroomLightsGroup);
-        
-        _logger.LogDebug("Setting dim red scene");
+        _logger.Debug("Setting dime red scene");
 
         if (_entities.Switch.SceneControllerMainLightswitchInGuestBathroom.IsOff())
         {
-            await TurnMainRelayOn(ha, CustomColors.RedDim());
+            await TurnMainRelayOn(CustomColors.RedDim());
             return;
         }
-        
-        _entities.Light.GuestBathroomLightsGroup.TurnOn(
-            hsColor:CustomColors.RedDim().HsColor, 
-            brightnessPct:CustomColors.RedDim().BrightnessPct);
-        
-        //_guestBathCeilingLightsEntities.CallService("turn_on", CustomColors.RedDim() );
+
+        _guestBathCeilingLightsEntities.CallService("turn_on", CustomColors.RedDim() );
     }
     
-    public void ModifyCeilingLightsBrightnessBy(IHaContext ha, int brightnessModifier)
+    public async Task ModifyCeilingLightsBrightnessBy(int brightnessModifier)
     {
-        _entities ??= new Entities(ha);
-        _guestBathCeilingLightsEntities ??= GroupUtilities.GetEntitiesFromGroup(ha, _entities.Light.GuestBathroomLightsGroup);
-        
         foreach (var ceilingLight in _guestBathCeilingLightsEntities)
         {
             var lightAttributesDict = (Dictionary<string,object>?)ceilingLight.Attributes;
@@ -141,63 +150,43 @@ public class GuestBathLightsWrapper : IGuestBathLightsWrapper
             if (newLightBrightness < 0)
                 newLightBrightness = 0;
             
-            if (_logger.IsEnabled(LogLevel.Debug))
-                _logger.LogDebug("Current brightness: {Bright} and new brightness will be: {NewBright}", currentLightBrightness, newLightBrightness);
-          
+            _logger.Information("Current brightness: {Bright} and new brightness will be: {NewBright}", currentLightBrightness, newLightBrightness);
+            
             ceilingLight.CallService("turn_on", new { brightness_pct = newLightBrightness } );
+
+            await Task.Delay(50);
         }
     }
 
-    private void allGuestBathLightsOnWithBrightness(IHaContext ha, int brightPercent)
+    private async Task allGuestBathLightsOnWithBrightness(int brightPercent)
     {
-        _entities ??= new Entities(ha);
-        
-        _entities.Light.GuestBathroomLightsGroup.TurnOn(brightnessPct:brightPercent);
-    }
-    
-    private async Task TurnMainRelayOn(IHaContext ha, CustomColorsTemperature turnOnStateData)
-    {
-        _entities ??= new Entities(ha);
-        
-        _entities.Switch.SceneControllerMainLightswitchInGuestBathroom.TurnOn();
-        
-        await Task.Delay(300);
-        
-        _entities.Light.GuestBathroomLightsGroup.TurnOn(
-            colorTempKelvin:turnOnStateData.Temperature,
-            brightnessPct:turnOnStateData.BrightnessPct);
-        
-        // Make sure it got set
-        for (var i = 0; i < 2; i++)
-        {
-            await Task.Delay(500);
-            
-            _entities.Light.GuestBathroomLightsGroup.TurnOn(
-                colorTempKelvin:turnOnStateData.Temperature,
-                brightnessPct:turnOnStateData.BrightnessPct);
+        for (var i = 0; i < 5; i++)
+        {           
+            await Task.Delay(200);
+
+            _guestBathCeilingLightsEntities.CallService("turn_on", new { brightness_pct = brightPercent } );
         }
     }
     
-    private async Task TurnMainRelayOn(IHaContext ha, CustomColorsHs turnOnStateData)
+    private async Task TurnMainRelayOn(object turnOnStateData)
     {
-        _entities ??= new Entities(ha);
-        
         _entities.Switch.SceneControllerMainLightswitchInGuestBathroom.TurnOn();
         
         await Task.Delay(300);
-        
-        _entities.Light.GuestBathroomLightsGroup.TurnOn(
-            hsColor:turnOnStateData.HsColor,
-            brightnessPct:turnOnStateData.BrightnessPct);
-        
-        // Make sure it got set
+
         for (var i = 0; i < 2; i++)
         {
+            _guestBathCeilingLightsEntities.CallService("turn_on", turnOnStateData );
+            await Task.Delay(100);
+        }
+        
+        // Make sure it got set
+        await Task.Delay(500);
+        
+        for (var i = 0; i < 2; i++)
+        {
+            _guestBathCeilingLightsEntities.CallService("turn_on", turnOnStateData );
             await Task.Delay(500);
-            
-            _entities.Light.GuestBathroomLightsGroup.TurnOn(
-                hsColor:turnOnStateData.HsColor,
-                brightnessPct:turnOnStateData.BrightnessPct);
         }
     }
 }

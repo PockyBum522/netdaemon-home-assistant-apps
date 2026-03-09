@@ -10,13 +10,13 @@ public static class GroupUtilities
     {
         var groupEntities = group.EntityState?.Attributes?.EntityId;
 
-        logger?.Information("Group entities strings: {@Entities}", groupEntities);
+        logger?.LogInformation("Group entities strings: {@Entities}", groupEntities);
         
         var returnEntities = new List<Entity>();
 
         foreach (var entityId in groupEntities ?? new []{ "Error" })
         {
-            logger?.Information("Looking up entity with ID: {EntityId}", entityId);
+            logger?.LogInformation("Looking up entity with ID: {EntityId}", entityId);
             
             var entity  = new Entity(ha, entityId);
 

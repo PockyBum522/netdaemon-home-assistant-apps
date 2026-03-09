@@ -23,12 +23,12 @@ public class AllEventsListener
         
         // _logger = new LoggerConfiguration()
         //     .Enrich.WithProperty("netDaemonLogging", $"Serilog{GetType().Name}Context")
-        //     .MinimumLevel.Information()
+        //     .MinimumLevel.LogInformation()
         //     .WriteTo.Console()
         //     .WriteTo.File($"logs/{namespaceLastPart}/{GetType().Name}_.log", rollingInterval: RollingInterval.Day)
         //     .CreateLogger();
         
-        _logger.Information("Initialized {NamespaceLastPart} v0.01", namespaceLastPart);
+        _logger.LogInformation("Initialized {NamespaceLastPart} v0.01", namespaceLastPart);
         
         // Uncomment to subscribe to all events
         // ha.Events.Where(e => e.EventType != "something that will never match").Subscribe(LogEventData);
@@ -40,6 +40,6 @@ public class AllEventsListener
 
         if (dataElement is null) return;
         
-        _logger.Information("Raw JSON: {EventData}", dataElement.Value.ToString());
+        _logger.LogInformation("Raw JSON: {EventData}", dataElement.Value.ToString());
     }
 }

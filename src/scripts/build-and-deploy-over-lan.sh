@@ -16,7 +16,7 @@ mount_point="/tmp/ha_smb"
 
 # ND folder after SSH commands below SSH into the server
 nd_folder="config/netdaemon6"
-build_path_remote="/root/$nd_folder"
+build_path_remote="$nd_folder"
 
 
 # Step 1: Run dotnet build
@@ -28,7 +28,7 @@ dotnet build "$solution_path/$solution_filename"
 
 # Step 2: Delete everything in the network share except 'logs' folder
 ssh pockybum522-ha-ssh@192.168.1.25 -i /media/secondary/keys/DAVID-DESKTOP-2024-10-03 << 'EOF'
-    cd "/root/config/netdaemon6"    # CHANGE THE PATH FOR THE CD IN HERE IF IT IS NOT YOUR ND PATH ON THE HA SERVER AFTER SSHING IN
+    cd "/config/netdaemon6"    # CHANGE THE PATH FOR THE CD IN HERE IF IT IS NOT YOUR ND PATH ON THE HA SERVER AFTER SSHING IN
     find . -not -name 'logs' -delete
 
     # Don't know why, but ND *really* wants this folder to exist even though we're only working with binaries

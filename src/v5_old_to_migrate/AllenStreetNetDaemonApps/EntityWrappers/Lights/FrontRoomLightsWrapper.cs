@@ -21,17 +21,17 @@ public class FrontRoomLightsWrapper : IFrontRoomLightsWrapper
         
         // _logger = new LoggerConfiguration()
         //     .Enrich.WithProperty("netDaemonLogging", $"Serilog{GetType().Name}Context")
-        //     .MinimumLevel.Information()
+        //     .MinimumLevel.LogInformation()
         //     .WriteTo.Console()
         //     .WriteTo.File($"logs/{namespaceLastPart}/{GetType().Name}_.log", rollingInterval: RollingInterval.Day)
         //     .CreateLogger();
         
-        _logger.Debug("Initialized {NamespaceLastPart} v0.01", namespaceLastPart);
+        _logger.LogDebug("Initialized {NamespaceLastPart} v0.01", namespaceLastPart);
     }
     
     public void TurnOnFrontRoomLightsFromMotion()
     {
-        _logger.Debug("Running {NameOfThis}", nameof(TurnOnFrontRoomLightsFromMotion));
+        _logger.LogDebug("Running {NameOfThis}", nameof(TurnOnFrontRoomLightsFromMotion));
 
         SharedState.MotionSensors.LastMotionInFrontRoomAt = DateTimeOffset.Now;
         
@@ -54,14 +54,14 @@ public class FrontRoomLightsWrapper : IFrontRoomLightsWrapper
     
     public void TurnOffFrontRoomLightsFromMotion()
     {
-        _logger.Debug("Running {NameOfThis}", nameof(TurnOffFrontRoomLightsFromMotion));
+        _logger.LogDebug("Running {NameOfThis}", nameof(TurnOffFrontRoomLightsFromMotion));
 
         var anyLightsAreOn = _entities.Light.FrontRoomLightsGroup.State == "on" ||
                                   _entities.Light.FoyerLightsGroup.State == "on";
         
         if (!anyLightsAreOn) return;
         
-        _logger.Debug("Turning off FrontRoom lights because there was no motion and at least one light state was on");
+        _logger.LogDebug("Turning off FrontRoom lights because there was no motion and at least one light state was on");
         
         // Now turn off the native group
         _entities.Light.FrontRoomLightsGroup.TurnOff();

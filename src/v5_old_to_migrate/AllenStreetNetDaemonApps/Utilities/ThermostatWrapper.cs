@@ -20,7 +20,7 @@ public class ThermostatWrapper
 
         _entities = new Entities(_ha);
         
-        _logger.Debug("Finished initializing ThermostatWrapper, current state: {@CurrentState}", CurrentThermostatState);
+        _logger.LogDebug("Finished initializing ThermostatWrapper, current state: {@CurrentState}", CurrentThermostatState);
     }
 
     public void RestoreSavedModeToThermostat()
@@ -36,7 +36,7 @@ public class ThermostatWrapper
         
         if (loweredMode.Contains("unknown")) return;
         
-        _logger.Debug("Setting thermostat to {NewMode} at {NewTemperature}", state.Mode, state.SetPoint);
+        _logger.LogDebug("Setting thermostat to {NewMode} at {NewTemperature}", state.Mode, state.SetPoint);
         
         savePersistentThermostatState(state);
         
@@ -67,7 +67,7 @@ public class ThermostatWrapper
         
         if (setpointDifference > 0.2)
         {
-            _logger.Information("Thermostat persistent file is out of sync. Setpoint was {LastSetpoint} and now settings to {NewSetpoint} and saving to persistent", CurrentThermostatState.SetPoint, currentSetpoint);
+            _logger.LogInformation("Thermostat persistent file is out of sync. Setpoint was {LastSetpoint} and now settings to {NewSetpoint} and saving to persistent", CurrentThermostatState.SetPoint, currentSetpoint);
             
             CurrentThermostatState.SetPoint = currentSetpoint;
             savePersistentThermostatState(CurrentThermostatState);
@@ -75,7 +75,7 @@ public class ThermostatWrapper
 
         if (!CurrentThermostatState.Mode.Equals(currentMode, StringComparison.InvariantCultureIgnoreCase))
         {
-            _logger.Information("Thermostat persistent file is out of sync. Mode was {LastMode} and now settings to {NewMode} and saving to persistent", CurrentThermostatState.Mode, currentMode);
+            _logger.LogInformation("Thermostat persistent file is out of sync. Mode was {LastMode} and now settings to {NewMode} and saving to persistent", CurrentThermostatState.Mode, currentMode);
 
             CurrentThermostatState.Mode = currentMode;
             savePersistentThermostatState(CurrentThermostatState);
@@ -92,7 +92,7 @@ public class ThermostatWrapper
         
         var fetchedState = JsonConvert.DeserializeObject<ThermostatState>(jsonString) ?? new ThermostatState();
         
-        _logger.Debug("Restoring thermostat saved state: {SavedMode} at {SavedTemperature}", fetchedState.Mode, fetchedState.SetPoint);
+        _logger.LogDebug("Restoring thermostat saved state: {SavedMode} at {SavedTemperature}", fetchedState.Mode, fetchedState.SetPoint);
         
         CurrentThermostatState.Mode = fetchedState.Mode;
         CurrentThermostatState.SetPoint = fetchedState.SetPoint;

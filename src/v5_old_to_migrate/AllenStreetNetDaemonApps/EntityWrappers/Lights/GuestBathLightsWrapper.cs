@@ -27,12 +27,12 @@ public class GuestBathLightsWrapper : IGuestBathLightsWrapper
         
         // _logger = new LoggerConfiguration()
         //     .Enrich.WithProperty("netDaemonLogging", $"Serilog{GetType().Name}Context")
-        //     .MinimumLevel.Information()
+        //     .MinimumLevel.LogInformation()
         //     .WriteTo.Console()
         //     .WriteTo.File($"logs/{namespaceLastPart}/{GetType().Name}_.log", rollingInterval: RollingInterval.Day)
         //     .CreateLogger();
         
-        _logger.Debug("Initialized {NamespaceLastPart} v0.01", namespaceLastPart);
+        _logger.LogDebug("Initialized {NamespaceLastPart} v0.01", namespaceLastPart);
 
         _guestBathCeilingLightsEntities = GroupUtilities.GetEntitiesFromGroup(ha, _entities.Light.GuestBathroomLightsGroup);
     }
@@ -43,7 +43,7 @@ public class GuestBathLightsWrapper : IGuestBathLightsWrapper
         
         foreach (var light in _guestBathCeilingLightsEntities)
         {
-            _logger.Debug("Walking all above mirror lights: {Name}.State: {State}", light.EntityId, light.State);
+            _logger.LogDebug("Walking all above mirror lights: {Name}.State: {State}", light.EntityId, light.State);
             
             if (light.State == "on")
                 foundOneOn = true;
@@ -54,13 +54,13 @@ public class GuestBathLightsWrapper : IGuestBathLightsWrapper
     
     public async Task TurnOffGuestBathLights()
     {
-        _logger.Debug("Running {NameOfThis}", nameof(TurnOffGuestBathLights));
+        _logger.LogDebug("Running {NameOfThis}", nameof(TurnOffGuestBathLights));
         
         var anyLightsAreOn = _guestBathCeilingLightsEntities.Any(l => l.State == "on");
         
         if (!anyLightsAreOn) return;
         
-        _logger.Debug("Turning off GuestBath lights because there was no motion and at least one light state was on");
+        _logger.LogDebug("Turning off GuestBath lights because there was no motion and at least one light state was on");
         
         foreach (var ceilingLight in _guestBathCeilingLightsEntities)
             ceilingLight.CallService("light.turn_off");
@@ -104,7 +104,7 @@ public class GuestBathLightsWrapper : IGuestBathLightsWrapper
     {
         _entities.Switch.SceneControllerMainLightswitchInGuestBathroom0x43Button1IndicationBinary.TurnOff();
         
-        _logger.Debug("Setting warm white scene");
+        _logger.LogDebug("Setting warm white scene");
         
         if (_entities.Switch.SceneControllerMainLightswitchInGuestBathroom.IsOff())
         {
@@ -117,7 +117,7 @@ public class GuestBathLightsWrapper : IGuestBathLightsWrapper
 
     public async Task SetGuestBathLightsDimRed()
     {
-        _logger.Debug("Setting dime red scene");
+        _logger.LogDebug("Setting dime red scene");
 
         if (_entities.Switch.SceneControllerMainLightswitchInGuestBathroom.IsOff())
         {
@@ -149,7 +149,7 @@ public class GuestBathLightsWrapper : IGuestBathLightsWrapper
             if (newLightBrightness < 0)
                 newLightBrightness = 0;
             
-            _logger.Information("Current brightness: {Bright} and new brightness will be: {NewBright}", currentLightBrightness, newLightBrightness);
+            _logger.LogInformation("Current brightness: {Bright} and new brightness will be: {NewBright}", currentLightBrightness, newLightBrightness);
             
             ceilingLight.CallService("turn_on", new { brightness_pct = newLightBrightness } );
 
