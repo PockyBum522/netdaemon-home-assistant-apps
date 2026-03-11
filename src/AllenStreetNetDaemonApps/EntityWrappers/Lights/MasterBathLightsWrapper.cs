@@ -101,7 +101,7 @@ public class MasterBathLightsWrapper : IMasterBathLightsWrapper
     {
         _logger.Debug("Running: {ThisName}", nameof(SetMasterBathLightsToWarmWhiteScene));
         
-        _masterBathLightsEntities.CallService("turn_on", CustomColors.WarmWhite() );
+        _masterBathLightsEntities.CallService("turn_on", CustomColors.VeryWarmWhite() );
     }
 
     public void SetMasterBathLightsDimRed()

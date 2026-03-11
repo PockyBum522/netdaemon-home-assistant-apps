@@ -119,7 +119,7 @@ public class KitchenLightsWrapper : IKitchenLightsWrapper
         }
         else
         {
-            await TurnMainRelayOn(CustomColors.WarmWhite(20));
+            await TurnMainRelayOn(CustomColors.VeryWarmWhite(20));
         }
     }
     
@@ -206,7 +206,7 @@ public class KitchenLightsWrapper : IKitchenLightsWrapper
         // Handle when kitchen main relay was off, turning on and try to not blind people with defaults
         if (_entities.Switch.SceneControllerKitchenMainLightswitchRightSide.IsOff())
         {
-            await TurnMainRelayOn(CustomColors.WarmWhite(10));
+            await TurnMainRelayOn(CustomColors.VeryWarmWhite(10));
         }
         
         await Task.Delay(750);
@@ -236,12 +236,12 @@ public class KitchenLightsWrapper : IKitchenLightsWrapper
         // Handle when kitchen main relay was off, turning on and try to not blind people with defaults
         if (_entities.Switch.SceneControllerKitchenMainLightswitchRightSide.IsOff())
         {
-            await TurnMainRelayOn(CustomColors.WarmWhite());
+            await TurnMainRelayOn(CustomColors.VeryWarmWhite());
             return;
         }
           
         // Then set the right colors, whether main relay was on or not
-        await TurnMainRelayOn(CustomColors.WarmWhite());
+        await TurnMainRelayOn(CustomColors.VeryWarmWhite());
     }
     
     private void allKitchenLightsOnWithBrightness(int brightPercent)

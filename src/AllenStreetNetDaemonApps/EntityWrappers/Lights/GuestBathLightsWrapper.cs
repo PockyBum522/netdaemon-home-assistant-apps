@@ -95,9 +95,9 @@ public class GuestBathLightsWrapper : IGuestBathLightsWrapper
         }
         else
         {
-            await TurnMainRelayOn(CustomColors.WarmWhite(20));
+            await TurnMainRelayOn(CustomColors.VeryWarmWhite(20));
             
-            _guestBathCeilingLightsEntities.CallService("turn_on", CustomColors.WarmWhite(20) );
+            _guestBathCeilingLightsEntities.CallService("turn_on", CustomColors.VeryWarmWhite(20) );
         }
     }
 
@@ -109,11 +109,11 @@ public class GuestBathLightsWrapper : IGuestBathLightsWrapper
         
         if (_entities.Switch.SceneControllerMainLightswitchInGuestBathroom.IsOff())
         {
-            await TurnMainRelayOn(CustomColors.WarmWhite());
+            await TurnMainRelayOn(CustomColors.VeryWarmWhite());
             return;
         }
 
-        _guestBathCeilingLightsEntities.CallService("turn_on", CustomColors.WarmWhite() );
+        _guestBathCeilingLightsEntities.CallService("turn_on", CustomColors.VeryWarmWhite() );
     }
 
     public async Task SetGuestBathLightsDimRed()

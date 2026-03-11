@@ -10,13 +10,14 @@ public static class CustomColors
     public static object VeryWarmWhite(int brightnessPercent = 100) =>
         new { color_temp_kelvin = 2864, brightness_pct = brightnessPercent };
     
-    public static CustomColorsTemperature WarmWhite(int brightnessPercent = 100) =>
-        new CustomColorsTemperature(3205, brightnessPercent);
+    // public static CustomColorsTemperature WarmWhite(int brightnessPercent = 100) =>
+    //     new CustomColorsTemperature(3205, brightnessPercent);
 }
 
-public class CustomColorsTemperature(int colorTemperature, int brightnessPct)
+public class CustomColorsTemperature(int brightnessPct)
 {
-    public int Temperature { get; private set; } = colorTemperature;
+    // Temperature was throwing as invalid in HA service call. Figure out how this should be set or just convert everything to a different color space
+    //public int Temperature { get; private set; } = colorTemperature;
     public int BrightnessPct { get; private set; } = brightnessPct;
 }
 
