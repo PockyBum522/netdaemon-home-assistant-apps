@@ -26,15 +26,15 @@
     </Target>
         
     <ItemGroup>
-        <PackageReference Include="CoordinateSharp" Version="3.4.1.1" />
-        <PackageReference Include="MQTTnet" Version="5.1.0.1559" />
-        <PackageReference Include="NetDaemon.AppModel" Version="25.48.0" />
-        <PackageReference Include="NetDaemon.Runtime" Version="25.48.0" />
-        <PackageReference Include="NetDaemon.HassModel" Version="25.48.0" />
-        <PackageReference Include="NetDaemon.Client" Version="25.48.0" />
-        <PackageReference Include="NetDaemon.Extensions.Scheduling" Version="25.48.0" />
-        <PackageReference Include="NetDaemon.Extensions.Logging" Version="25.48.0" />
-        <PackageReference Include="NetDaemon.Extensions.Tts" Version="25.48.0" />
+        <PackageReference Include="CoordinateSharp" Version="3.5.1.1" />
+        <PackageReference Include="MQTTnet" Version="5.2.0.1603" />
+        <PackageReference Include="NetDaemon.AppModel" Version="26.36.0" />
+        <PackageReference Include="NetDaemon.Runtime" Version="26.36.0" />
+        <PackageReference Include="NetDaemon.HassModel" Version="26.36.0" />
+        <PackageReference Include="NetDaemon.Client" Version="26.36.0" />
+        <PackageReference Include="NetDaemon.Extensions.Scheduling" Version="26.36.0" />
+        <PackageReference Include="NetDaemon.Extensions.Logging" Version="26.36.0" />
+        <PackageReference Include="NetDaemon.Extensions.Tts" Version="26.36.0" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.5-beta1" />
     </ItemGroup>
         
