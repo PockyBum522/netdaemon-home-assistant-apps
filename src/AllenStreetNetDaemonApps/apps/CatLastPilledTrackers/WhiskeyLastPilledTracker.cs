@@ -116,7 +116,7 @@ public class WhiskeyLastPilledTracker
 
         await blinkLightWithCurrentColor();
 
-        await Task.Delay(TimeSpan.FromSeconds(2));
+        await Task.Delay(TimeSpan.FromSeconds(0.75));
         
         // Set back to warm white
         _entities.Light.NightlightInKitchenBySink.CallService("turn_on", new { color_temp_kelvin = 2000 } );
@@ -126,14 +126,14 @@ public class WhiskeyLastPilledTracker
     private async Task blinkLightWithCurrentColor()
     {
         // Blink
-        for (var i = 0; i < 4; i++)
+        for (var i = 0; i < 3; i++)
         {
-            await Task.Delay(TimeSpan.FromSeconds(0.5));
+            await Task.Delay(TimeSpan.FromSeconds(0.2));
         
             _entities.Light.NightlightInKitchenBySink.CallService("turn_on", new { brightness = 1 } );
             _entities.Light.NightlightInKitchenByStove.CallService("turn_on", new { brightness = 1 } );
         
-            await Task.Delay(TimeSpan.FromSeconds(0.5));
+            await Task.Delay(TimeSpan.FromSeconds(0.2));
         
             _entities.Light.NightlightInKitchenBySink.CallService("turn_on", new { brightness = 254 } );
             _entities.Light.NightlightInKitchenByStove.CallService("turn_on", new { brightness = 254 } );
