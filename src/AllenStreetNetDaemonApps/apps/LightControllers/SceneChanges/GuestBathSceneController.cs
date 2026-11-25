@@ -134,7 +134,7 @@ public class GuestBathSceneController
 
         if (dataElement is null) return;
         
-        //_logger.LogDebug("Raw JSON: {EventData}", dataElement.Value.ToString());
+        //_logger.Debug("Raw JSON: {EventData}", dataElement.Value.ToString());
 
         var zWaveEvent = dataElement.Value.Deserialize<ZWaveDataElementValue>();
 
@@ -176,7 +176,7 @@ public class GuestBathSceneController
         switch (zWaveEvent.Label)
         {
             // Big relay button
-            case "Scene 005":
+            case "Switch Button":
                 if (_guestBathLightsWrapper.AreAnyAboveMirrorLightsOn())
                 {
                     _entities.Switch.SceneControllerMainLightswitchInGuestBathroom0x43Button1IndicationBinary.TurnOn();
@@ -188,19 +188,19 @@ public class GuestBathSceneController
                 }
                 break;
 
-            case "Scene 001":
+            case "Button 1":
                 await _guestBathLightsWrapper.SetGuestBathLightsDimRed();
                 break;
 
-            case "Scene 002":
+            case "Button 2":
                 await _guestBathLightsWrapper.SetGuestBathLightsBrighter();
                 break;
             
-            case "Scene 003":
+            case "Button 3":
                 await _guestBathLightsWrapper.SetGuestBathLightsToWarmWhiteScene();
                 break;
             
-            case "Scene 004":
+            case "Button 4":
                 await _guestBathLightsWrapper.SetGuestBathLightsDimmer();
                 break;
         }
