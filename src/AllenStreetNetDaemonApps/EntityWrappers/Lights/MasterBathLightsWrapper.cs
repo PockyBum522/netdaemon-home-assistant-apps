@@ -108,7 +108,7 @@ public class MasterBathLightsWrapper : IMasterBathLightsWrapper
     {
         _logger.Debug("Running: {ThisName}", nameof(SetMasterBathLightsDimRed));
 
-        _masterBathLightsEntities.CallService("turn_on", CustomColors.RedDim() );
+        _masterBathLightsEntities.CallService("turn_on", CustomColors.DimRed() );
     }
     
     public async Task ModifyCeilingLightsBrightnessBy(int brightnessModifier)

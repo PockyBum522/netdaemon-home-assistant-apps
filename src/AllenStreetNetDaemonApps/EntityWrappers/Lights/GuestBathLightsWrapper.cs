@@ -122,11 +122,11 @@ public class GuestBathLightsWrapper : IGuestBathLightsWrapper
 
         if (_entities.Switch.SceneControllerMainLightswitchInGuestBathroom.IsOff())
         {
-            await TurnMainRelayOn(CustomColors.RedDim());
+            await TurnMainRelayOn(CustomColors.DimRed());
             return;
         }
 
-        _guestBathCeilingLightsEntities.CallService("turn_on", CustomColors.RedDim() );
+        _guestBathCeilingLightsEntities.CallService("turn_on", CustomColors.DimRed() );
     }
     
     public async Task ModifyCeilingLightsBrightnessBy(int brightnessModifier)
