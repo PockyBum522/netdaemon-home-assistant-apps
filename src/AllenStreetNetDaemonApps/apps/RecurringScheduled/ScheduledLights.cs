@@ -119,6 +119,8 @@ public class ScheduledLights
         _entities.Light.DenLampLightsGroup.TurnOn();
 
         _entities.Light.KitchenUnderCabinetLightsGroup.TurnOn();
+        
+        _entities.Light.NightlightInGuestBathroomByWindow.TurnOn();
 
         _logger.Debug("Lights set for sunset");
     }
@@ -134,6 +136,8 @@ public class ScheduledLights
         _entities.Switch.LaundryRoomLights.TurnOff();
         
         _entities.Switch.PlantGrowLightsInFoyerByMasterBedroom.TurnOn();
+        
+        _entities.Light.NightlightInGuestBathroomByWindow.TurnOn();
         
         _logger.Debug("Lights set for morning");
     }
