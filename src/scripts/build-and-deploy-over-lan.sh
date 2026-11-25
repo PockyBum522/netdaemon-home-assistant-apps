@@ -70,9 +70,11 @@ sudo cp -r "${build_path_local}/." "${mount_point}/"
 echo "Built and deployed, now restarting ND addon"
 
 # You will unfortunately need to turn off protected mode on the "terminal & ssh” addon for this line to work:
-# Replace options in below line with your correct user, host, private key path, port, and addon ID
+# Grep line will fetch addon ID automatically and use it to restart. This should work through upgrades, etc
+
 ssh pockybum522-ha-ssh@192.168.1.25 -i /media/secondary/keys/DAVID-DESKTOP-2024-10-03 << 'EOF'
-    sudo docker restart addon_c6a2317c_netdaemon6
+    ND_ADDON_ID="$(sudo docker ps | grep netdaemon | cut -d ' ' -f1)"
+    sudo docker restart $ND_ADDON_ID
 EOF
 
 echo "ND addon restarted - Script execution completed."
