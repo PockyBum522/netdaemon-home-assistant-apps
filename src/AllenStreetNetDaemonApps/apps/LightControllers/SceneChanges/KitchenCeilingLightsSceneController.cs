@@ -182,7 +182,7 @@ public class KitchenCeilingLightsSceneController
         switch (zWaveEvent.Label)
         {
             // Main relay
-            case "Scene 005":
+            case "Switch Button":
                 if (_kitchenLightsWrapper.AreAnyCeilingLightsOn())
                 {
                     await _kitchenLightsWrapper.SetKitchenCeilingLightsOff();
@@ -194,19 +194,19 @@ public class KitchenCeilingLightsSceneController
                 }
                 break;
             
-            case "Scene 001":
+            case "Button 1":
                 await _kitchenLightsWrapper.SetKitchenLightsToWarmWhite();
                 break;
             
-            case "Scene 002":
+            case "Button 2":
                 await _kitchenLightsWrapper.SetKitchenLightsBrighter();
                 break;
             
-            case "Scene 003":
+            case "Button 3":
                 await _kitchenLightsWrapper.SetKitchenLightsToPurpleScene();
                 break;
             
-            case "Scene 004":
+            case "Button 4":
                 await _kitchenLightsWrapper.SetKitchenLightsDimmer();
                 break;
         }

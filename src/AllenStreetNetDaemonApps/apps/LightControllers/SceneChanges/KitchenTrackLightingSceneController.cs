@@ -166,19 +166,19 @@ public class KitchenTrackLightingSceneController
 
         switch (zWaveEvent.Label)
         {
-            case "Scene 001":
+            case "Button 1":
                 await _kitchenLightsWrapper.SetKitchenLightsToWarmWhite();
                 break;
             
-            case "Scene 002":
+            case "Button 2":
                 await _kitchenLightsWrapper.SetKitchenLightsBrighter();
                 break;
             
-            case "Scene 003":
+            case "Button 3":
                 await _kitchenLightsWrapper.SetKitchenLightsToEspressoMachineScene();
                 break;
             
-            case "Scene 004":
+            case "Button 4":
                 await _kitchenLightsWrapper.SetKitchenLightsDimmer();
                 break;
         }
