@@ -38,9 +38,9 @@ EOF
 
 # Unmount in case it's still mounted from a prior run of this script
 #echo "[LOCAL] Unmounting ..."
-#cd - >/dev/null
-#sudo umount "${mount_point}"
-#rmdir "${mount_point}"
+cd /tmp
+sudo umount "${mount_point}"
+sudo rmdir "${mount_point}"
 
 
 
